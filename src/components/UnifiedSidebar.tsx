@@ -300,29 +300,33 @@ function NoteCard({
   return (
     <>
       <div
-        className={`group/card relative flex items-stretch rounded-xl cursor-pointer transition-all duration-150 ${
+        className={`group/card relative flex items-stretch rounded-xl cursor-pointer transition-colors duration-150 overflow-hidden ${
           isActive
-            ? 'bg-emerald-600/15 border border-emerald-500/30 shadow-sm'
+            ? 'bg-emerald-500/12'
             : isNew
-              ? 'bg-amber-500/5 border border-dashed border-amber-500/40 hover:bg-amber-500/10'
-              : 'border border-transparent hover:bg-slate-700/40 active:bg-slate-700/60'
+              ? 'bg-amber-500/[0.06] hover:bg-amber-500/10'
+              : 'hover:bg-slate-700/40 active:bg-slate-700/60'
         }`}
         onClick={onSelect}
       >
-        {/* Active indicator bar */}
-        {isActive && (
-          <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-emerald-500 rounded-full" />
+        {/* Left accent bar: active=emerald, new=amber (dashed feel via opacity) */}
+        {(isActive || isNew) && (
+          <span
+            className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full ${
+              isActive ? 'bg-emerald-400' : 'bg-amber-400/70'
+            }`}
+          />
         )}
 
         <div className="flex-1 py-3.5 sm:py-3 pl-4 pr-2 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className={`text-base sm:text-sm font-semibold leading-snug truncate ${
-              isActive ? 'text-emerald-100' : isNew ? 'text-amber-200 italic' : 'text-slate-100'
+              isActive ? 'text-emerald-50' : isNew ? 'text-amber-100 italic' : 'text-slate-100'
             }`}>
               {note.title || 'Untitled'}
             </h3>
             {isNew && (
-              <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-amber-400/90 bg-amber-500/15 border border-amber-500/30 rounded-full px-1.5 py-0.5">
+              <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-amber-300 bg-amber-500/15 rounded-full px-1.5 py-0.5">
                 New
               </span>
             )}
@@ -330,13 +334,12 @@ function NoteCard({
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-2 sm:mt-1.5">
             {showFolder && (
-              <span className={`flex items-center gap-1 text-sm sm:text-xs ${
-                folderName ? 'text-emerald-400/80' : 'text-slate-500'
-              }`}>
+              <span className="flex items-center gap-1 text-sm sm:text-xs text-slate-500">
                 <FolderOpen className="w-4 h-4 sm:w-3 sm:h-3 flex-shrink-0" />
                 <span className="truncate max-w-[100px]">{folderName || 'No folder'}</span>
               </span>
             )}
+
             <span className="flex items-center gap-1 text-sm sm:text-xs text-slate-500">
               <Clock className="w-4 h-4 sm:w-3 sm:h-3 flex-shrink-0" />
               {formatDate(note.updated_at)}
@@ -381,7 +384,7 @@ function NoteCard({
           <div
             ref={menuRef}
             style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, zIndex: 9999 }}
-            className="w-[196px] bg-slate-800 border border-slate-600/60 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-1.5 overflow-hidden"
+            className="w-[196px] bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] py-1.5 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -686,7 +689,7 @@ function SidebarNavBar({
     <div className="border-b border-slate-700/50 bg-slate-800">
       {/* Full-width segmented navigation — the only element in this row */}
       <div className="h-11 px-3 flex items-center">
-        <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-xl bg-slate-900/40">
+        <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-lg bg-slate-900/60">
           <button
             onClick={() => persistMode('all')}
             className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
@@ -713,7 +716,7 @@ function SidebarNavBar({
 
       {/* Folder context strip — only inside a folder */}
       {insideFolder && crumbInfo && (
-        <div className="h-10 px-2 flex items-center gap-1 bg-slate-800/30 border-t border-slate-700/40">
+        <div className="h-11 px-2 flex items-center gap-1 bg-slate-800/60 border-t border-slate-700/50">
           <button
             onClick={() => setSelectedFolderId(null)}
             className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 active:scale-95 transition-all"
@@ -743,7 +746,7 @@ function SidebarNavBar({
           ) : (
             <>
               <div className="flex-1 min-w-0 flex items-center gap-2.5 ml-1">
-                <span className={`flex-shrink-0 w-2 h-2 rounded-full ${crumbInfo.dot} ${crumbInfo.dotShadow}`} />
+                <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
                 <div className="flex items-baseline gap-2 min-w-0">
                   <span className={`truncate text-sm font-medium ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
                     {crumbInfo.name}
@@ -780,7 +783,8 @@ function SidebarNavBar({
           <div className="fixed inset-0 z-[9998]" onClick={() => setCrumbMenuOpen(false)} />
           <div
             style={{ position: 'fixed', top: crumbMenuPos.top, left: crumbMenuPos.left, zIndex: 9999, width: 200 }}
-            className="bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.75)]"
+            className="bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
+
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -892,7 +896,7 @@ function SidebarFab({
           <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
           <div
             style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 9999, width: 220 }}
-            className="bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.75)]"
+            className="bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -986,15 +990,24 @@ function FolderRowFlat({
   const count = notes.filter((n) => n.folder_id === folder.id).length;
 
   return (
-    <div className="group folder-row w-full flex items-center gap-3 px-4 py-3.5 sm:px-3 sm:py-2.5 bg-slate-700/40 hover:bg-slate-700/70 active:bg-slate-700 border border-slate-700/50 hover:border-emerald-500/40 rounded-xl transition-all">
+    <div className="group folder-row relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/50 hover:bg-slate-700/70 active:bg-slate-700 rounded-xl transition-colors overflow-hidden">
+      {/* Left accent bar — folder's identity color */}
+      <span
+        className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full ${
+          folder.is_new ? 'bg-amber-400/80' : 'bg-emerald-400/70 group-hover:bg-emerald-400'
+        } transition-colors`}
+      />
       <button onClick={onSelect} className="flex items-center gap-3 flex-1 min-w-0 text-left">
-        <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-emerald-600/10 flex-shrink-0">
+        <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
+          folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
+        }`}>
           {folder.is_new ? (
-            <FolderPlus className="w-5 h-5 sm:w-4.5 sm:h-4.5 text-amber-400/80 group-hover:text-amber-400 transition-colors" />
+            <FolderPlus className="w-5 h-5 sm:w-4 sm:h-4 text-amber-300" />
           ) : (
-            <FolderIcon className="w-5 h-5 sm:w-4.5 sm:h-4.5 text-emerald-400/70 group-hover:text-emerald-400 transition-colors" />
+            <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-400" />
           )}
         </div>
+
         {isRenaming ? (
           <input
             type="text"
@@ -1014,10 +1027,11 @@ function FolderRowFlat({
           <span className="folder-name flex-1 min-w-0 text-[17px] sm:text-sm font-semibold text-white truncate">{folder.name}</span>
         )}
         {!isRenaming && (
-          <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-600/50 text-[11px] font-semibold text-slate-400 tabular-nums">
+          <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
             {count}
           </span>
         )}
+
       </button>
 
       <button
@@ -1035,9 +1049,9 @@ function FolderRowFlat({
           <div
             ref={menuRef}
             style={{ position: 'fixed', top: menuPos!.top, left: menuPos!.left, zIndex: 9999 }}
-            className="folder-dropdown bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden
-                       shadow-[0_20px_60px_rgba(0,0,0,0.75),0_0_0_0.5px_rgba(255,255,255,0.07)]
+            className="folder-dropdown bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)]
                        animate-[dropdownIn_0.18s_cubic-bezier(0.34,1.4,0.64,1)_both]"
+
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -1263,9 +1277,10 @@ export function UnifiedSidebar({
           onClick={onOpenWorkspaceManagement}
           className="flex-1 min-w-0 flex items-center gap-2.5 text-left group/header rounded-lg -mx-1 px-1 py-1 hover:bg-slate-700/20 transition-colors"
         >
-          <div className="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
             <Notebook className="w-5 h-5 text-emerald-400" />
           </div>
+
           <div className="min-w-0 flex-1">
             <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">Workspace</p>
             <h1 className="text-sm font-bold text-white truncate">{workspaceName || 'My Notes'}</h1>
@@ -1274,7 +1289,7 @@ export function UnifiedSidebar({
         </button>
         <button
           onClick={() => setSearchOpen((v) => !v)}
-          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
+          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
             searchOpen || searchQuery
               ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
               : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
@@ -1288,7 +1303,7 @@ export function UnifiedSidebar({
 
       {/* Contextual search bar — under header, above nav row */}
       {searchOpen && (
-        <div className="h-12 px-3 flex items-center gap-2 bg-slate-800 border-b border-slate-700/50">
+        <div className="h-11 px-3 flex items-center gap-2 bg-slate-800 border-b border-slate-700/50">
           <div className="flex-1 min-w-0 relative h-9">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
             <input
@@ -1298,7 +1313,7 @@ export function UnifiedSidebar({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); } }}
-              className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+              className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
             />
             {searchQuery && (
               <button
@@ -1486,18 +1501,19 @@ export function UnifiedSidebar({
                       {showUnfiled && (
                         <button
                           onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
-                          className="group w-full flex items-center gap-3 px-4 py-3.5 sm:px-3 sm:py-2.5 bg-slate-700/20 hover:bg-slate-700/40 active:bg-slate-700/30 border border-dashed border-slate-600/60 hover:border-slate-500/60 rounded-xl transition-all"
+                          className="group relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700 rounded-xl transition-colors overflow-hidden"
                         >
-                          <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-700/60 flex-shrink-0">
-                            <Inbox className="w-5 h-5 sm:w-4.5 sm:h-4.5 text-slate-400 group-hover:text-slate-300 transition-colors" />
+                          <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-slate-500/70" />
+                          <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
+                            <Inbox className="w-5 h-5 sm:w-4 sm:h-4 text-slate-300" />
                           </div>
-                          <span className="flex-1 min-w-0 text-[17px] sm:text-sm font-semibold text-slate-300 truncate">No Folder</span>
-                          <span className="flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-600/40 text-[11px] font-semibold text-slate-500 tabular-nums">
+                          <span className="flex-1 min-w-0 text-[17px] sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
+                          <span className="flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
                             {unfiledNotes.length}
                           </span>
-                          <span className="flex-shrink-0 w-10 sm:w-8" aria-hidden="true" />
                         </button>
                       )}
+
 
                       {foldersFiltered.map((folder) => (
                         <FolderRowFlat
