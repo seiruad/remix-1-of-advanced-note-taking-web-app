@@ -606,14 +606,12 @@ function FolderDetailHeader({
   displayName,
   noteCount,
   isNoFolder,
-  onBack,
   onRename,
   onDelete,
 }: {
   displayName: string;
   noteCount: number;
   isNoFolder: boolean;
-  onBack: () => void;
   onRename: (name: string) => void;
   onDelete: () => void;
 }) {
@@ -654,14 +652,10 @@ function FolderDetailHeader({
   };
 
   return (
-    <div className="flex items-center gap-3 px-1 pb-3 mb-1 border-b border-slate-700/50">
-      <button
-        onClick={onBack}
-        className="flex items-center justify-center w-11 h-11 sm:w-9 sm:h-9 -ml-1 rounded-xl hover:bg-slate-700/60 active:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors flex-shrink-0"
-        aria-label="Back to folders"
-      >
-        <ArrowLeft className="w-6 h-6 sm:w-5 sm:h-5" />
-      </button>
+    <div className="flex items-center gap-2 px-2 py-1.5 mb-2 rounded-lg bg-emerald-500/[0.06] border-l-2 border-emerald-500/60">
+      <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 text-emerald-400/90">
+        {isNoFolder ? <Inbox className="w-3.5 h-3.5" /> : <FolderOpen className="w-3.5 h-3.5" />}
+      </span>
 
       {isRenaming ? (
         <input
@@ -673,17 +667,14 @@ function FolderDetailHeader({
             if (e.key === 'Enter') handleRename();
             if (e.key === 'Escape') { setRenameValue(displayName); setIsRenaming(false); }
           }}
-          className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded-lg px-2.5 py-1.5 outline-none border border-emerald-500/60 ring-2 ring-emerald-500/20"
+          className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded px-2 py-0.5 text-xs outline-none border border-emerald-500/60 ring-1 ring-emerald-500/20"
           autoFocus
         />
       ) : (
-        <h2 className="flex-1 min-w-0 text-lg sm:text-base font-bold text-white truncate">{displayName}</h2>
-      )}
-
-      {!isRenaming && (
-        <span className="flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-700/60 text-[11px] font-semibold text-slate-400 tabular-nums">
-          {noteCount}
-        </span>
+        <h2 className="flex-1 min-w-0 text-xs font-semibold text-slate-200 truncate tracking-wide">
+          {displayName}
+          <span className="ml-1.5 text-slate-500 font-normal tabular-nums">· {noteCount}</span>
+        </h2>
       )}
 
       {!isNoFolder && !isRenaming && (
@@ -691,7 +682,7 @@ function FolderDetailHeader({
           <button
             ref={triggerRef}
             onClick={(e) => { e.stopPropagation(); menuOpen ? setMenuOpen(false) : openMenu(); }}
-            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-10 h-10 sm:w-8 sm:h-8 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 transition-colors"
+            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 transition-colors"
             title="Folder options"
           >
             <MoreHorizontal className="folder-menu-icon" />
@@ -1268,7 +1259,6 @@ export function UnifiedSidebar({
                       displayName={displayName}
                       noteCount={folderNotes.length}
                       isNoFolder={isNoFolder}
-                      onBack={() => setSelectedFolderId(null)}
                       onRename={(name) => onRenameFolder(folder!.id, name)}
                       onDelete={() => setFolderToDelete(folder!)}
                     />
