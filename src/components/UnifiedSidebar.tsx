@@ -876,18 +876,16 @@ function SidebarFab({
         onClick={handleClick}
         aria-label={label}
         title={label}
-        className="group absolute bottom-4 right-4 z-20 flex items-center justify-center w-14 h-14 rounded-full text-white bg-gradient-to-b from-emerald-400 to-emerald-600 ring-1 ring-emerald-300/40 shadow-[0_10px_28px_-6px_rgba(16,185,129,0.65)] hover:brightness-110 active:brightness-95 active:scale-[0.96] transition-all duration-150"
+        className="group absolute bottom-4 right-4 z-20 flex items-center gap-2.5 h-11 pl-3.5 pr-3 rounded-xl text-sm font-semibold text-white bg-emerald-500/90 hover:bg-emerald-500 active:bg-emerald-600/90 ring-1 ring-emerald-300/40 shadow-[0_8px_24px_-6px_rgba(16,185,129,0.45)] active:scale-[0.98] transition-all duration-150"
       >
-        <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/25 to-transparent opacity-60" />
-        {fabMode === 'choice' ? (
-          <span className="relative flex items-center justify-center">
-            <Plus className="w-6 h-6" strokeWidth={2.5} />
-            <span className="absolute -bottom-1 -right-1.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white/95 text-emerald-600 ring-1 ring-emerald-700/20">
-              <ChevronDown className="w-2.5 h-2.5" strokeWidth={3.5} />
-            </span>
-          </span>
-        ) : (
-          <Plus className="relative w-7 h-7" strokeWidth={2.5} />
+        <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/15 text-white">
+          <Plus className="w-4 h-4" strokeWidth={2.5} />
+        </span>
+        <span className="whitespace-nowrap">
+          {fabMode === 'choice' ? 'New' : label}
+        </span>
+        {fabMode === 'choice' && (
+          <ChevronDown className="w-3.5 h-3.5 text-emerald-100/80" strokeWidth={2.5} />
         )}
       </button>
 
