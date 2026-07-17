@@ -91,7 +91,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
   // Realtime subscription
   useEffect(() => {
     const channel = supabase
-      .channel('files-changes')
+      .channel(`files-changes-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'files' },
