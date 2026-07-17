@@ -1049,8 +1049,8 @@ function FolderRowFlat({
             ref={menuRef}
             style={{ position: 'fixed', top: menuPos!.top, left: menuPos!.left, zIndex: 9999 }}
             className="folder-dropdown bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)]
-                       shadow-[0_20px_60px_rgba(0,0,0,0.75),0_0_0_0.5px_rgba(255,255,255,0.07)]
                        animate-[dropdownIn_0.18s_cubic-bezier(0.34,1.4,0.64,1)_both]"
+
             onClick={(e) => e.stopPropagation()}
           >
             <button
