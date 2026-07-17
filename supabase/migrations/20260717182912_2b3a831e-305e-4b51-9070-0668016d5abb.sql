@@ -1,0 +1,10 @@
+ALTER TABLE public.files REPLICA IDENTITY FULL;
+ALTER TABLE public.notes REPLICA IDENTITY FULL;
+ALTER TABLE public.folders REPLICA IDENTITY FULL;
+ALTER TABLE public.workspaces REPLICA IDENTITY FULL;
+ALTER TABLE public.note_files REPLICA IDENTITY FULL;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.files;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.notes;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.folders;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.workspaces;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.note_files;
