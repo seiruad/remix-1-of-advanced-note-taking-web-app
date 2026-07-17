@@ -790,7 +790,7 @@ function SidebarNavBar({
               <input
                 ref={mobileSearchInputRef}
                 type="text"
-                placeholder="Search notes..."
+                placeholder={searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 onKeyDown={(e) => {
