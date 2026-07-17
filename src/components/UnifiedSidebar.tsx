@@ -1336,169 +1336,198 @@ export function UnifiedSidebar({
 
       {/* ===== NoteList-Viewer ===== */}
       <div className="flex-1 overflow-y-auto notes-list-scroll">
-        {searchResults ? (
-          /* Search results */
-          <div className="p-3">
-            <p className="text-xs text-slate-500 px-1 mb-2">
-              {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
-            </p>
-            {searchResults.length === 0 ? (
-              <div className="py-12 text-center">
-                <Search className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                <p className="text-sm text-slate-500">No notes found</p>
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {searchResults.map((note) => (
-                  <NoteCard
-                    key={note.id}
-                    note={note}
-                    folders={sortedFolders}
-                    isActive={currentNoteId === note.id}
-                    onSelect={() => onSelectNote(note.id)}
-                    onDelete={() => setNoteToDelete(note)}
-                    onMove={(fid) => onMoveNote(note.id, fid)}
-                    workspaceName={workspaceName}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+        {(() => {
+          const q = searchQuery.trim().toLowerCase();
+          const hasQuery = q.length > 0;
 
-        ) : mode === 'all' ? (
-          /* All Notes — flat alphabetical */
-          <div className="p-3">
-            {allNotesSorted.length === 0 ? (
-              <div className="py-16 text-center">
-                <Notebook className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                <p className="text-sm font-medium text-slate-500">No notes yet</p>
-                <p className="text-xs text-slate-600 mt-1">Tap "New Note" to get started</p>
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {allNotesSorted.map((note) => (
-                  <NoteCard
-                    key={note.id}
-                    note={note}
-                    folders={sortedFolders}
-                    isActive={currentNoteId === note.id}
-                    onSelect={() => onSelectNote(note.id)}
-                    onDelete={() => setNoteToDelete(note)}
-                    onMove={(fid) => onMoveNote(note.id, fid)}
-                    workspaceName={workspaceName}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          const NoMatchesFallback = ({ label }: { label: string }) => (
+            <div className="py-12 text-center px-4">
+              <Search className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+              <p className="text-sm text-slate-500">No {label} match "{searchQuery}"</p>
+              <button
+                onClick={switchToAllNotes}
+                className="mt-3 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                Search all notes instead →
+              </button>
+            </div>
+          );
 
-        ) : (
-          /* Folders mode */
-          <div className="p-3">
-            {/* Folders mode — drill-down view */}
-            {(() => {
-              const NO_FOLDER_ID = '__no_folder__';
-
-              if (selectedFolderId) {
-                const isNoFolder = selectedFolderId === NO_FOLDER_ID;
-                const folder = isNoFolder ? null : sortedFolders.find((f) => f.id === selectedFolderId);
-                if (!isNoFolder && !folder) return null;
-                const folderNotes = (isNoFolder
-                  ? unfiledNotes
-                  : notes.filter((n) => n.folder_id === folder!.id)
-                ).slice().sort((a, b) => {
-                  const aNew = a.is_new ?? false;
-                  const bNew = b.is_new ?? false;
-                  if (aNew !== bNew) return aNew ? -1 : 1;
-                  return (a.title || '').localeCompare(b.title || '');
-                });
-                
-                return (
-                  <div>
-                    {folderNotes.length > 0 ? (
-
-                      <div className="space-y-1.5">
-                        {folderNotes.map((note) => (
-                          <NoteCard
-                            key={note.id}
-                            note={note}
-                            folders={sortedFolders}
-                            isActive={currentNoteId === note.id}
-                            onSelect={() => onSelectNote(note.id)}
-                            onDelete={() => setNoteToDelete(note)}
-                            onMove={(fid) => onMoveNote(note.id, fid)}
-                            showFolder={false}
-                            workspaceName={workspaceName}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="py-12 text-center">
-                        <FileText className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                        <p className="text-sm font-medium text-slate-500">
-                          {isNoFolder ? 'No unfiled notes' : 'No notes in this folder'}
-                        </p>
-                        {!isNoFolder && (
-                          <button
-                            onClick={() => handleCreateNoteInFolder(folder!.id)}
-                            className="mt-3 text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
-                          >
-                            Create a note here
-                          </button>
-                        )}
-                      </div>
-                    )}
+          /* ---------- All Notes mode ---------- */
+          if (mode === 'all') {
+            const list = hasQuery ? allNotesSorted.filter((n) => noteMatches(n, q)) : allNotesSorted;
+            return (
+              <div className="p-3">
+                {allNotesSorted.length === 0 ? (
+                  <div className="py-16 text-center">
+                    <Notebook className="w-10 h-10 text-slate-700 mx-auto mb-3" />
+                    <p className="text-sm font-medium text-slate-500">No notes yet</p>
+                    <p className="text-xs text-slate-600 mt-1">Tap "New Note" to get started</p>
                   </div>
-                );
-              }
-
-              if (sortedFolders.length === 0 && unfiledNotes.length === 0) {
-                return (
+                ) : list.length === 0 ? (
                   <div className="py-12 text-center">
-                    <FolderIcon className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-                    <p className="text-sm font-medium text-slate-500">No folders yet</p>
-                    <p className="text-xs text-slate-600 mt-1">Folders keep your notes organized</p>
+                    <Search className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500">No notes match "{searchQuery}"</p>
                   </div>
+                ) : (
+                  <>
+                    {hasQuery && (
+                      <p className="text-xs text-slate-500 px-1 mb-2">
+                        {list.length} result{list.length !== 1 ? 's' : ''}
+                      </p>
+                    )}
+                    <div className="space-y-1">
+                      {list.map((note) => (
+                        <NoteCard
+                          key={note.id}
+                          note={note}
+                          folders={sortedFolders}
+                          isActive={currentNoteId === note.id}
+                          onSelect={() => onSelectNote(note.id)}
+                          onDelete={() => setNoteToDelete(note)}
+                          onMove={(fid) => onMoveNote(note.id, fid)}
+                          workspaceName={workspaceName}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          }
+
+          /* ---------- Folders mode ---------- */
+          return (
+            <div className="p-3">
+              {(() => {
+                const NO_FOLDER_ID = '__no_folder__';
+
+                /* Inside a folder — search only inside its notes */
+                if (selectedFolderId) {
+                  const isNoFolder = selectedFolderId === NO_FOLDER_ID;
+                  const folder = isNoFolder ? null : sortedFolders.find((f) => f.id === selectedFolderId);
+                  if (!isNoFolder && !folder) return null;
+                  const baseNotes = (isNoFolder
+                    ? unfiledNotes
+                    : notes.filter((n) => n.folder_id === folder!.id)
+                  ).slice().sort((a, b) => {
+                    const aNew = a.is_new ?? false;
+                    const bNew = b.is_new ?? false;
+                    if (aNew !== bNew) return aNew ? -1 : 1;
+                    return (a.title || '').localeCompare(b.title || '');
+                  });
+                  const folderNotes = hasQuery ? baseNotes.filter((n) => noteMatches(n, q)) : baseNotes;
+
+                  return (
+                    <div>
+                      {folderNotes.length > 0 ? (
+                        <>
+                          {hasQuery && (
+                            <p className="text-xs text-slate-500 px-1 mb-2">
+                              {folderNotes.length} result{folderNotes.length !== 1 ? 's' : ''} in folder
+                            </p>
+                          )}
+                          <div className="space-y-1.5">
+                            {folderNotes.map((note) => (
+                              <NoteCard
+                                key={note.id}
+                                note={note}
+                                folders={sortedFolders}
+                                isActive={currentNoteId === note.id}
+                                onSelect={() => onSelectNote(note.id)}
+                                onDelete={() => setNoteToDelete(note)}
+                                onMove={(fid) => onMoveNote(note.id, fid)}
+                                showFolder={false}
+                                workspaceName={workspaceName}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      ) : hasQuery ? (
+                        <NoMatchesFallback label="notes in this folder" />
+                      ) : (
+                        <div className="py-12 text-center">
+                          <FileText className="w-10 h-10 text-slate-700 mx-auto mb-3" />
+                          <p className="text-sm font-medium text-slate-500">
+                            {isNoFolder ? 'No unfiled notes' : 'No notes in this folder'}
+                          </p>
+                          {!isNoFolder && (
+                            <button
+                              onClick={() => handleCreateNoteInFolder(folder!.id)}
+                              className="mt-3 text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
+                            >
+                              Create a note here
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                /* Folders list — search only folder names */
+                if (sortedFolders.length === 0 && unfiledNotes.length === 0) {
+                  return (
+                    <div className="py-12 text-center">
+                      <FolderIcon className="w-12 h-12 text-slate-700 mx-auto mb-3" />
+                      <p className="text-sm font-medium text-slate-500">No folders yet</p>
+                      <p className="text-xs text-slate-600 mt-1">Folders keep your notes organized</p>
+                    </div>
+                  );
+                }
+
+                const foldersFiltered = hasQuery
+                  ? sortedFolders.filter((f) => f.name.toLowerCase().includes(q))
+                  : sortedFolders;
+                const showUnfiled = unfiledNotes.length > 0 && (!hasQuery || 'no folder'.includes(q));
+
+                if (hasQuery && foldersFiltered.length === 0 && !showUnfiled) {
+                  return <NoMatchesFallback label="folders" />;
+                }
+
+                return (
+                  <>
+                    {hasQuery && (
+                      <p className="text-xs text-slate-500 px-1 mb-2">
+                        {foldersFiltered.length + (showUnfiled ? 1 : 0)} folder{foldersFiltered.length + (showUnfiled ? 1 : 0) !== 1 ? 's' : ''} match
+                      </p>
+                    )}
+                    <div className="space-y-2.5">
+                      {showUnfiled && (
+                        <button
+                          onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
+                          className="group w-full flex items-center gap-3 px-4 py-3.5 sm:px-3 sm:py-2.5 bg-slate-700/20 hover:bg-slate-700/40 active:bg-slate-700/30 border border-dashed border-slate-600/60 hover:border-slate-500/60 rounded-xl transition-all"
+                        >
+                          <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-700/60 flex-shrink-0">
+                            <Inbox className="w-5 h-5 sm:w-4.5 sm:h-4.5 text-slate-400 group-hover:text-slate-300 transition-colors" />
+                          </div>
+                          <span className="flex-1 min-w-0 text-[17px] sm:text-sm font-semibold text-slate-300 truncate">No Folder</span>
+                          <span className="flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-600/40 text-[11px] font-semibold text-slate-500 tabular-nums">
+                            {unfiledNotes.length}
+                          </span>
+                          <span className="flex-shrink-0 w-10 sm:w-8" aria-hidden="true" />
+                        </button>
+                      )}
+
+                      {foldersFiltered.map((folder) => (
+                        <FolderRowFlat
+                          key={folder.id}
+                          folder={folder}
+                          notes={notes}
+                          onSelect={() => setSelectedFolderId(folder.id)}
+                          onRename={(name) => onRenameFolder(folder.id, name)}
+                          onDelete={() => setFolderToDelete(folder)}
+                        />
+                      ))}
+                    </div>
+                  </>
                 );
-              }
-
-              return (
-                <div className="space-y-2.5">
-                  {/* No Folder — always first, unique design */}
-                  {unfiledNotes.length > 0 && (
-                    <button
-                      onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
-                      className="group w-full flex items-center gap-3 px-4 py-3.5 sm:px-3 sm:py-2.5 bg-slate-700/20 hover:bg-slate-700/40 active:bg-slate-700/30 border border-dashed border-slate-600/60 hover:border-slate-500/60 rounded-xl transition-all"
-                    >
-                      <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-700/60 flex-shrink-0">
-                        <Inbox className="w-5 h-5 sm:w-4.5 sm:h-4.5 text-slate-400 group-hover:text-slate-300 transition-colors" />
-                      </div>
-                      <span className="flex-1 min-w-0 text-[17px] sm:text-sm font-semibold text-slate-300 truncate">No Folder</span>
-                      <span className="flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-600/40 text-[11px] font-semibold text-slate-500 tabular-nums">
-                        {unfiledNotes.length}
-                      </span>
-                      {/* spacer matching the three-dots button width so badge aligns with other folder rows */}
-                      <span className="flex-shrink-0 w-10 sm:w-8" aria-hidden="true" />
-                    </button>
-                  )}
-
-                  {/* Named folders */}
-                  {sortedFolders.map((folder) => (
-                    <FolderRowFlat
-                      key={folder.id}
-                      folder={folder}
-                      notes={notes}
-                      onSelect={() => setSelectedFolderId(folder.id)}
-                      onRename={(name) => onRenameFolder(folder.id, name)}
-                      onDelete={() => setFolderToDelete(folder)}
-                    />
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-        )}
+              })()}
+            </div>
+          );
+        })()}
       </div>
+
 
       {/* Footer: Storage */}
       <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenSettings} />
