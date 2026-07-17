@@ -740,68 +740,19 @@ function SidebarNavBar({
     return null;
   })();
 
-  
-
   const mobileSearchVisible = searchOpen || !!searchQuery;
 
-  /* Left slot: segmented toggle (default) or breadcrumb (inside a folder).
-     Both variants share the same shell: h-9, rounded-xl, bg-slate-900/40. */
-  const leftSlot = insideFolder && crumbInfo ? (
-    <div className="flex-1 min-w-0 h-9 flex items-center gap-1 pl-1 pr-1 rounded-xl bg-slate-900/40">
-      <button
-        onClick={() => setSelectedFolderId(null)}
-        className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
-        aria-label="Back to folders"
-      >
-        <ChevronLeft className="w-4 h-4" />
-      </button>
+  // Contextual search placeholder
+  const searchPlaceholder = (() => {
+    if (mode === 'all') return 'Search all notes…';
+    if (!insideFolder) return 'Search folders…';
+    if (isNoFolder) return 'Search in "No Folder"…';
+    if (currentFolder) return `Search in "${currentFolder.name}"…`;
+    return 'Search…';
+  })();
 
-      <span className={`flex-shrink-0 w-2 h-2 rounded-full ${crumbInfo.dot}`} />
-
-      {isRenaming && crumbInfo.canMenu && currentFolder ? (
-        <input
-          type="text"
-          value={renameValue}
-          onChange={(e) => setRenameValue(e.target.value)}
-          onBlur={() => {
-            const v = renameValue.trim();
-            if (v && v !== currentFolder.name) onRenameFolder(currentFolder.id, v);
-            setIsRenaming(false);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-            if (e.key === 'Escape') { setRenameValue(currentFolder.name); setIsRenaming(false); }
-          }}
-          className="flex-1 min-w-0 h-7 bg-slate-700/80 text-white rounded-md px-2 text-[13px] font-semibold outline-none border border-emerald-500/60"
-          autoFocus
-        />
-      ) : (
-        <>
-          <span className={`min-w-0 flex-1 truncate text-[13px] font-semibold leading-none ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
-            {crumbInfo.name}
-          </span>
-          {crumbInfo.isNew && (
-            <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
-              New
-            </span>
-          )}
-          <span className="flex-shrink-0 text-[12px] font-medium text-slate-500 tabular-nums pr-1">
-            {crumbInfo.count}
-          </span>
-          {crumbInfo.canMenu && (
-            <button
-              ref={crumbRef}
-              onClick={(e) => { e.stopPropagation(); crumbMenuOpen ? setCrumbMenuOpen(false) : openCrumbMenu(); }}
-              className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
-              aria-label="Folder options"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </button>
-          )}
-        </>
-      )}
-    </div>
-  ) : (
+  /* Segmented toggle — always visible, both tabs functional even inside a folder. */
+  const leftSlot = (
     <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-xl bg-slate-900/40">
       <button
         onClick={() => persistMode('all')}
@@ -813,7 +764,11 @@ function SidebarNavBar({
         All Notes
       </button>
       <button
-        onClick={() => persistMode('folders')}
+        onClick={() => {
+          // If we're already in folders mode and drilled into a folder, "Folders" pops back to the list.
+          if (mode === 'folders' && insideFolder) setSelectedFolderId(null);
+          else persistMode('folders');
+        }}
         className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
           mode === 'folders' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
         }`}
