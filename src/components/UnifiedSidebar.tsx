@@ -1055,127 +1055,24 @@ export function UnifiedSidebar({
         </div>
       </button>
 
-      {/* Controls */}
-      <div className="px-3 pt-3 pb-2 border-b border-slate-700/50 space-y-2.5">
-        {/* Mode toggle */}
-        <div className="flex gap-1 p-0.5 bg-slate-900/50 rounded-xl">
-          <button
-            onClick={() => { setMode('all'); setSelectedFolderId(null); try { localStorage.setItem(MODE_STORAGE_KEY, 'all'); } catch {} }}
-            className={`flex-1 flex items-center justify-center gap-2 px-2 py-2.5 rounded-[10px] text-sm font-semibold transition-all ${
-              mode === 'all'
-                ? 'bg-slate-700 text-emerald-400 shadow-sm'
-                : 'text-slate-400 hover:text-slate-300 active:bg-slate-700/40'
-            }`}
-          >
-            <LayoutList className="w-4 h-4" />
-            All Notes
-          </button>
-          <button
-            onClick={() => { setMode('folders'); setSelectedFolderId(null); try { localStorage.setItem(MODE_STORAGE_KEY, 'folders'); } catch {} }}
-            className={`flex-1 flex items-center justify-center gap-2 px-2 py-2.5 rounded-[10px] text-sm font-semibold transition-all ${
-              mode === 'folders'
-                ? 'bg-slate-700 text-emerald-400 shadow-sm'
-                : 'text-slate-400 hover:text-slate-300 active:bg-slate-700/40'
-            }`}
-          >
-            <FolderTreeIcon className="w-4 h-4" />
-            Folders
-          </button>
-        </div>
+      <SidebarNavBar
+        mode={mode}
+        setMode={setMode}
+        selectedFolderId={selectedFolderId}
+        setSelectedFolderId={setSelectedFolderId}
+        folders={sortedFolders}
+        notes={notes}
+        unfiledCount={unfiledNotes.length}
+        searchQuery={searchQuery}
+        onSearchChange={onSearchChange}
+        onCreateNote={onCreateNote}
+        onCreateFolder={onCreateFolder}
+        onCreateNoteInFolder={handleCreateNoteInFolder}
+        onRenameFolder={onRenameFolder}
+        onOpenDeleteFolder={(f) => setFolderToDelete(f)}
+        onExpandUnfiled={() => setExpanded(UNFILED_KEY, true)}
+      />
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-8 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-sm transition-all"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-500 hover:text-slate-300 transition-colors"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {/* Action row — depends on mode & selected folder */}
-        {(() => {
-          const NO_FOLDER_ID = '__no_folder__';
-
-          // Case 1: All Notes — single New Note button
-          if (mode === 'all') {
-            return (
-              <div className="flex">
-                <button
-                  onClick={() => onCreateNote()}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-                >
-                  <Plus className="w-4 h-4" />
-                  New Note
-                </button>
-              </div>
-            );
-          }
-
-          // Case 3: Folders mode + inside a folder — back + folder info + New Note
-          if (selectedFolderId) {
-            const isNoFolder = selectedFolderId === NO_FOLDER_ID;
-
-
-
-            const handleNewNote = () => {
-              if (isNoFolder) {
-                onCreateNote();
-              } else {
-                handleCreateNoteInFolder(selectedFolderId);
-              }
-            };
-
-            return (
-              <div className="flex">
-                <button
-                  onClick={handleNewNote}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-                  title="New note in this folder"
-                  aria-label="New note in this folder"
-                >
-                  <Plus className="w-4 h-4" />
-                  New Note
-                </button>
-              </div>
-            );
-          }
-
-          // Case 2: Folders mode, no folder open — New Folder + New Note
-          return (
-            <div className="flex gap-2">
-              <button
-                onClick={() => onCreateFolder('New Folder', null)}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 text-slate-200 rounded-xl text-sm font-semibold transition-colors shadow-sm"
-              >
-                <FolderPlus className="w-4 h-4" />
-                New Folder
-              </button>
-              <button
-                onClick={() => {
-                  onCreateNote();
-                  setExpanded(UNFILED_KEY, true);
-                  setSelectedFolderId(NO_FOLDER_ID);
-                }}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-              >
-                <Plus className="w-4 h-4" />
-                New Note
-              </button>
-            </div>
-          );
-        })()}
-      </div>
 
 
       {/* ===== NoteList-Viewer ===== */}
