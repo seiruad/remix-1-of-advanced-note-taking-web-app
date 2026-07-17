@@ -21,7 +21,7 @@ import {
   FolderInput,
   
   FolderPlus,
-  ArrowLeft,
+  ChevronLeft,
   Inbox,
 } from 'lucide-react';
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
@@ -657,58 +657,46 @@ function FolderDetailHeader({
 
   const variant = isNoFolder
     ? {
-        wrap: 'bg-slate-800/70 border-b border-dashed border-slate-600/60',
-        accent: 'bg-slate-500',
+        wrap: 'bg-slate-900/85 border-b border-dashed border-slate-600/50',
         iconWrap: 'bg-slate-700/70 text-slate-300',
-        icon: <Inbox className="w-3.5 h-3.5" />,
-        label: 'UNFILED',
-        labelColor: 'text-slate-500',
+        icon: <Inbox className="w-4 h-4" />,
+        pill: 'bg-slate-700/60 text-slate-400',
         nameColor: 'text-slate-200',
       }
     : isNew
     ? {
-        wrap: 'bg-amber-500/[0.10] border-b border-amber-500/25',
-        accent: 'bg-amber-400',
+        wrap: 'bg-slate-900/85 border-b border-amber-500/30',
         iconWrap: 'bg-amber-500/15 text-amber-300',
-        icon: <FolderPlus className="w-3.5 h-3.5" />,
-        label: 'NEW',
-        labelColor: 'text-amber-400/80',
+        icon: <FolderPlus className="w-4 h-4" />,
+        pill: 'bg-amber-500/15 text-amber-300',
         nameColor: 'text-white',
       }
     : {
-        wrap: 'bg-emerald-500/[0.08] border-b border-emerald-500/20',
-        accent: 'bg-emerald-400',
+        wrap: 'bg-slate-900/85 border-b border-emerald-500/25',
         iconWrap: 'bg-emerald-500/15 text-emerald-300',
-        icon: <FolderOpen className="w-3.5 h-3.5" />,
-        label: 'FOLDER',
-        labelColor: 'text-emerald-400/70',
+        icon: <FolderOpen className="w-4 h-4" />,
+        pill: 'bg-emerald-500/15 text-emerald-300',
         nameColor: 'text-white',
       };
 
   return (
     <div
-      className={`sticky top-0 z-20 -mx-3 mb-2 px-2 py-1.5 flex items-center gap-1.5 backdrop-blur-md ${variant.wrap}`}
+      className={`sticky top-0 z-20 -mx-3 mb-2 h-14 px-2 flex items-center gap-2 backdrop-blur-md ${variant.wrap}`}
     >
-      <span className={`flex-shrink-0 w-0.5 h-7 rounded-full ${variant.accent}`} />
-
       <button
         onClick={onBack}
-        className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors"
+        className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
         title="Back to folders"
         aria-label="Back to folders"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ChevronLeft className="w-5 h-5" />
       </button>
 
-      <span className={`flex-shrink-0 flex items-center justify-center w-6 h-6 rounded ${variant.iconWrap}`}>
+      <span className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg ${variant.iconWrap}`}>
         {variant.icon}
       </span>
 
-      <span className={`flex-shrink-0 text-[9px] font-bold tracking-[0.12em] ${variant.labelColor}`}>
-        {variant.label}
-      </span>
-
-      <div className="flex-1 min-w-0 flex items-baseline gap-1.5">
+      <div className="flex-1 min-w-0 flex items-center gap-2">
         {isRenaming ? (
           <input
             type="text"
@@ -719,15 +707,22 @@ function FolderDetailHeader({
               if (e.key === 'Enter') handleRename();
               if (e.key === 'Escape') { setRenameValue(displayName); setIsRenaming(false); }
             }}
-            className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded px-1.5 py-0.5 text-sm outline-none border border-emerald-500/60 ring-1 ring-emerald-500/20"
+            className="folder-rename-input flex-1 min-w-0 h-8 bg-slate-700/80 text-white rounded-md px-2 text-base font-semibold outline-none border border-emerald-500/60 ring-1 ring-emerald-500/20"
             autoFocus
           />
         ) : (
           <>
-            <h2 className={`text-sm font-semibold truncate leading-tight ${variant.nameColor}`}>
+            <h2 className={`text-base font-semibold truncate leading-tight ${variant.nameColor}`}>
               {displayName}
             </h2>
-            <span className="text-[11px] text-slate-500 tabular-nums flex-shrink-0">· {noteCount}</span>
+            {isNew && (
+              <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 uppercase">
+                New
+              </span>
+            )}
+            <span className={`flex-shrink-0 text-[11px] font-semibold tabular-nums px-1.5 py-0.5 rounded-full ${variant.pill}`}>
+              {noteCount}
+            </span>
           </>
         )}
       </div>
@@ -737,11 +732,11 @@ function FolderDetailHeader({
           <button
             ref={triggerRef}
             onClick={(e) => { e.stopPropagation(); menuOpen ? setMenuOpen(false) : openMenu(); }}
-            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors"
+            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
             title="Folder options"
             aria-label="Folder options"
           >
-            <MoreHorizontal className="folder-menu-icon" />
+            <MoreHorizontal className="w-5 h-5" />
           </button>
 
           {menuOpen && createPortal(
