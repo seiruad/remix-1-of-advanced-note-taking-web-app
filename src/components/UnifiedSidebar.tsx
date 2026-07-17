@@ -309,11 +309,15 @@ function NoteCard({
         }`}
         onClick={onSelect}
       >
-        {/* Left accent bar: active=emerald, new=amber (dashed feel via opacity) */}
+        {/* Left accent bar: active=emerald, new+active=bright amber, new=amber */}
         {(isActive || isNew) && (
           <span
             className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full ${
-              isActive ? 'bg-emerald-400' : 'bg-amber-400/70'
+              isActive && isNew
+                ? 'bg-amber-400'
+                : isActive
+                  ? 'bg-emerald-400'
+                  : 'bg-amber-400/70'
             }`}
           />
         )}
