@@ -722,10 +722,10 @@ function SidebarNavBar({
     plusOpen ? setPlusOpen(false) : openPlus();
   };
 
-  // Breadcrumb variant (color dot)
+  // Breadcrumb variant (color dot + matching glow)
   const crumbInfo = (() => {
     if (isNoFolder) {
-      return { name: 'No Folder', count: unfiledCount, dot: 'bg-slate-500', italic: true, canMenu: false, isNew: false };
+      return { name: 'No Folder', count: unfiledCount, dot: 'bg-slate-500', dotShadow: 'shadow-[0_0_8px_rgba(148,163,184,0.35)]', italic: true, canMenu: false, isNew: false };
     }
     if (currentFolder) {
       const folderNoteCount = _notes.filter((n) => n.folder_id === currentFolder.id).length;
@@ -733,6 +733,7 @@ function SidebarNavBar({
         name: currentFolder.name,
         count: folderNoteCount,
         dot: currentFolder.is_new ? 'bg-amber-400' : 'bg-emerald-400',
+        dotShadow: currentFolder.is_new ? 'shadow-[0_0_8px_rgba(251,191,36,0.45)]' : 'shadow-[0_0_8px_rgba(52,211,153,0.45)]',
         italic: false,
         canMenu: true,
         isNew: !!currentFolder.is_new,
@@ -886,16 +887,16 @@ function SidebarNavBar({
 
       {/* Folder context strip — shown only inside a folder, keeps toggle above always usable */}
       {insideFolder && crumbInfo && !mobileSearchVisible && (
-        <div className="h-9 px-3 flex items-center gap-2 border-t border-slate-700/40 bg-slate-900/20">
+        <div className="h-10 px-2 flex items-center gap-1 bg-slate-800/30 border-t border-slate-700/40">
           <button
             onClick={() => setSelectedFolderId(null)}
-            className="flex-shrink-0 flex items-center justify-center w-9 h-9 -ml-1 rounded-xl bg-slate-700/40 text-slate-300 hover:text-emerald-300 hover:bg-slate-700/70 active:bg-slate-700/90 active:scale-[0.97] transition-all"
+            className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 active:scale-95 transition-all"
             aria-label="Back to all folders"
             title="Back to all folders"
           >
             <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
           </button>
-          <span className={`flex-shrink-0 w-2 h-2 rounded-full ${crumbInfo.dot}`} />
+
           {isRenaming && crumbInfo.canMenu && currentFolder ? (
             <input
               type="text"
@@ -915,25 +916,31 @@ function SidebarNavBar({
             />
           ) : (
             <>
-              <span className={`min-w-0 flex-1 truncate text-[13px] font-semibold ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
-                {crumbInfo.name}
-              </span>
-              {crumbInfo.isNew && (
-                <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
-                  New
+              <div className="flex-1 min-w-0 flex items-center gap-2.5 ml-1">
+                <span className={`flex-shrink-0 w-2 h-2 rounded-full ${crumbInfo.dot} ${crumbInfo.dotShadow}`} />
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className={`truncate text-sm font-medium ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
+                    {crumbInfo.name}
+                  </span>
+                  {crumbInfo.isNew && (
+                    <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
+                      New
+                    </span>
+                  )}
+                </div>
+                <span className="flex-shrink-0 text-[11px] font-medium text-slate-500 tabular-nums">
+                  {crumbInfo.count}
                 </span>
-              )}
-              <span className="flex-shrink-0 text-[12px] font-medium text-slate-500 tabular-nums">
-                {crumbInfo.count}
-              </span>
+              </div>
+
               {crumbInfo.canMenu && (
                 <button
                   ref={crumbRef}
                   onClick={(e) => { e.stopPropagation(); crumbMenuOpen ? setCrumbMenuOpen(false) : openCrumbMenu(); }}
-                  className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+                  className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-all"
                   aria-label="Folder options"
                 >
-                  <MoreHorizontal className="w-4 h-4" />
+                  <MoreHorizontal className="w-5 h-5" strokeWidth={2.5} />
                 </button>
               )}
             </>
