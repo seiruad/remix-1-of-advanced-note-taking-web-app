@@ -896,7 +896,7 @@ function SidebarFab({
           <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
           <div
             style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 9999, width: 220 }}
-            className="bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.75)]"
+            className="bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
             onClick={(e) => e.stopPropagation()}
           >
             <button
