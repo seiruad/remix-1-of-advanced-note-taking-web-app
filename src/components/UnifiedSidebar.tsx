@@ -17,7 +17,7 @@ import {
   FolderTree as FolderTreeIcon,
   X,
   Pencil,
-  Settings2,
+  
   MoreHorizontal,
   FolderInput,
   
@@ -1271,68 +1271,74 @@ export function UnifiedSidebar({
 
   return (
     <div className="flex flex-col h-full bg-slate-800 border-r border-slate-700/50">
-      {/* Workspace header — clickable main region + search icon (sibling buttons, not nested) */}
-      <div className="w-full px-4 pt-4 pb-3 border-b border-slate-700/50 flex items-center gap-2">
-        <button
-          onClick={onOpenWorkspaceManagement}
-          className="flex-1 min-w-0 flex items-center gap-2.5 text-left group/header rounded-lg -mx-1 px-1 py-1 hover:bg-slate-700/20 transition-colors"
-        >
-          <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-            <Notebook className="w-5 h-5 text-emerald-400" />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">Workspace</p>
-            <h1 className="text-sm font-bold text-white truncate">{workspaceName || 'My Notes'}</h1>
-          </div>
-          <Settings2 className="w-4 h-4 text-slate-500 group-hover/header:text-emerald-400 transition-colors flex-shrink-0" />
-        </button>
-        <button
-          onClick={() => setSearchOpen((v) => !v)}
-          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
-            searchOpen || searchQuery
-              ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
-              : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
-          }`}
-          aria-label={searchOpen ? 'Close search' : 'Open search'}
-          title={searchOpen ? 'Close search' : 'Search'}
-        >
-          <Search className="w-4 h-4" />
-        </button>
+      {/* Workspace header — 56px, in-place swap between workspace info and search */}
+      <div className="w-full h-14 px-3 border-b border-slate-700/50 flex items-center gap-2">
+        {!searchOpen ? (
+          <>
+            <button
+              onClick={onOpenWorkspaceManagement}
+              className="min-w-0 flex items-center gap-2.5 text-left group/header rounded-lg px-1.5 py-1 hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors"
+              aria-label="Switch workspace"
+              title="Switch workspace"
+            >
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+                <Notebook className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">Workspace</p>
+                <div className="flex items-center gap-1 min-w-0">
+                  <h1 className="text-sm font-semibold text-slate-100 truncate">{workspaceName || 'My Notes'}</h1>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover/header:text-emerald-400 transition-colors flex-shrink-0" />
+                </div>
+              </div>
+            </button>
+            <div className="flex-1" />
+            <button
+              onClick={() => setSearchOpen(true)}
+              className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
+                searchQuery
+                  ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
+              }`}
+              aria-label="Open search"
+              title="Search"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="flex-1 min-w-0 relative h-9">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); } }}
+                autoFocus
+                className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => { onSearchChange(''); setSearchOpen(false); }}
+              className="flex-shrink-0 h-9 px-2.5 rounded-lg text-[13px] font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+            >
+              Cancel
+            </button>
+          </>
+        )}
       </div>
-
-      {/* Contextual search bar — under header, above nav row */}
-      {searchOpen && (
-        <div className="h-11 px-3 flex items-center gap-2 bg-slate-800 border-b border-slate-700/50">
-          <div className="flex-1 min-w-0 relative h-9">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder={searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); } }}
-              className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => onSearchChange('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
-                aria-label="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-          <button
-            onClick={() => { onSearchChange(''); setSearchOpen(false); }}
-            className="flex-shrink-0 h-9 px-2.5 rounded-lg text-[13px] font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
 
       <SidebarNavBar
         mode={mode}
