@@ -1379,7 +1379,7 @@ export function UnifiedSidebar({
                   if (aNew !== bNew) return aNew ? -1 : 1;
                   return (a.title || '').localeCompare(b.title || '');
                 });
-                const displayName = isNoFolder ? 'No Folder' : folder!.name;
+                
                 return (
                   <div>
                     {folderNotes.length > 0 ? (
