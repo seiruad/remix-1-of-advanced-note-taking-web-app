@@ -740,7 +740,7 @@ function SidebarNavBar({
     return null;
   })();
 
-  const showMobileSearchIcon = !searchOpen;
+  
 
   const mobileSearchVisible = searchOpen || !!searchQuery;
 
