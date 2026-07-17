@@ -830,32 +830,10 @@ function SidebarNavBar({
       <div className="h-11 px-3 flex items-center gap-2">
         {leftSlot}
 
-        {/* Desktop: inline search */}
-        <div className="hidden sm:block relative w-[180px] flex-shrink-0">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-8 pr-7 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-slate-500 hover:text-slate-300 transition-colors"
-              aria-label="Clear search"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {/* Mobile: search icon toggle */}
+        {/* Search icon toggle (all breakpoints — keeps the row uncluttered) */}
         <button
           onClick={() => setSearchOpen((v) => !v)}
-          className={`sm:hidden flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
+          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
             mobileSearchVisible ? 'bg-slate-700 text-emerald-400' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
           }`}
           aria-label="Search notes"
@@ -876,12 +854,13 @@ function SidebarNavBar({
         </button>
       </div>
 
-      {/* Row 2 — mobile search (in-flow, animated) */}
+      {/* Row 2 — collapsible search (in-flow, animated) */}
       <div
-        className={`sm:hidden overflow-hidden transition-[max-height,opacity] duration-200 ease-out ${
+        className={`overflow-hidden transition-[max-height,opacity] duration-200 ease-out ${
           mobileSearchVisible ? 'max-h-16 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
+
         <div className="px-3 pb-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
