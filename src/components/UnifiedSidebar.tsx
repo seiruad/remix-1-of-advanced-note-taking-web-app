@@ -876,10 +876,22 @@ function SidebarNavBar({
               const isChoice = mode === 'folders' && !insideFolder;
               const isUnfiled = insideFolder && isNoFolder;
               const tone = isChoice
-                ? 'bg-amber-500 hover:bg-amber-400 active:bg-amber-600'
+                ? {
+                    grad: 'from-amber-400 to-amber-600',
+                    ring: 'ring-amber-300/40',
+                    glow: 'shadow-[0_4px_14px_-4px_rgba(245,158,11,0.55)]',
+                  }
                 : isUnfiled
-                ? 'bg-slate-600 hover:bg-slate-500 active:bg-slate-700'
-                : 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700';
+                ? {
+                    grad: 'from-slate-500 to-slate-700',
+                    ring: 'ring-slate-300/20',
+                    glow: 'shadow-[0_4px_14px_-4px_rgba(148,163,184,0.45)]',
+                  }
+                : {
+                    grad: 'from-emerald-400 to-emerald-600',
+                    ring: 'ring-emerald-300/40',
+                    glow: 'shadow-[0_4px_14px_-4px_rgba(16,185,129,0.55)]',
+                  };
               const label = isChoice
                 ? 'Create note or folder'
                 : isUnfiled
@@ -889,23 +901,28 @@ function SidebarNavBar({
                 <button
                   ref={plusRef}
                   onClick={handlePlusClick}
-                  className={`relative flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl text-white shadow-sm transition-colors ${tone}`}
+                  className={`group relative flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl text-white bg-gradient-to-b ${tone.grad} ring-1 ${tone.ring} ${tone.glow} hover:brightness-110 active:brightness-95 active:scale-[0.97] transition-all duration-150`}
                   aria-label={label}
                   title={label}
                 >
+                  {/* subtle inner highlight */}
+                  <span className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-white/20 to-transparent opacity-60" />
                   {isChoice ? (
-                    <>
-                      <FolderPlus className="w-[18px] h-[18px]" />
-                      <ChevronDown className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 opacity-90" strokeWidth={3} />
-                    </>
+                    <span className="relative flex items-center justify-center">
+                      <FolderPlus className="w-[17px] h-[17px]" strokeWidth={2.25} />
+                      <span className="absolute -bottom-1 -right-1.5 flex items-center justify-center w-3 h-3 rounded-full bg-white/95 text-amber-600 ring-1 ring-amber-700/20">
+                        <ChevronDown className="w-2 h-2" strokeWidth={3.5} />
+                      </span>
+                    </span>
                   ) : isUnfiled ? (
-                    <FileText className="w-[18px] h-[18px]" />
+                    <FileText className="relative w-[17px] h-[17px]" strokeWidth={2.25} />
                   ) : (
-                    <Plus className="w-5 h-5" />
+                    <Plus className="relative w-[19px] h-[19px]" strokeWidth={2.5} />
                   )}
                 </button>
               );
             })()}
+
 
           </>
         )}
