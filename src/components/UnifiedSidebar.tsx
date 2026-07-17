@@ -301,10 +301,10 @@ function NoteCard({
     <>
       <div
         className={`group/card relative flex items-stretch rounded-xl cursor-pointer transition-colors duration-150 overflow-hidden ${
-          isActive
-            ? 'bg-emerald-500/12'
-            : isNew
-              ? 'bg-amber-500/[0.06] hover:bg-amber-500/10'
+          isNew
+            ? 'bg-amber-500/[0.06] hover:bg-amber-500/10'
+            : isActive
+              ? 'bg-emerald-500/12'
               : 'hover:bg-slate-700/40 active:bg-slate-700/60'
         }`}
         onClick={onSelect}
@@ -321,7 +321,7 @@ function NoteCard({
         <div className="flex-1 py-3.5 sm:py-3 pl-4 pr-2 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className={`text-base sm:text-sm font-semibold leading-snug truncate ${
-              isActive ? 'text-emerald-50' : isNew ? 'text-amber-100 italic' : 'text-slate-100'
+              isNew ? 'text-amber-100 italic' : isActive ? 'text-emerald-50' : 'text-slate-100'
             }`}>
               {note.title || 'Untitled'}
             </h3>
