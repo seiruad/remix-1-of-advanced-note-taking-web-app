@@ -946,15 +946,18 @@ function FolderRowFlat({
             onClick={(e) => e.stopPropagation()}
             onBlur={handleRename}
             onKeyDown={(e) => {
+              e.stopPropagation();
               if (e.key === 'Enter') handleRename();
               if (e.key === 'Escape') { setRenameValue(folder.name); setIsRenaming(false); }
             }}
+            onKeyUp={(e) => e.stopPropagation()}
+            onKeyPress={(e) => e.stopPropagation()}
             ref={renameInputRef}
             className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded-lg px-2.5 py-1.5 outline-none border border-emerald-500/60 ring-2 ring-emerald-500/20"
             autoFocus
           />
         ) : (
-          <span className="folder-name flex-1 min-w-0 text-[17px] sm:text-sm font-semibold text-white truncate">{folder.name}</span>
+          <span className="folder-name flex-1 min-w-0 text-left text-[17px] sm:text-sm font-semibold text-white truncate">{folder.name}</span>
         )}
         {!isRenaming && (
           <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
