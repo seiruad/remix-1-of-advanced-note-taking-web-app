@@ -756,8 +756,6 @@ function FolderDetailHeader({
             </>,
             document.body,
           )}
-        </>
-      )}
     </div>
   );
 }
