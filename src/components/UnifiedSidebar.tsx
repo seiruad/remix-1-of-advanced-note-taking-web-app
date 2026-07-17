@@ -716,7 +716,7 @@ function SidebarNavBar({
 
       {/* Folder context strip — only inside a folder */}
       {insideFolder && crumbInfo && (
-        <div className="h-10 px-2 flex items-center gap-1 bg-slate-800/30 border-t border-slate-700/40">
+        <div className="h-11 px-2 flex items-center gap-1 bg-slate-800/60 border-t border-slate-700/50">
           <button
             onClick={() => setSelectedFolderId(null)}
             className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 active:scale-95 transition-all"
