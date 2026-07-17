@@ -946,15 +946,18 @@ function FolderRowFlat({
             onClick={(e) => e.stopPropagation()}
             onBlur={handleRename}
             onKeyDown={(e) => {
+              e.stopPropagation();
               if (e.key === 'Enter') handleRename();
               if (e.key === 'Escape') { setRenameValue(folder.name); setIsRenaming(false); }
             }}
+            onKeyUp={(e) => e.stopPropagation()}
+            onKeyPress={(e) => e.stopPropagation()}
             ref={renameInputRef}
             className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded-lg px-2.5 py-1.5 outline-none border border-emerald-500/60 ring-2 ring-emerald-500/20"
             autoFocus
           />
         ) : (
-          <span className="folder-name flex-1 min-w-0 text-[17px] sm:text-sm font-semibold text-white truncate">{folder.name}</span>
+          <span className="folder-name flex-1 min-w-0 text-left text-[17px] sm:text-sm font-semibold text-white truncate">{folder.name}</span>
         )}
         {!isRenaming && (
           <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
@@ -1430,19 +1433,22 @@ export function UnifiedSidebar({
                     )}
                     <div className="space-y-2.5">
                       {showUnfiled && (
-                        <button
-                          onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
-                          className="group relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700 rounded-xl transition-colors overflow-hidden"
-                        >
+                        <div className="group relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700 rounded-xl transition-colors overflow-hidden">
                           <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-slate-500/70" />
-                          <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
-                            <Inbox className="w-5 h-5 sm:w-4 sm:h-4 text-slate-300" />
-                          </div>
-                          <span className="flex-1 min-w-0 text-[17px] sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
-                          <span className="flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
-                            {unfiledNotes.length}
-                          </span>
-                        </button>
+                          <button
+                            onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
+                            className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                          >
+                            <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
+                              <Inbox className="w-5 h-5 sm:w-4 sm:h-4 text-slate-300" />
+                            </div>
+                            <span className="flex-1 min-w-0 text-left text-[17px] sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
+                            <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
+                              {unfiledNotes.length}
+                            </span>
+                          </button>
+                          <span aria-hidden className="flex-shrink-0 w-10 h-10 sm:w-8 sm:h-8" />
+                        </div>
                       )}
 
 
