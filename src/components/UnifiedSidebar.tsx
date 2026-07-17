@@ -1464,21 +1464,12 @@ export function UnifiedSidebar({
                   );
                 }
 
-                /* Folders list — search only folder names */
-                if (sortedFolders.length === 0 && unfiledNotes.length === 0) {
-                  return (
-                    <div className="py-12 text-center">
-                      <FolderIcon className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-                      <p className="text-sm font-medium text-slate-500">No folders yet</p>
-                      <p className="text-xs text-slate-600 mt-1">Folders keep your notes organized</p>
-                    </div>
-                  );
-                }
-
+                /* Folders list — search only folder names. "No Folder" is always pinned on top. */
                 const foldersFiltered = hasQuery
                   ? sortedFolders.filter((f) => f.name.toLowerCase().includes(q))
                   : sortedFolders;
-                const showUnfiled = unfiledNotes.length > 0 && (!hasQuery || 'no folder'.includes(q));
+                const showUnfiled = !hasQuery || 'no folder'.includes(q);
+
 
                 if (hasQuery && foldersFiltered.length === 0 && !showUnfiled) {
                   return <NoMatchesFallback label="folders" />;
