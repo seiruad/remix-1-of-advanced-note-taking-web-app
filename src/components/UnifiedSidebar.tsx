@@ -820,7 +820,7 @@ function SidebarNavBar({
 
 /* ---------- Sidebar FAB (contextual create) ---------- */
 
-type FabMode = 'note' | 'note-in-folder' | 'unfiled' | 'choice';
+type FabMode = 'note' | 'note-in-folder' | 'unfiled' | 'folder';
 
 function SidebarFab({
   fabMode,
@@ -831,96 +831,28 @@ function SidebarFab({
   onCreateNote: () => void;
   onCreateFolder: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-  const btnRef = useRef<HTMLButtonElement | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open]);
-
-  const openMenu = () => {
-    const rect = btnRef.current!.getBoundingClientRect();
-    const MENU_W = 220;
-    const MENU_H = 120;
-    const MARGIN = 8;
-    const left = Math.min(rect.right - MENU_W, window.innerWidth - MENU_W - MARGIN);
-    const top = Math.max(MARGIN, rect.top - MENU_H - 8);
-    setPos({ top, left: Math.max(MARGIN, left) });
-    setOpen(true);
-  };
+  const label = fabMode === 'folder' ? 'New Folder' : 'New Note';
 
   const handleClick = () => {
-    if (fabMode === 'choice') {
-      open ? setOpen(false) : openMenu();
+    if (fabMode === 'folder') {
+      onCreateFolder();
     } else {
       onCreateNote();
     }
   };
 
-  const label = fabMode === 'choice'
-    ? 'Create note or folder'
-    : fabMode === 'note-in-folder'
-    ? 'New note in this folder'
-    : fabMode === 'unfiled'
-    ? 'New unfiled note'
-    : 'New note';
-
   return (
-    <>
-      <button
-        ref={btnRef}
-        onClick={handleClick}
-        aria-label={label}
-        title={label}
-        className="group absolute bottom-4 right-4 z-20 flex items-center gap-2.5 h-11 pl-3.5 pr-3 rounded-xl text-sm font-semibold text-white bg-emerald-500/90 hover:bg-emerald-500 active:bg-emerald-600/90 ring-1 ring-emerald-300/40 shadow-[0_8px_24px_-6px_rgba(16,185,129,0.45)] active:scale-[0.98] transition-all duration-150"
-      >
-        <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/15 text-white">
-          <Plus className="w-4 h-4" strokeWidth={2.5} />
-        </span>
-        <span className="whitespace-nowrap">
-          {fabMode === 'choice' ? 'New' : label}
-        </span>
-        {fabMode === 'choice' && (
-          <ChevronDown className="w-3.5 h-3.5 text-emerald-100/80" strokeWidth={2.5} />
-        )}
-      </button>
-
-      {open && pos && createPortal(
-        <>
-          <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
-          <div
-            style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 9999, width: 220 }}
-            className="bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => { setOpen(false); onCreateNote(); }}
-              className="w-full flex items-center gap-3 px-3 py-3 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
-            >
-              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-300">
-                <FileText className="w-4 h-4" />
-              </span>
-              <span className="text-sm font-medium">New Note</span>
-            </button>
-            <div className="h-px bg-white/8" />
-            <button
-              onClick={() => { setOpen(false); onCreateFolder(); }}
-              className="w-full flex items-center gap-3 px-3 py-3 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
-            >
-              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-700/70 text-slate-200">
-                <FolderPlus className="w-4 h-4" />
-              </span>
-              <span className="text-sm font-medium">New Folder</span>
-            </button>
-          </div>
-        </>,
-        document.body,
-      )}
-    </>
+    <button
+      onClick={handleClick}
+      aria-label={label}
+      title={label}
+      className="group w-full flex items-center justify-center gap-2.5 h-12 sm:h-11 rounded-xl text-sm font-semibold text-white bg-emerald-500/90 hover:bg-emerald-500 active:bg-emerald-600/90 ring-1 ring-emerald-300/40 shadow-[0_8px_24px_-6px_rgba(16,185,129,0.45)] active:scale-[0.98] transition-all duration-150"
+    >
+      <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/15 text-white">
+        <Plus className="w-4 h-4" strokeWidth={2.5} />
+      </span>
+      <span className="whitespace-nowrap">{label}</span>
+    </button>
   );
 }
 
