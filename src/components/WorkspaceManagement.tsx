@@ -85,9 +85,14 @@ export function WorkspaceManagement({
     const name = newName.trim();
     if (!name) return;
     setError(null);
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData.user) {
+      setError('You must be signed in to create a workspace');
+      return;
+    }
     const { data, error: err } = await supabase
       .from('workspaces')
-      .insert({ name })
+      .insert({ name, user_id: userData.user.id })
       .select()
       .single();
     if (err) {
