@@ -1175,7 +1175,7 @@ export function UnifiedSidebar({
 
   const fabMode: FabMode = (() => {
     if (mode === 'all') return 'note';
-    if (!insideFolderView) return 'choice';
+    if (!insideFolderView) return 'folder';
     if (isNoFolderView) return 'unfiled';
     return 'note-in-folder';
   })();
@@ -1185,12 +1185,7 @@ export function UnifiedSidebar({
     if (insideFolderView) {
       if (isNoFolderView) onCreateNote();
       else if (currentFolderView) handleCreateNoteInFolder(currentFolderView.id);
-      return;
     }
-    // Folders list → choice menu's "New Note" branch: create unfiled and open No Folder
-    onCreateNote();
-    setExpanded(UNFILED_KEY, true);
-    setSelectedFolderId(NO_FOLDER_ID);
   };
 
   const handleFabCreateFolder = () => {
