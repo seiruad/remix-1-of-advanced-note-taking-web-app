@@ -21,7 +21,7 @@ import {
   FolderInput,
   
   FolderPlus,
-  ChevronLeft,
+  
   Inbox,
 } from 'lucide-react';
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
