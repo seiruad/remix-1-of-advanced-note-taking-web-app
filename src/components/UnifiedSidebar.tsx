@@ -653,38 +653,74 @@ function FolderDetailHeader({
     setIsRenaming(false);
   };
 
+  const variant = isNoFolder
+    ? {
+        wrap: 'bg-slate-800/60 border-y border-dashed border-slate-600/60',
+        accent: 'bg-slate-500',
+        iconWrap: 'bg-slate-700/70 text-slate-300',
+        icon: <Inbox className="w-3.5 h-3.5" />,
+        label: 'UNFILED',
+        labelColor: 'text-slate-500',
+        nameColor: 'text-slate-200',
+      }
+    : isNew
+    ? {
+        wrap: 'bg-amber-500/[0.08] border-y border-amber-500/25',
+        accent: 'bg-amber-400',
+        iconWrap: 'bg-amber-500/15 text-amber-300',
+        icon: <FolderPlus className="w-3.5 h-3.5" />,
+        label: 'NEW FOLDER',
+        labelColor: 'text-amber-400/80',
+        nameColor: 'text-white',
+      }
+    : {
+        wrap: 'bg-emerald-500/[0.07] border-y border-emerald-500/20',
+        accent: 'bg-emerald-400',
+        iconWrap: 'bg-emerald-500/15 text-emerald-300',
+        icon: <FolderOpen className="w-3.5 h-3.5" />,
+        label: 'FOLDER',
+        labelColor: 'text-emerald-400/70',
+        nameColor: 'text-white',
+      };
+
   return (
-    <div className="flex items-center gap-2 px-2 py-1.5 mb-2 rounded-lg bg-emerald-500/[0.06] border-l-2 border-emerald-500/60">
-      <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 text-emerald-400/90">
-        {isNoFolder ? <Inbox className="w-3.5 h-3.5" /> : <FolderOpen className="w-3.5 h-3.5" />}
+    <div className={`-mx-3 mb-2 px-3 py-2 flex items-center gap-2.5 ${variant.wrap}`}>
+      <span className={`flex-shrink-0 w-0.5 h-8 rounded-full ${variant.accent}`} />
+
+      <span className={`flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md ${variant.iconWrap}`}>
+        {variant.icon}
       </span>
 
-      {isRenaming ? (
-        <input
-          type="text"
-          value={renameValue}
-          onChange={(e) => setRenameValue(e.target.value)}
-          onBlur={handleRename}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleRename();
-            if (e.key === 'Escape') { setRenameValue(displayName); setIsRenaming(false); }
-          }}
-          className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded px-2 py-0.5 text-xs outline-none border border-emerald-500/60 ring-1 ring-emerald-500/20"
-          autoFocus
-        />
-      ) : (
-        <h2 className="flex-1 min-w-0 text-xs font-semibold text-slate-200 truncate tracking-wide">
-          {displayName}
-          <span className="ml-1.5 text-slate-500 font-normal tabular-nums">· {noteCount}</span>
-        </h2>
-      )}
+      <div className="flex-1 min-w-0">
+        <div className={`text-[9px] font-bold tracking-[0.12em] leading-none mb-0.5 ${variant.labelColor}`}>
+          {variant.label} · {noteCount}
+        </div>
+        {isRenaming ? (
+          <input
+            type="text"
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onBlur={handleRename}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleRename();
+              if (e.key === 'Escape') { setRenameValue(displayName); setIsRenaming(false); }
+            }}
+            className="folder-rename-input w-full bg-slate-700/80 text-white rounded px-1.5 py-0.5 text-sm outline-none border border-emerald-500/60 ring-1 ring-emerald-500/20"
+            autoFocus
+          />
+        ) : (
+          <h2 className={`text-sm font-semibold truncate leading-tight ${variant.nameColor}`}>
+            {displayName}
+          </h2>
+        )}
+      </div>
 
       {!isNoFolder && !isRenaming && (
         <>
           <button
             ref={triggerRef}
             onClick={(e) => { e.stopPropagation(); menuOpen ? setMenuOpen(false) : openMenu(); }}
-            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 transition-colors"
+            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors"
             title="Folder options"
           >
             <MoreHorizontal className="folder-menu-icon" />
