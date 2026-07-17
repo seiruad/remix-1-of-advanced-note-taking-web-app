@@ -740,171 +740,175 @@ function SidebarNavBar({
     return null;
   })();
 
-  const showMobileSearchIcon = !searchOpen;
+  
+
+  const mobileSearchVisible = searchOpen || !!searchQuery;
+
+  /* Left slot: segmented toggle (default) or breadcrumb (inside a folder).
+     Both variants share the same shell: h-9, rounded-xl, bg-slate-900/40. */
+  const leftSlot = insideFolder && crumbInfo ? (
+    <div className="flex-1 min-w-0 h-9 flex items-center gap-1 pl-1 pr-1 rounded-xl bg-slate-900/40">
+      <button
+        onClick={() => setSelectedFolderId(null)}
+        className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+        aria-label="Back to folders"
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </button>
+
+      <span className={`flex-shrink-0 w-2 h-2 rounded-full ${crumbInfo.dot}`} />
+
+      {isRenaming && crumbInfo.canMenu && currentFolder ? (
+        <input
+          type="text"
+          value={renameValue}
+          onChange={(e) => setRenameValue(e.target.value)}
+          onBlur={() => {
+            const v = renameValue.trim();
+            if (v && v !== currentFolder.name) onRenameFolder(currentFolder.id, v);
+            setIsRenaming(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+            if (e.key === 'Escape') { setRenameValue(currentFolder.name); setIsRenaming(false); }
+          }}
+          className="flex-1 min-w-0 h-7 bg-slate-700/80 text-white rounded-md px-2 text-[13px] font-semibold outline-none border border-emerald-500/60"
+          autoFocus
+        />
+      ) : (
+        <>
+          <span className={`min-w-0 flex-1 truncate text-[13px] font-semibold leading-none ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
+            {crumbInfo.name}
+          </span>
+          {crumbInfo.isNew && (
+            <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
+              New
+            </span>
+          )}
+          <span className="flex-shrink-0 text-[12px] font-medium text-slate-500 tabular-nums pr-1">
+            {crumbInfo.count}
+          </span>
+          {crumbInfo.canMenu && (
+            <button
+              ref={crumbRef}
+              onClick={(e) => { e.stopPropagation(); crumbMenuOpen ? setCrumbMenuOpen(false) : openCrumbMenu(); }}
+              className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+              aria-label="Folder options"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  ) : (
+    <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-xl bg-slate-900/40">
+      <button
+        onClick={() => persistMode('all')}
+        className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+          mode === 'all' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
+        }`}
+      >
+        <LayoutList className="w-3.5 h-3.5" />
+        All Notes
+      </button>
+      <button
+        onClick={() => persistMode('folders')}
+        className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+          mode === 'folders' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
+        }`}
+      >
+        <FolderTreeIcon className="w-3.5 h-3.5" />
+        Folders
+      </button>
+    </div>
+  );
 
   return (
-    <div className="relative border-b border-slate-700/50 bg-slate-800">
-      {/* Nav-row (44px) */}
-      <div className="relative h-11 px-2 flex items-center gap-1.5">
-        {/* LEFT: segmented control OR breadcrumb */}
-        {insideFolder && crumbInfo ? (
-          <div className="flex-1 min-w-0 flex items-center gap-1 h-10">
-            <button
-              onClick={() => setSelectedFolderId(null)}
-              className="group flex items-center gap-0.5 h-10 px-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 active:bg-slate-700/70 transition-colors flex-shrink-0"
-              aria-label="Back to folders"
-            >
-              <ChevronLeft className="w-4 h-4 -mr-0.5" />
-              <span className="text-[13px] font-medium">Folders</span>
-            </button>
+    <div className="border-b border-slate-700/50 bg-slate-800">
+      {/* Row 1 — nav row */}
+      <div className="h-11 px-3 flex items-center gap-2">
+        {leftSlot}
 
-            <span className="flex-shrink-0 text-slate-600 text-xs px-0.5">/</span>
-
-            <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
-
-            {isRenaming && crumbInfo.canMenu && currentFolder ? (
-              <input
-                type="text"
-                value={renameValue}
-                onChange={(e) => setRenameValue(e.target.value)}
-                onBlur={() => {
-                  const v = renameValue.trim();
-                  if (v && v !== currentFolder.name) onRenameFolder(currentFolder.id, v);
-                  setIsRenaming(false);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-                  if (e.key === 'Escape') { setRenameValue(currentFolder.name); setIsRenaming(false); }
-                }}
-                className="flex-1 min-w-0 h-8 bg-slate-700/80 text-white rounded-md px-2 text-sm font-semibold outline-none border border-emerald-500/60"
-                autoFocus
-              />
-            ) : (
-              <>
-                <span className={`min-w-0 truncate text-sm font-semibold ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-white'}`}>
-                  {crumbInfo.name}
-                </span>
-                {crumbInfo.isNew && (
-                  <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
-                    New
-                  </span>
-                )}
-                <span className="flex-shrink-0 text-[12px] font-medium text-slate-500 tabular-nums">
-                  · {crumbInfo.count}
-                </span>
-                {crumbInfo.canMenu && (
-                  <button
-                    ref={crumbRef}
-                    onClick={(e) => { e.stopPropagation(); crumbMenuOpen ? setCrumbMenuOpen(false) : openCrumbMenu(); }}
-                    className="flex-shrink-0 flex items-center justify-center w-8 h-8 ml-0.5 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 active:bg-slate-700/70 transition-colors"
-                    aria-label="Folder options"
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="flex-1 min-w-0 flex gap-1 p-0.5 bg-slate-900/50 rounded-xl h-10">
-            <button
-              onClick={() => persistMode('all')}
-              className={`flex-1 flex items-center justify-center gap-1.5 rounded-[9px] text-[13px] font-semibold transition-all ${
-                mode === 'all' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
-              }`}
-            >
-              <LayoutList className="w-3.5 h-3.5" />
-              All Notes
-            </button>
-            <button
-              onClick={() => persistMode('folders')}
-              className={`flex-1 flex items-center justify-center gap-1.5 rounded-[9px] text-[13px] font-semibold transition-all ${
-                mode === 'folders' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
-              }`}
-            >
-              <FolderTreeIcon className="w-3.5 h-3.5" />
-              Folders
-            </button>
-          </div>
-        )}
-
-        {/* RIGHT: mobile search icon + primary New */}
-        {showMobileSearchIcon && (
-          <button
-            onClick={() => setSearchOpen(true)}
-            className="sm:hidden flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 active:bg-slate-700/70 transition-colors"
-            aria-label="Search notes"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-        )}
-        <button
-          ref={plusRef}
-          onClick={handlePlusClick}
-          className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-sm transition-colors"
-          aria-label={mode === 'folders' && !insideFolder ? 'Create new' : 'New note'}
-          title={mode === 'folders' && !insideFolder ? 'Create new…' : 'New note'}
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-
-        {/* Mobile search overlay */}
-        {searchOpen && (
-          <div className="sm:hidden absolute inset-x-2 top-1/2 -translate-y-1/2 z-10 flex items-center gap-1 bg-slate-800">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-              <input
-                ref={mobileSearchInputRef}
-                type="text"
-                placeholder="Search notes..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    onSearchChange('');
-                    setSearchOpen(false);
-                  }
-                }}
-                className="w-full h-10 bg-slate-900/70 border border-slate-700/50 rounded-xl pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-sm"
-              />
-            </div>
-            <button
-              onClick={() => { onSearchChange(''); setSearchOpen(false); }}
-              className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 active:bg-slate-700/70 transition-colors"
-              aria-label="Close search"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Desktop persistent search */}
-      <div className="hidden sm:block px-3 pb-2.5 pt-0.5">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+        {/* Desktop: inline search */}
+        <div className="hidden sm:block relative w-[180px] flex-shrink-0">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
           <input
             ref={searchInputRef}
             type="text"
             placeholder="Search notes..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full h-10 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-sm transition-all"
+            className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-8 pr-7 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
           />
           {searchQuery && (
             <button
               onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-500 hover:text-slate-300 transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-slate-500 hover:text-slate-300 transition-colors"
               aria-label="Clear search"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
+
+        {/* Mobile: search icon toggle */}
+        <button
+          onClick={() => setSearchOpen((v) => !v)}
+          className={`sm:hidden flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
+            mobileSearchVisible ? 'bg-slate-700 text-emerald-400' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
+          }`}
+          aria-label="Search notes"
+          aria-pressed={mobileSearchVisible}
+        >
+          <Search className="w-4 h-4" />
+        </button>
+
+        {/* Primary: + New */}
+        <button
+          ref={plusRef}
+          onClick={handlePlusClick}
+          className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-sm transition-colors"
+          aria-label={mode === 'folders' && !insideFolder ? 'Create new' : 'New note'}
+          title={mode === 'folders' && !insideFolder ? 'Create new…' : 'New note'}
+        >
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
 
-      {/* Mobile: small bottom padding so the row breathes */}
-      <div className="sm:hidden h-2" />
+      {/* Row 2 — mobile search (in-flow, animated) */}
+      <div
+        className={`sm:hidden overflow-hidden transition-[max-height,opacity] duration-200 ease-out ${
+          mobileSearchVisible ? 'max-h-16 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-3 pb-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+            <input
+              ref={mobileSearchInputRef}
+              type="text"
+              placeholder="Search notes..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); }
+              }}
+              className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-9 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+            />
+            {(searchQuery || searchOpen) && (
+              <button
+                onClick={() => { onSearchChange(''); setSearchOpen(false); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
+                aria-label="Close search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
 
       {/* + New popover (Folders mode, no folder open) */}
       {plusOpen && plusPos && createPortal(
