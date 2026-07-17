@@ -1026,10 +1026,11 @@ function FolderRowFlat({
           <span className="folder-name flex-1 min-w-0 text-[17px] sm:text-sm font-semibold text-white truncate">{folder.name}</span>
         )}
         {!isRenaming && (
-          <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-600/50 text-[11px] font-semibold text-slate-400 tabular-nums">
+          <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
             {count}
           </span>
         )}
+
       </button>
 
       <button
