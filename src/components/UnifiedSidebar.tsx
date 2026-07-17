@@ -1080,42 +1080,106 @@ export function UnifiedSidebar({
           )}
         </div>
 
-        {/* New note / New folder button */}
-        <div className="flex">
-          {mode === 'all' ? (
-            <button
-              onClick={() => onCreateNote()}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              New Note
-            </button>
-          ) : selectedFolderId && selectedFolderId !== '__no_folder__' ? (
-            <button
-              onClick={() => handleCreateNoteInFolder(selectedFolderId)}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              New Note
-            </button>
-          ) : selectedFolderId === '__no_folder__' ? (
-            <button
-              onClick={() => onCreateNote(undefined)}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              New Note
-            </button>
-          ) : (
-            <button
-              onClick={() => onCreateFolder('New Folder', null)}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 text-slate-200 rounded-xl text-sm font-semibold transition-colors shadow-sm"
-            >
-              <FolderPlus className="w-4 h-4" />
-              New Folder
-            </button>
-          )}
-        </div>
+        {/* Action row — depends on mode & selected folder */}
+        {(() => {
+          const NO_FOLDER_ID = '__no_folder__';
+
+          // Case 1: All Notes — single New Note button
+          if (mode === 'all') {
+            return (
+              <div className="flex">
+                <button
+                  onClick={() => onCreateNote()}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  New Note
+                </button>
+              </div>
+            );
+          }
+
+          // Case 3: Folders mode + inside a folder — back + folder info + New Note
+          if (selectedFolderId) {
+            const isNoFolder = selectedFolderId === NO_FOLDER_ID;
+            const folder = isNoFolder ? null : sortedFolders.find((f) => f.id === selectedFolderId);
+            const displayName = isNoFolder ? 'No Folder' : folder?.name ?? '';
+            const folderNoteCount = isNoFolder
+              ? unfiledNotes.length
+              : notes.filter((n) => n.folder_id === selectedFolderId).length;
+
+            const handleNewNote = () => {
+              if (isNoFolder) {
+                onCreateNote();
+              } else {
+                handleCreateNoteInFolder(selectedFolderId);
+              }
+            };
+
+            return (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedFolderId(null)}
+                  className="flex-shrink-0 flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 text-slate-200 rounded-xl transition-colors shadow-sm"
+                  title="Back to folders"
+                  aria-label="Back to folders"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+
+                <div className="min-w-0 flex-1 flex items-center gap-2 px-3 py-2 bg-slate-900/40 border border-slate-700/50 rounded-xl">
+                  {isNoFolder ? (
+                    <Inbox className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                  ) : (
+                    <FolderIcon className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-white truncate leading-tight">
+                      {displayName}
+                    </p>
+                    <p className="text-[11px] text-slate-500 leading-tight tabular-nums">
+                      {folderNoteCount} {folderNoteCount === 1 ? 'note' : 'notes'}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleNewNote}
+                  className="flex-shrink-0 flex items-center justify-center gap-1.5 px-3 h-11 sm:h-10 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
+                  title="New note in this folder"
+                  aria-label="New note in this folder"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">New Note</span>
+                </button>
+              </div>
+            );
+          }
+
+          // Case 2: Folders mode, no folder open — New Folder + New Note
+          return (
+            <div className="flex gap-2">
+              <button
+                onClick={() => onCreateFolder('New Folder', null)}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 text-slate-200 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+              >
+                <FolderPlus className="w-4 h-4" />
+                New Folder
+              </button>
+              <button
+                onClick={() => {
+                  onCreateNote();
+                  setExpanded(UNFILED_KEY, true);
+                  setSelectedFolderId(NO_FOLDER_ID);
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                New Note
+              </button>
+            </div>
+          );
+        })()}
       </div>
 
 
