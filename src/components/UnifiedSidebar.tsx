@@ -1277,9 +1277,10 @@ export function UnifiedSidebar({
           onClick={onOpenWorkspaceManagement}
           className="flex-1 min-w-0 flex items-center gap-2.5 text-left group/header rounded-lg -mx-1 px-1 py-1 hover:bg-slate-700/20 transition-colors"
         >
-          <div className="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
             <Notebook className="w-5 h-5 text-emerald-400" />
           </div>
+
           <div className="min-w-0 flex-1">
             <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">Workspace</p>
             <h1 className="text-sm font-bold text-white truncate">{workspaceName || 'My Notes'}</h1>
