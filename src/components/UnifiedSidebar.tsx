@@ -826,67 +826,65 @@ function SidebarNavBar({
 
   return (
     <div className="border-b border-slate-700/50 bg-slate-800">
-      {/* Row 1 — nav row */}
+      {/* Single nav row — swaps between controls and search inline (no vertical growth) */}
       <div className="h-11 px-3 flex items-center gap-2">
-        {leftSlot}
+        {mobileSearchVisible ? (
+          <>
+            <div className="flex-1 min-w-0 relative h-9">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <input
+                ref={mobileSearchInputRef}
+                type="text"
+                placeholder="Search notes..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); }
+                }}
+                className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => { onSearchChange(''); setSearchOpen(false); }}
+              className="flex-shrink-0 h-9 px-2.5 rounded-lg text-[13px] font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <>
+            {leftSlot}
 
-        {/* Search icon toggle (all breakpoints — keeps the row uncluttered) */}
-        <button
-          onClick={() => setSearchOpen((v) => !v)}
-          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
-            mobileSearchVisible ? 'bg-slate-700 text-emerald-400' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
-          }`}
-          aria-label="Search notes"
-          aria-pressed={mobileSearchVisible}
-        >
-          <Search className="w-4 h-4" />
-        </button>
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+              aria-label="Search notes"
+            >
+              <Search className="w-4 h-4" />
+            </button>
 
-        {/* Primary: + New */}
-        <button
-          ref={plusRef}
-          onClick={handlePlusClick}
-          className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-sm transition-colors"
-          aria-label={mode === 'folders' && !insideFolder ? 'Create new' : 'New note'}
-          title={mode === 'folders' && !insideFolder ? 'Create new…' : 'New note'}
-        >
-          <Plus className="w-5 h-5" />
-        </button>
+            <button
+              ref={plusRef}
+              onClick={handlePlusClick}
+              className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-sm transition-colors"
+              aria-label={mode === 'folders' && !insideFolder ? 'Create new' : 'New note'}
+              title={mode === 'folders' && !insideFolder ? 'Create new…' : 'New note'}
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </>
+        )}
       </div>
 
-      {/* Row 2 — collapsible search (in-flow, animated) */}
-      <div
-        className={`overflow-hidden transition-[max-height,opacity] duration-200 ease-out ${
-          mobileSearchVisible ? 'max-h-16 opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-
-        <div className="px-3 pb-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-            <input
-              ref={mobileSearchInputRef}
-              type="text"
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); }
-              }}
-              className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-9 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
-            />
-            {(searchQuery || searchOpen) && (
-              <button
-                onClick={() => { onSearchChange(''); setSearchOpen(false); }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
-                aria-label="Close search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
 
 
       {/* + New popover (Folders mode, no folder open) */}
