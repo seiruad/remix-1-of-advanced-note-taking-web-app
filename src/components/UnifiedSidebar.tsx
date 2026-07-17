@@ -17,7 +17,7 @@ import {
   FolderTree as FolderTreeIcon,
   X,
   Pencil,
-  Settings2,
+  
   MoreHorizontal,
   FolderInput,
   
