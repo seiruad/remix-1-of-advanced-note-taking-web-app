@@ -746,7 +746,7 @@ function SidebarNavBar({
           ) : (
             <>
               <div className="flex-1 min-w-0 flex items-center gap-2.5 ml-1">
-                <span className={`flex-shrink-0 w-2 h-2 rounded-full ${crumbInfo.dot} ${crumbInfo.dotShadow}`} />
+                <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
                 <div className="flex items-baseline gap-2 min-w-0">
                   <span className={`truncate text-sm font-medium ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
                     {crumbInfo.name}
