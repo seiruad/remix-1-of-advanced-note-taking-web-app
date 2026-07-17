@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import {
   Folder as FolderIcon,
   ChevronRight,
+  ChevronLeft,
   ChevronDown,
   Plus,
   Trash2,
