@@ -1467,11 +1467,13 @@ export function UnifiedSidebar({
 
         {/* FAB — contextual create */}
         {!hideFab && (
-          <SidebarFab
-            fabMode={fabMode}
-            onCreateNote={handleFabCreateNote}
-            onCreateFolder={handleFabCreateFolder}
-          />
+          <div className="px-3 pt-2 pb-3 bg-slate-800 border-t border-slate-700/30">
+            <SidebarFab
+              fabMode={fabMode}
+              onCreateNote={handleFabCreateNote}
+              onCreateFolder={handleFabCreateFolder}
+            />
+          </div>
         )}
       </div>
 
