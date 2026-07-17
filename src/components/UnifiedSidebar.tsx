@@ -1149,11 +1149,8 @@ export function UnifiedSidebar({
           // Case 3: Folders mode + inside a folder — back + folder info + New Note
           if (selectedFolderId) {
             const isNoFolder = selectedFolderId === NO_FOLDER_ID;
-            const folder = isNoFolder ? null : sortedFolders.find((f) => f.id === selectedFolderId);
-            const displayName = isNoFolder ? 'No Folder' : folder?.name ?? '';
-            const folderNoteCount = isNoFolder
-              ? unfiledNotes.length
-              : notes.filter((n) => n.folder_id === selectedFolderId).length;
+
+
 
             const handleNewNote = () => {
               if (isNoFolder) {
