@@ -647,7 +647,7 @@ function SidebarNavBar({
 
   const plusRef = useRef<HTMLButtonElement | null>(null);
   const crumbRef = useRef<HTMLButtonElement | null>(null);
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  
   const mobileSearchInputRef = useRef<HTMLInputElement | null>(null);
 
   // Sync mode -> localStorage
