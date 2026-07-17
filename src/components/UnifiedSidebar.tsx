@@ -301,11 +301,13 @@ function NoteCard({
     <>
       <div
         className={`group/card relative flex items-stretch rounded-xl cursor-pointer transition-colors duration-150 overflow-hidden ${
-          isNew
-            ? 'bg-amber-500/[0.06] hover:bg-amber-500/10'
-            : isActive
-              ? 'bg-emerald-500/12'
-              : 'hover:bg-slate-700/40 active:bg-slate-700/60'
+          isActive && isNew
+            ? 'bg-amber-500/15'
+            : isNew
+              ? 'bg-amber-500/[0.06] hover:bg-amber-500/10'
+              : isActive
+                ? 'bg-emerald-500/12'
+                : 'hover:bg-slate-700/40 active:bg-slate-700/60'
         }`}
         onClick={onSelect}
       >
