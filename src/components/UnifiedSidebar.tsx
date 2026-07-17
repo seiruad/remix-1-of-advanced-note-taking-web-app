@@ -607,6 +607,7 @@ function FolderDetailHeader({
   noteCount,
   isNoFolder,
   isNew = false,
+  onBack,
   onRename,
   onDelete,
 }: {
@@ -614,6 +615,7 @@ function FolderDetailHeader({
   noteCount: number;
   isNoFolder: boolean;
   isNew?: boolean;
+  onBack: () => void;
   onRename: (name: string) => void;
   onDelete: () => void;
 }) {
@@ -655,7 +657,7 @@ function FolderDetailHeader({
 
   const variant = isNoFolder
     ? {
-        wrap: 'bg-slate-800/60 border-y border-dashed border-slate-600/60',
+        wrap: 'bg-slate-800/70 border-b border-dashed border-slate-600/60',
         accent: 'bg-slate-500',
         iconWrap: 'bg-slate-700/70 text-slate-300',
         icon: <Inbox className="w-3.5 h-3.5" />,
@@ -665,16 +667,16 @@ function FolderDetailHeader({
       }
     : isNew
     ? {
-        wrap: 'bg-amber-500/[0.08] border-y border-amber-500/25',
+        wrap: 'bg-amber-500/[0.10] border-b border-amber-500/25',
         accent: 'bg-amber-400',
         iconWrap: 'bg-amber-500/15 text-amber-300',
         icon: <FolderPlus className="w-3.5 h-3.5" />,
-        label: 'NEW FOLDER',
+        label: 'NEW',
         labelColor: 'text-amber-400/80',
         nameColor: 'text-white',
       }
     : {
-        wrap: 'bg-emerald-500/[0.07] border-y border-emerald-500/20',
+        wrap: 'bg-emerald-500/[0.08] border-b border-emerald-500/20',
         accent: 'bg-emerald-400',
         iconWrap: 'bg-emerald-500/15 text-emerald-300',
         icon: <FolderOpen className="w-3.5 h-3.5" />,
@@ -684,17 +686,29 @@ function FolderDetailHeader({
       };
 
   return (
-    <div className={`-mx-3 mb-2 px-3 py-2 flex items-center gap-2.5 ${variant.wrap}`}>
-      <span className={`flex-shrink-0 w-0.5 h-8 rounded-full ${variant.accent}`} />
+    <div
+      className={`sticky top-0 z-20 -mx-3 mb-2 px-2 py-1.5 flex items-center gap-1.5 backdrop-blur-md ${variant.wrap}`}
+    >
+      <span className={`flex-shrink-0 w-0.5 h-7 rounded-full ${variant.accent}`} />
 
-      <span className={`flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md ${variant.iconWrap}`}>
+      <button
+        onClick={onBack}
+        className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors"
+        title="Back to folders"
+        aria-label="Back to folders"
+      >
+        <ArrowLeft className="w-4 h-4" />
+      </button>
+
+      <span className={`flex-shrink-0 flex items-center justify-center w-6 h-6 rounded ${variant.iconWrap}`}>
         {variant.icon}
       </span>
 
-      <div className="flex-1 min-w-0">
-        <div className={`text-[9px] font-bold tracking-[0.12em] leading-none mb-0.5 ${variant.labelColor}`}>
-          {variant.label} · {noteCount}
-        </div>
+      <span className={`flex-shrink-0 text-[9px] font-bold tracking-[0.12em] ${variant.labelColor}`}>
+        {variant.label}
+      </span>
+
+      <div className="flex-1 min-w-0 flex items-baseline gap-1.5">
         {isRenaming ? (
           <input
             type="text"
@@ -705,13 +719,16 @@ function FolderDetailHeader({
               if (e.key === 'Enter') handleRename();
               if (e.key === 'Escape') { setRenameValue(displayName); setIsRenaming(false); }
             }}
-            className="folder-rename-input w-full bg-slate-700/80 text-white rounded px-1.5 py-0.5 text-sm outline-none border border-emerald-500/60 ring-1 ring-emerald-500/20"
+            className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded px-1.5 py-0.5 text-sm outline-none border border-emerald-500/60 ring-1 ring-emerald-500/20"
             autoFocus
           />
         ) : (
-          <h2 className={`text-sm font-semibold truncate leading-tight ${variant.nameColor}`}>
-            {displayName}
-          </h2>
+          <>
+            <h2 className={`text-sm font-semibold truncate leading-tight ${variant.nameColor}`}>
+              {displayName}
+            </h2>
+            <span className="text-[11px] text-slate-500 tabular-nums flex-shrink-0">· {noteCount}</span>
+          </>
         )}
       </div>
 
@@ -720,8 +737,9 @@ function FolderDetailHeader({
           <button
             ref={triggerRef}
             onClick={(e) => { e.stopPropagation(); menuOpen ? setMenuOpen(false) : openMenu(); }}
-            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors"
+            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors"
             title="Folder options"
+            aria-label="Folder options"
           >
             <MoreHorizontal className="folder-menu-icon" />
           </button>
