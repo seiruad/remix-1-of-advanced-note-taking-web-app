@@ -1246,15 +1246,19 @@ export function UnifiedSidebar({
     setExpanded(folderId, true);
   };
 
-  const searchResults = useMemo(() => {
-    if (!searchQuery.trim()) return null;
-    const q = searchQuery.toLowerCase();
-    return notes.filter(
-      (n) =>
-        n.title.toLowerCase().includes(q) ||
-        JSON.stringify(n.content).toLowerCase().includes(q)
-    );
-  }, [notes, searchQuery]);
+  const noteMatches = useCallback(
+    (n: NoteWithDetails, q: string) =>
+      n.title.toLowerCase().includes(q) ||
+      JSON.stringify(n.content).toLowerCase().includes(q),
+    [],
+  );
+
+  const switchToAllNotes = useCallback(() => {
+    setSelectedFolderId(null);
+    setMode('all');
+    try { localStorage.setItem(MODE_STORAGE_KEY, 'all'); } catch { /* noop */ }
+  }, []);
+
 
   const sortedFolders = useMemo(
     () => [...folders].sort((a, b) => {
