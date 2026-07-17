@@ -1259,16 +1259,8 @@ export function UnifiedSidebar({
                 const displayName = isNoFolder ? 'No Folder' : folder!.name;
                 return (
                   <div>
-                    <FolderDetailHeader
-                      displayName={displayName}
-                      noteCount={folderNotes.length}
-                      isNoFolder={isNoFolder}
-                      onBack={() => setSelectedFolderId(null)}
-                      isNew={!isNoFolder && (folder!.is_new ?? false)}
-                      onRename={(name) => onRenameFolder(folder!.id, name)}
-                      onDelete={() => setFolderToDelete(folder!)}
-                    />
                     {folderNotes.length > 0 ? (
+
                       <div className="space-y-1.5">
                         {folderNotes.map((note) => (
                           <NoteCard
