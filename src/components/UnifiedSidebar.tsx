@@ -300,29 +300,33 @@ function NoteCard({
   return (
     <>
       <div
-        className={`group/card relative flex items-stretch rounded-xl cursor-pointer transition-all duration-150 ${
+        className={`group/card relative flex items-stretch rounded-xl cursor-pointer transition-colors duration-150 overflow-hidden ${
           isActive
-            ? 'bg-emerald-600/15 border border-emerald-500/30 shadow-sm'
+            ? 'bg-emerald-500/12'
             : isNew
-              ? 'bg-amber-500/5 border border-dashed border-amber-500/40 hover:bg-amber-500/10'
-              : 'border border-transparent hover:bg-slate-700/40 active:bg-slate-700/60'
+              ? 'bg-amber-500/[0.06] hover:bg-amber-500/10'
+              : 'hover:bg-slate-700/40 active:bg-slate-700/60'
         }`}
         onClick={onSelect}
       >
-        {/* Active indicator bar */}
-        {isActive && (
-          <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-emerald-500 rounded-full" />
+        {/* Left accent bar: active=emerald, new=amber (dashed feel via opacity) */}
+        {(isActive || isNew) && (
+          <span
+            className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full ${
+              isActive ? 'bg-emerald-400' : 'bg-amber-400/70'
+            }`}
+          />
         )}
 
         <div className="flex-1 py-3.5 sm:py-3 pl-4 pr-2 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className={`text-base sm:text-sm font-semibold leading-snug truncate ${
-              isActive ? 'text-emerald-100' : isNew ? 'text-amber-200 italic' : 'text-slate-100'
+              isActive ? 'text-emerald-50' : isNew ? 'text-amber-100 italic' : 'text-slate-100'
             }`}>
               {note.title || 'Untitled'}
             </h3>
             {isNew && (
-              <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-amber-400/90 bg-amber-500/15 border border-amber-500/30 rounded-full px-1.5 py-0.5">
+              <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-amber-300 bg-amber-500/15 rounded-full px-1.5 py-0.5">
                 New
               </span>
             )}
@@ -330,13 +334,12 @@ function NoteCard({
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-2 sm:mt-1.5">
             {showFolder && (
-              <span className={`flex items-center gap-1 text-sm sm:text-xs ${
-                folderName ? 'text-emerald-400/80' : 'text-slate-500'
-              }`}>
+              <span className="flex items-center gap-1 text-sm sm:text-xs text-slate-500">
                 <FolderOpen className="w-4 h-4 sm:w-3 sm:h-3 flex-shrink-0" />
                 <span className="truncate max-w-[100px]">{folderName || 'No folder'}</span>
               </span>
             )}
+
             <span className="flex items-center gap-1 text-sm sm:text-xs text-slate-500">
               <Clock className="w-4 h-4 sm:w-3 sm:h-3 flex-shrink-0" />
               {formatDate(note.updated_at)}
