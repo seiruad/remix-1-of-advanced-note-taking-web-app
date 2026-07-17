@@ -883,6 +883,56 @@ function SidebarNavBar({
         )}
       </div>
 
+      {/* Folder context strip — shown only inside a folder, keeps toggle above always usable */}
+      {insideFolder && crumbInfo && !mobileSearchVisible && (
+        <div className="h-9 px-3 flex items-center gap-2 border-t border-slate-700/40 bg-slate-900/20">
+          <span className={`flex-shrink-0 w-2 h-2 rounded-full ${crumbInfo.dot}`} />
+          {isRenaming && crumbInfo.canMenu && currentFolder ? (
+            <input
+              type="text"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onBlur={() => {
+                const v = renameValue.trim();
+                if (v && v !== currentFolder.name) onRenameFolder(currentFolder.id, v);
+                setIsRenaming(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                if (e.key === 'Escape') { setRenameValue(currentFolder.name); setIsRenaming(false); }
+              }}
+              className="flex-1 min-w-0 h-7 bg-slate-700/80 text-white rounded-md px-2 text-[13px] font-semibold outline-none border border-emerald-500/60"
+              autoFocus
+            />
+          ) : (
+            <>
+              <span className={`min-w-0 flex-1 truncate text-[13px] font-semibold ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
+                {crumbInfo.name}
+              </span>
+              {crumbInfo.isNew && (
+                <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
+                  New
+                </span>
+              )}
+              <span className="flex-shrink-0 text-[12px] font-medium text-slate-500 tabular-nums">
+                {crumbInfo.count}
+              </span>
+              {crumbInfo.canMenu && (
+                <button
+                  ref={crumbRef}
+                  onClick={(e) => { e.stopPropagation(); crumbMenuOpen ? setCrumbMenuOpen(false) : openCrumbMenu(); }}
+                  className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+                  aria-label="Folder options"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+
 
 
       {/* + New popover (Folders mode, no folder open) */}
