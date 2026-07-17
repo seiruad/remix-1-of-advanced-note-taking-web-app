@@ -1278,8 +1278,8 @@ export function UnifiedSidebar({
       />
 
       {/* ===== NoteList-Viewer ===== */}
-      <div className="flex-1 relative min-h-0">
-        <div className="absolute inset-0 overflow-y-auto notes-list-scroll">
+      <div className="flex-1 relative min-h-0 flex flex-col">
+        <div className="flex-1 overflow-y-auto notes-list-scroll min-h-0">
 
         {(() => {
           const q = searchQuery.trim().toLowerCase();
