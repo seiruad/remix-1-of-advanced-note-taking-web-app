@@ -1287,6 +1287,7 @@ export function UnifiedSidebar({
                       displayName={displayName}
                       noteCount={folderNotes.length}
                       isNoFolder={isNoFolder}
+                      onBack={() => setSelectedFolderId(null)}
                       isNew={!isNoFolder && (folder!.is_new ?? false)}
                       onRename={(name) => onRenameFolder(folder!.id, name)}
                       onDelete={() => setFolderToDelete(folder!)}
