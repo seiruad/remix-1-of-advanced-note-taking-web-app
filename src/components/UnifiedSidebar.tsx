@@ -682,7 +682,7 @@ function FolderDetailHeader({
           <button
             ref={triggerRef}
             onClick={(e) => { e.stopPropagation(); menuOpen ? setMenuOpen(false) : openMenu(); }}
-            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-10 h-10 sm:w-8 sm:h-8 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 transition-colors"
+            className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 transition-colors"
             title="Folder options"
           >
             <MoreHorizontal className="folder-menu-icon" />
