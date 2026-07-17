@@ -1204,14 +1204,65 @@ export function UnifiedSidebar({
     ? notes.filter((n) => n.folder_id === folderToDelete.id).length
     : 0;
 
+  const [searchOpen, setSearchOpen] = useState<boolean>(() => !!searchQuery);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (searchQuery && !searchOpen) setSearchOpen(true);
+  }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) searchInputRef.current.focus();
+  }, [searchOpen]);
+
+  const isNoFolderView = selectedFolderId === NO_FOLDER_ID;
+  const insideFolderView = !!selectedFolderId;
+  const currentFolderView = insideFolderView && !isNoFolderView
+    ? folders.find((f) => f.id === selectedFolderId) ?? null
+    : null;
+
+  const searchPlaceholder = (() => {
+    if (mode === 'all') return 'Search all notes…';
+    if (!insideFolderView) return 'Search folders…';
+    if (isNoFolderView) return 'Search in "No Folder"…';
+    if (currentFolderView) return `Search in "${currentFolderView.name}"…`;
+    return 'Search…';
+  })();
+
+  const fabMode: FabMode = (() => {
+    if (mode === 'all') return 'note';
+    if (!insideFolderView) return 'choice';
+    if (isNoFolderView) return 'unfiled';
+    return 'note-in-folder';
+  })();
+
+  const handleFabCreateNote = () => {
+    if (mode === 'all') { onCreateNote(); return; }
+    if (insideFolderView) {
+      if (isNoFolderView) onCreateNote();
+      else if (currentFolderView) handleCreateNoteInFolder(currentFolderView.id);
+      return;
+    }
+    // Folders list → choice menu's "New Note" branch: create unfiled and open No Folder
+    onCreateNote();
+    setExpanded(UNFILED_KEY, true);
+    setSelectedFolderId(NO_FOLDER_ID);
+  };
+
+  const handleFabCreateFolder = () => {
+    onCreateFolder('New Folder', null);
+  };
+
+  const hideFab = searchOpen && !!searchQuery;
+
   return (
     <div className="flex flex-col h-full bg-slate-800 border-r border-slate-700/50">
-      {/* Workspace header */}
-      <button
-        onClick={onOpenWorkspaceManagement}
-        className="w-full px-4 pt-4 pb-3 border-b border-slate-700/50 text-left group/header hover:bg-slate-700/20 transition-colors"
-      >
-        <div className="flex items-center gap-2.5">
+      {/* Workspace header — clickable main region + search icon (sibling buttons, not nested) */}
+      <div className="w-full px-4 pt-4 pb-3 border-b border-slate-700/50 flex items-center gap-2">
+        <button
+          onClick={onOpenWorkspaceManagement}
+          className="flex-1 min-w-0 flex items-center gap-2.5 text-left group/header rounded-lg -mx-1 px-1 py-1 hover:bg-slate-700/20 transition-colors"
+        >
           <div className="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
             <Notebook className="w-5 h-5 text-emerald-400" />
           </div>
@@ -1220,8 +1271,53 @@ export function UnifiedSidebar({
             <h1 className="text-sm font-bold text-white truncate">{workspaceName || 'My Notes'}</h1>
           </div>
           <Settings2 className="w-4 h-4 text-slate-500 group-hover/header:text-emerald-400 transition-colors flex-shrink-0" />
+        </button>
+        <button
+          onClick={() => setSearchOpen((v) => !v)}
+          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
+            searchOpen || searchQuery
+              ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
+              : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
+          }`}
+          aria-label={searchOpen ? 'Close search' : 'Open search'}
+          title={searchOpen ? 'Close search' : 'Search'}
+        >
+          <Search className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Contextual search bar — under header, above nav row */}
+      {searchOpen && (
+        <div className="h-12 px-3 flex items-center gap-2 bg-slate-800 border-b border-slate-700/50">
+          <div className="flex-1 min-w-0 relative h-9">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); } }}
+              className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => { onSearchChange(''); setSearchOpen(false); }}
+            className="flex-shrink-0 h-9 px-2.5 rounded-lg text-[13px] font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+          >
+            Cancel
+          </button>
         </div>
-      </button>
+      )}
 
       <SidebarNavBar
         mode={mode}
@@ -1231,20 +1327,14 @@ export function UnifiedSidebar({
         folders={sortedFolders}
         notes={notes}
         unfiledCount={unfiledNotes.length}
-        searchQuery={searchQuery}
-        onSearchChange={onSearchChange}
-        onCreateNote={onCreateNote}
-        onCreateFolder={onCreateFolder}
-        onCreateNoteInFolder={handleCreateNoteInFolder}
         onRenameFolder={onRenameFolder}
         onOpenDeleteFolder={(f) => setFolderToDelete(f)}
-        onExpandUnfiled={() => setExpanded(UNFILED_KEY, true)}
       />
 
-
-
       {/* ===== NoteList-Viewer ===== */}
-      <div className="flex-1 overflow-y-auto notes-list-scroll">
+      <div className="flex-1 relative min-h-0">
+        <div className="absolute inset-0 overflow-y-auto notes-list-scroll">
+
         {(() => {
           const q = searchQuery.trim().toLowerCase();
           const hasQuery = q.length > 0;
