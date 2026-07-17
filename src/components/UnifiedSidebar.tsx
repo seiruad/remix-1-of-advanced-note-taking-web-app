@@ -887,6 +887,14 @@ function SidebarNavBar({
       {/* Folder context strip — shown only inside a folder, keeps toggle above always usable */}
       {insideFolder && crumbInfo && !mobileSearchVisible && (
         <div className="h-9 px-3 flex items-center gap-2 border-t border-slate-700/40 bg-slate-900/20">
+          <button
+            onClick={() => setSelectedFolderId(null)}
+            className="flex-shrink-0 flex items-center justify-center w-7 h-7 -ml-1 rounded-lg text-slate-400 hover:text-emerald-300 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+            aria-label="Back to all folders"
+            title="Back to all folders"
+          >
+            <ChevronLeft className="w-4 h-4" strokeWidth={2.5} />
+          </button>
           <span className={`flex-shrink-0 w-2 h-2 rounded-full ${crumbInfo.dot}`} />
           {isRenaming && crumbInfo.canMenu && currentFolder ? (
             <input
