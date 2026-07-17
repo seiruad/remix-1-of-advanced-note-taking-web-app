@@ -872,15 +872,41 @@ function SidebarNavBar({
               <Search className="w-4 h-4" />
             </button>
 
-            <button
-              ref={plusRef}
-              onClick={handlePlusClick}
-              className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-sm transition-colors"
-              aria-label={mode === 'folders' && !insideFolder ? 'Create new' : 'New note'}
-              title={mode === 'folders' && !insideFolder ? 'Create new…' : 'New note'}
-            >
-              <Plus className="w-5 h-5" />
-            </button>
+            {(() => {
+              const isChoice = mode === 'folders' && !insideFolder;
+              const isUnfiled = insideFolder && isNoFolder;
+              const tone = isChoice
+                ? 'bg-amber-500 hover:bg-amber-400 active:bg-amber-600'
+                : isUnfiled
+                ? 'bg-slate-600 hover:bg-slate-500 active:bg-slate-700'
+                : 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700';
+              const label = isChoice
+                ? 'Create note or folder'
+                : isUnfiled
+                ? 'New unfiled note'
+                : 'New note';
+              return (
+                <button
+                  ref={plusRef}
+                  onClick={handlePlusClick}
+                  className={`relative flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl text-white shadow-sm transition-colors ${tone}`}
+                  aria-label={label}
+                  title={label}
+                >
+                  {isChoice ? (
+                    <>
+                      <FolderPlus className="w-[18px] h-[18px]" />
+                      <ChevronDown className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 opacity-90" strokeWidth={3} />
+                    </>
+                  ) : isUnfiled ? (
+                    <FileText className="w-[18px] h-[18px]" />
+                  ) : (
+                    <Plus className="w-5 h-5" />
+                  )}
+                </button>
+              );
+            })()}
+
           </>
         )}
       </div>
