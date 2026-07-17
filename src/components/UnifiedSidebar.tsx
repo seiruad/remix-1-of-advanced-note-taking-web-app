@@ -613,14 +613,8 @@ function SidebarNavBar({
   folders,
   notes: _notes,
   unfiledCount,
-  searchQuery,
-  onSearchChange,
-  onCreateNote,
-  onCreateFolder,
-  onCreateNoteInFolder,
   onRenameFolder,
   onOpenDeleteFolder,
-  onExpandUnfiled,
 }: {
   mode: Mode;
   setMode: (m: Mode) => void;
@@ -629,66 +623,28 @@ function SidebarNavBar({
   folders: FolderType[];
   notes: NoteWithDetails[];
   unfiledCount: number;
-  searchQuery: string;
-  onSearchChange: (q: string) => void;
-  onCreateNote: (folderId?: string) => void;
-  onCreateFolder: (name: string, parentId: string | null) => void;
-  onCreateNoteInFolder: (folderId: string) => void;
   onRenameFolder: (folderId: string, name: string) => void;
   onOpenDeleteFolder: (folder: FolderType) => void;
-  onExpandUnfiled: () => void;
 }) {
-  const [searchOpen, setSearchOpen] = useState<boolean>(() => !!searchQuery);
-  const [plusOpen, setPlusOpen] = useState(false);
-  const [plusPos, setPlusPos] = useState<{ top: number; left: number } | null>(null);
   const [crumbMenuOpen, setCrumbMenuOpen] = useState(false);
   const [crumbMenuPos, setCrumbMenuPos] = useState<{ top: number; left: number } | null>(null);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
 
-  const plusRef = useRef<HTMLButtonElement | null>(null);
   const crumbRef = useRef<HTMLButtonElement | null>(null);
-  
-  const mobileSearchInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Sync mode -> localStorage
   const persistMode = (m: Mode) => {
     setMode(m);
     setSelectedFolderId(null);
     try { localStorage.setItem(MODE_STORAGE_KEY, m); } catch { /* noop */ }
   };
 
-  // Auto-open mobile search when there's a query (e.g. restored)
   useEffect(() => {
-    if (searchQuery && !searchOpen) setSearchOpen(true);
-  }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (searchOpen && mobileSearchInputRef.current) {
-      mobileSearchInputRef.current.focus();
-    }
-  }, [searchOpen]);
-
-  // Close popovers on outside click / Escape
-  useEffect(() => {
-    if (!plusOpen && !crumbMenuOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setPlusOpen(false); setCrumbMenuOpen(false); }
-    };
+    if (!crumbMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setCrumbMenuOpen(false); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [plusOpen, crumbMenuOpen]);
-
-  const openPlus = () => {
-    const rect = plusRef.current!.getBoundingClientRect();
-    const MENU_W = 220;
-    const MENU_H = 120;
-    const MARGIN = 8;
-    const left = Math.min(rect.right - MENU_W, window.innerWidth - MENU_W - MARGIN);
-    const top = Math.min(rect.bottom + 6, window.innerHeight - MENU_H - MARGIN);
-    setPlusPos({ top: Math.max(MARGIN, top), left: Math.max(MARGIN, left) });
-    setPlusOpen(true);
-  };
+  }, [crumbMenuOpen]);
 
   const openCrumbMenu = () => {
     const rect = crumbRef.current!.getBoundingClientRect();
@@ -701,28 +657,12 @@ function SidebarNavBar({
     setCrumbMenuOpen(true);
   };
 
-  // Which primary action?
   const isNoFolder = selectedFolderId === NO_FOLDER_ID;
   const insideFolder = !!selectedFolderId;
   const currentFolder = insideFolder && !isNoFolder
     ? folders.find((f) => f.id === selectedFolderId) ?? null
     : null;
 
-  const handlePlusClick = () => {
-    if (mode === 'all') {
-      onCreateNote();
-      return;
-    }
-    if (insideFolder) {
-      if (isNoFolder) onCreateNote();
-      else if (currentFolder) onCreateNoteInFolder(currentFolder.id);
-      return;
-    }
-    // Folders mode, no folder open -> popover
-    plusOpen ? setPlusOpen(false) : openPlus();
-  };
-
-  // Breadcrumb variant (color dot + matching glow)
   const crumbInfo = (() => {
     if (isNoFolder) {
       return { name: 'No Folder', count: unfiledCount, dot: 'bg-slate-500', dotShadow: 'shadow-[0_0_8px_rgba(148,163,184,0.35)]', italic: true, canMenu: false, isNew: false };
@@ -742,151 +682,37 @@ function SidebarNavBar({
     return null;
   })();
 
-  const mobileSearchVisible = searchOpen || !!searchQuery;
-
-  // Contextual search placeholder
-  const searchPlaceholder = (() => {
-    if (mode === 'all') return 'Search all notes…';
-    if (!insideFolder) return 'Search folders…';
-    if (isNoFolder) return 'Search in "No Folder"…';
-    if (currentFolder) return `Search in "${currentFolder.name}"…`;
-    return 'Search…';
-  })();
-
-  /* Segmented toggle — always visible, both tabs functional even inside a folder. */
-  const leftSlot = (
-    <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-xl bg-slate-900/40">
-      <button
-        onClick={() => persistMode('all')}
-        className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
-          mode === 'all' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
-        }`}
-      >
-        <LayoutList className="w-3.5 h-3.5" />
-        All Notes
-      </button>
-      <button
-        onClick={() => {
-          // If we're already in folders mode and drilled into a folder, "Folders" pops back to the list.
-          if (mode === 'folders' && insideFolder) setSelectedFolderId(null);
-          else persistMode('folders');
-        }}
-        className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
-          mode === 'folders' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
-        }`}
-      >
-        <FolderTreeIcon className="w-3.5 h-3.5" />
-        Folders
-      </button>
-    </div>
-  );
-
   return (
     <div className="border-b border-slate-700/50 bg-slate-800">
-      {/* Single nav row — swaps between controls and search inline (no vertical growth) */}
-      <div className="h-11 px-3 flex items-center gap-2">
-        {mobileSearchVisible ? (
-          <>
-            <div className="flex-1 min-w-0 relative h-9">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-              <input
-                ref={mobileSearchInputRef}
-                type="text"
-                placeholder={searchPlaceholder}
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); }
-                }}
-                className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => onSearchChange('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-            <button
-              onClick={() => { onSearchChange(''); setSearchOpen(false); }}
-              className="flex-shrink-0 h-9 px-2.5 rounded-lg text-[13px] font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
-          <>
-            {leftSlot}
-
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
-              aria-label="Search notes"
-            >
-              <Search className="w-4 h-4" />
-            </button>
-
-            {(() => {
-              const isChoice = mode === 'folders' && !insideFolder;
-              const isUnfiled = insideFolder && isNoFolder;
-              const tone = isChoice
-                ? {
-                    grad: 'from-amber-400 to-amber-600',
-                    ring: 'ring-amber-300/40',
-                    glow: 'shadow-[0_4px_14px_-4px_rgba(245,158,11,0.55)]',
-                  }
-                : isUnfiled
-                ? {
-                    grad: 'from-slate-500 to-slate-700',
-                    ring: 'ring-slate-300/20',
-                    glow: 'shadow-[0_4px_14px_-4px_rgba(148,163,184,0.45)]',
-                  }
-                : {
-                    grad: 'from-emerald-400 to-emerald-600',
-                    ring: 'ring-emerald-300/40',
-                    glow: 'shadow-[0_4px_14px_-4px_rgba(16,185,129,0.55)]',
-                  };
-              const label = isChoice
-                ? 'Create note or folder'
-                : isUnfiled
-                ? 'New unfiled note'
-                : 'New note';
-              return (
-                <button
-                  ref={plusRef}
-                  onClick={handlePlusClick}
-                  className={`group relative flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl text-white bg-gradient-to-b ${tone.grad} ring-1 ${tone.ring} ${tone.glow} hover:brightness-110 active:brightness-95 active:scale-[0.97] transition-all duration-150`}
-                  aria-label={label}
-                  title={label}
-                >
-                  {/* subtle inner highlight */}
-                  <span className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-white/20 to-transparent opacity-60" />
-                  {isChoice ? (
-                    <span className="relative flex items-center justify-center">
-                      <FolderPlus className="w-[17px] h-[17px]" strokeWidth={2.25} />
-                      <span className="absolute -bottom-1 -right-1.5 flex items-center justify-center w-3 h-3 rounded-full bg-white/95 text-amber-600 ring-1 ring-amber-700/20">
-                        <ChevronDown className="w-2 h-2" strokeWidth={3.5} />
-                      </span>
-                    </span>
-                  ) : isUnfiled ? (
-                    <FileText className="relative w-[17px] h-[17px]" strokeWidth={2.25} />
-                  ) : (
-                    <Plus className="relative w-[19px] h-[19px]" strokeWidth={2.5} />
-                  )}
-                </button>
-              );
-            })()}
-
-
-          </>
-        )}
+      {/* Full-width segmented navigation — the only element in this row */}
+      <div className="h-11 px-3 flex items-center">
+        <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-xl bg-slate-900/40">
+          <button
+            onClick={() => persistMode('all')}
+            className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+              mode === 'all' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
+            }`}
+          >
+            <LayoutList className="w-3.5 h-3.5" />
+            All Notes
+          </button>
+          <button
+            onClick={() => {
+              if (mode === 'folders' && insideFolder) setSelectedFolderId(null);
+              else persistMode('folders');
+            }}
+            className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+              mode === 'folders' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
+            }`}
+          >
+            <FolderTreeIcon className="w-3.5 h-3.5" />
+            Folders
+          </button>
+        </div>
       </div>
 
-      {/* Folder context strip — shown only inside a folder, keeps toggle above always usable */}
-      {insideFolder && crumbInfo && !mobileSearchVisible && (
+      {/* Folder context strip — only inside a folder */}
+      {insideFolder && crumbInfo && (
         <div className="h-10 px-2 flex items-center gap-1 bg-slate-800/30 border-t border-slate-700/40">
           <button
             onClick={() => setSelectedFolderId(null)}
@@ -948,47 +774,6 @@ function SidebarNavBar({
         </div>
       )}
 
-
-
-
-      {/* + New popover (Folders mode, no folder open) */}
-      {plusOpen && plusPos && createPortal(
-        <>
-          <div className="fixed inset-0 z-[9998]" onClick={() => setPlusOpen(false)} />
-          <div
-            style={{ position: 'fixed', top: plusPos.top, left: plusPos.left, zIndex: 9999, width: 220 }}
-            className="bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.75)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => {
-                setPlusOpen(false);
-                onCreateNote();
-                onExpandUnfiled();
-                setSelectedFolderId(NO_FOLDER_ID);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-3 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
-            >
-              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-300">
-                <FileText className="w-4 h-4" />
-              </span>
-              <span className="text-sm font-medium">New Note</span>
-            </button>
-            <div className="h-px bg-white/8" />
-            <button
-              onClick={() => { setPlusOpen(false); onCreateFolder('New Folder', null); }}
-              className="w-full flex items-center gap-3 px-3 py-3 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
-            >
-              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-700/70 text-slate-200">
-                <FolderPlus className="w-4 h-4" />
-              </span>
-              <span className="text-sm font-medium">New Folder</span>
-            </button>
-          </div>
-        </>,
-        document.body,
-      )}
-
       {/* Breadcrumb ⋯ popover (Rename / Delete) */}
       {crumbMenuOpen && crumbMenuPos && currentFolder && createPortal(
         <>
@@ -1026,6 +811,114 @@ function SidebarNavBar({
         document.body,
       )}
     </div>
+  );
+}
+
+/* ---------- Sidebar FAB (contextual create) ---------- */
+
+type FabMode = 'note' | 'note-in-folder' | 'unfiled' | 'choice';
+
+function SidebarFab({
+  fabMode,
+  onCreateNote,
+  onCreateFolder,
+}: {
+  fabMode: FabMode;
+  onCreateNote: () => void;
+  onCreateFolder: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  const openMenu = () => {
+    const rect = btnRef.current!.getBoundingClientRect();
+    const MENU_W = 220;
+    const MENU_H = 120;
+    const MARGIN = 8;
+    const left = Math.min(rect.right - MENU_W, window.innerWidth - MENU_W - MARGIN);
+    const top = Math.max(MARGIN, rect.top - MENU_H - 8);
+    setPos({ top, left: Math.max(MARGIN, left) });
+    setOpen(true);
+  };
+
+  const handleClick = () => {
+    if (fabMode === 'choice') {
+      open ? setOpen(false) : openMenu();
+    } else {
+      onCreateNote();
+    }
+  };
+
+  const label = fabMode === 'choice'
+    ? 'Create note or folder'
+    : fabMode === 'note-in-folder'
+    ? 'New note in this folder'
+    : fabMode === 'unfiled'
+    ? 'New unfiled note'
+    : 'New note';
+
+  return (
+    <>
+      <button
+        ref={btnRef}
+        onClick={handleClick}
+        aria-label={label}
+        title={label}
+        className="group absolute bottom-4 right-4 z-20 flex items-center justify-center w-14 h-14 rounded-full text-white bg-gradient-to-b from-emerald-400 to-emerald-600 ring-1 ring-emerald-300/40 shadow-[0_10px_28px_-6px_rgba(16,185,129,0.65)] hover:brightness-110 active:brightness-95 active:scale-[0.96] transition-all duration-150"
+      >
+        <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/25 to-transparent opacity-60" />
+        {fabMode === 'choice' ? (
+          <span className="relative flex items-center justify-center">
+            <Plus className="w-6 h-6" strokeWidth={2.5} />
+            <span className="absolute -bottom-1 -right-1.5 flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white/95 text-emerald-600 ring-1 ring-emerald-700/20">
+              <ChevronDown className="w-2.5 h-2.5" strokeWidth={3.5} />
+            </span>
+          </span>
+        ) : (
+          <Plus className="relative w-7 h-7" strokeWidth={2.5} />
+        )}
+      </button>
+
+      {open && pos && createPortal(
+        <>
+          <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
+          <div
+            style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 9999, width: 220 }}
+            className="bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.75)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => { setOpen(false); onCreateNote(); }}
+              className="w-full flex items-center gap-3 px-3 py-3 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
+            >
+              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-300">
+                <FileText className="w-4 h-4" />
+              </span>
+              <span className="text-sm font-medium">New Note</span>
+            </button>
+            <div className="h-px bg-white/8" />
+            <button
+              onClick={() => { setOpen(false); onCreateFolder(); }}
+              className="w-full flex items-center gap-3 px-3 py-3 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
+            >
+              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-700/70 text-slate-200">
+                <FolderPlus className="w-4 h-4" />
+              </span>
+              <span className="text-sm font-medium">New Folder</span>
+            </button>
+          </div>
+        </>,
+        document.body,
+      )}
+    </>
   );
 }
 
@@ -1311,14 +1204,65 @@ export function UnifiedSidebar({
     ? notes.filter((n) => n.folder_id === folderToDelete.id).length
     : 0;
 
+  const [searchOpen, setSearchOpen] = useState<boolean>(() => !!searchQuery);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (searchQuery && !searchOpen) setSearchOpen(true);
+  }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) searchInputRef.current.focus();
+  }, [searchOpen]);
+
+  const isNoFolderView = selectedFolderId === NO_FOLDER_ID;
+  const insideFolderView = !!selectedFolderId;
+  const currentFolderView = insideFolderView && !isNoFolderView
+    ? folders.find((f) => f.id === selectedFolderId) ?? null
+    : null;
+
+  const searchPlaceholder = (() => {
+    if (mode === 'all') return 'Search all notes…';
+    if (!insideFolderView) return 'Search folders…';
+    if (isNoFolderView) return 'Search in "No Folder"…';
+    if (currentFolderView) return `Search in "${currentFolderView.name}"…`;
+    return 'Search…';
+  })();
+
+  const fabMode: FabMode = (() => {
+    if (mode === 'all') return 'note';
+    if (!insideFolderView) return 'choice';
+    if (isNoFolderView) return 'unfiled';
+    return 'note-in-folder';
+  })();
+
+  const handleFabCreateNote = () => {
+    if (mode === 'all') { onCreateNote(); return; }
+    if (insideFolderView) {
+      if (isNoFolderView) onCreateNote();
+      else if (currentFolderView) handleCreateNoteInFolder(currentFolderView.id);
+      return;
+    }
+    // Folders list → choice menu's "New Note" branch: create unfiled and open No Folder
+    onCreateNote();
+    setExpanded(UNFILED_KEY, true);
+    setSelectedFolderId(NO_FOLDER_ID);
+  };
+
+  const handleFabCreateFolder = () => {
+    onCreateFolder('New Folder', null);
+  };
+
+  const hideFab = searchOpen && !!searchQuery;
+
   return (
     <div className="flex flex-col h-full bg-slate-800 border-r border-slate-700/50">
-      {/* Workspace header */}
-      <button
-        onClick={onOpenWorkspaceManagement}
-        className="w-full px-4 pt-4 pb-3 border-b border-slate-700/50 text-left group/header hover:bg-slate-700/20 transition-colors"
-      >
-        <div className="flex items-center gap-2.5">
+      {/* Workspace header — clickable main region + search icon (sibling buttons, not nested) */}
+      <div className="w-full px-4 pt-4 pb-3 border-b border-slate-700/50 flex items-center gap-2">
+        <button
+          onClick={onOpenWorkspaceManagement}
+          className="flex-1 min-w-0 flex items-center gap-2.5 text-left group/header rounded-lg -mx-1 px-1 py-1 hover:bg-slate-700/20 transition-colors"
+        >
           <div className="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
             <Notebook className="w-5 h-5 text-emerald-400" />
           </div>
@@ -1327,8 +1271,53 @@ export function UnifiedSidebar({
             <h1 className="text-sm font-bold text-white truncate">{workspaceName || 'My Notes'}</h1>
           </div>
           <Settings2 className="w-4 h-4 text-slate-500 group-hover/header:text-emerald-400 transition-colors flex-shrink-0" />
+        </button>
+        <button
+          onClick={() => setSearchOpen((v) => !v)}
+          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
+            searchOpen || searchQuery
+              ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
+              : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
+          }`}
+          aria-label={searchOpen ? 'Close search' : 'Open search'}
+          title={searchOpen ? 'Close search' : 'Search'}
+        >
+          <Search className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Contextual search bar — under header, above nav row */}
+      {searchOpen && (
+        <div className="h-12 px-3 flex items-center gap-2 bg-slate-800 border-b border-slate-700/50">
+          <div className="flex-1 min-w-0 relative h-9">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Escape') { onSearchChange(''); setSearchOpen(false); } }}
+              className="w-full h-9 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => { onSearchChange(''); setSearchOpen(false); }}
+            className="flex-shrink-0 h-9 px-2.5 rounded-lg text-[13px] font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+          >
+            Cancel
+          </button>
         </div>
-      </button>
+      )}
 
       <SidebarNavBar
         mode={mode}
@@ -1338,20 +1327,14 @@ export function UnifiedSidebar({
         folders={sortedFolders}
         notes={notes}
         unfiledCount={unfiledNotes.length}
-        searchQuery={searchQuery}
-        onSearchChange={onSearchChange}
-        onCreateNote={onCreateNote}
-        onCreateFolder={onCreateFolder}
-        onCreateNoteInFolder={handleCreateNoteInFolder}
         onRenameFolder={onRenameFolder}
         onOpenDeleteFolder={(f) => setFolderToDelete(f)}
-        onExpandUnfiled={() => setExpanded(UNFILED_KEY, true)}
       />
 
-
-
       {/* ===== NoteList-Viewer ===== */}
-      <div className="flex-1 overflow-y-auto notes-list-scroll">
+      <div className="flex-1 relative min-h-0">
+        <div className="absolute inset-0 overflow-y-auto notes-list-scroll">
+
         {(() => {
           const q = searchQuery.trim().toLowerCase();
           const hasQuery = q.length > 0;
@@ -1481,21 +1464,12 @@ export function UnifiedSidebar({
                   );
                 }
 
-                /* Folders list — search only folder names */
-                if (sortedFolders.length === 0 && unfiledNotes.length === 0) {
-                  return (
-                    <div className="py-12 text-center">
-                      <FolderIcon className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-                      <p className="text-sm font-medium text-slate-500">No folders yet</p>
-                      <p className="text-xs text-slate-600 mt-1">Folders keep your notes organized</p>
-                    </div>
-                  );
-                }
-
+                /* Folders list — search only folder names. "No Folder" is always pinned on top. */
                 const foldersFiltered = hasQuery
                   ? sortedFolders.filter((f) => f.name.toLowerCase().includes(q))
                   : sortedFolders;
-                const showUnfiled = unfiledNotes.length > 0 && (!hasQuery || 'no folder'.includes(q));
+                const showUnfiled = !hasQuery || 'no folder'.includes(q);
+
 
                 if (hasQuery && foldersFiltered.length === 0 && !showUnfiled) {
                   return <NoMatchesFallback label="folders" />;
@@ -1542,11 +1516,22 @@ export function UnifiedSidebar({
             </div>
           );
         })()}
+        </div>
+
+        {/* FAB — contextual create */}
+        {!hideFab && (
+          <SidebarFab
+            fabMode={fabMode}
+            onCreateNote={handleFabCreateNote}
+            onCreateFolder={handleFabCreateFolder}
+          />
+        )}
       </div>
 
 
       {/* Footer: Storage */}
       <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenSettings} />
+
 
       {/* Delete note confirmation */}
       {noteToDelete && (
