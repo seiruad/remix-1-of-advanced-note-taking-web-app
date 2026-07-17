@@ -1289,7 +1289,7 @@ export function UnifiedSidebar({
         </button>
         <button
           onClick={() => setSearchOpen((v) => !v)}
-          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
+          className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
             searchOpen || searchQuery
               ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
               : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
