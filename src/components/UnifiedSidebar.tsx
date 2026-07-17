@@ -1303,7 +1303,7 @@ export function UnifiedSidebar({
 
       {/* Contextual search bar — under header, above nav row */}
       {searchOpen && (
-        <div className="h-12 px-3 flex items-center gap-2 bg-slate-800 border-b border-slate-700/50">
+        <div className="h-11 px-3 flex items-center gap-2 bg-slate-800 border-b border-slate-700/50">
           <div className="flex-1 min-w-0 relative h-9">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
             <input
