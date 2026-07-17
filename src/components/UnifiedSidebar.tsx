@@ -722,10 +722,10 @@ function SidebarNavBar({
     plusOpen ? setPlusOpen(false) : openPlus();
   };
 
-  // Breadcrumb variant (color dot)
+  // Breadcrumb variant (color dot + matching glow)
   const crumbInfo = (() => {
     if (isNoFolder) {
-      return { name: 'No Folder', count: unfiledCount, dot: 'bg-slate-500', italic: true, canMenu: false, isNew: false };
+      return { name: 'No Folder', count: unfiledCount, dot: 'bg-slate-500', dotShadow: 'shadow-[0_0_8px_rgba(148,163,184,0.35)]', italic: true, canMenu: false, isNew: false };
     }
     if (currentFolder) {
       const folderNoteCount = _notes.filter((n) => n.folder_id === currentFolder.id).length;
@@ -733,6 +733,7 @@ function SidebarNavBar({
         name: currentFolder.name,
         count: folderNoteCount,
         dot: currentFolder.is_new ? 'bg-amber-400' : 'bg-emerald-400',
+        dotShadow: currentFolder.is_new ? 'shadow-[0_0_8px_rgba(251,191,36,0.45)]' : 'shadow-[0_0_8px_rgba(52,211,153,0.45)]',
         italic: false,
         canMenu: true,
         isNew: !!currentFolder.is_new,
