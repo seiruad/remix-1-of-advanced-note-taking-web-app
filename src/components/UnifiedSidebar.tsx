@@ -606,14 +606,12 @@ function FolderDetailHeader({
   displayName,
   noteCount,
   isNoFolder,
-  onBack,
   onRename,
   onDelete,
 }: {
   displayName: string;
   noteCount: number;
   isNoFolder: boolean;
-  onBack: () => void;
   onRename: (name: string) => void;
   onDelete: () => void;
 }) {
