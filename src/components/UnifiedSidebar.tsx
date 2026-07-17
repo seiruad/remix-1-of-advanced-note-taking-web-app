@@ -600,165 +600,391 @@ function FolderSection({
   );
 }
 
-/* ---------- Folder detail header (drill-down view) ---------- */
+/* ---------- Sidebar nav-bar (mode toggle / breadcrumb / search / + New) ---------- */
 
-function FolderDetailHeader({
-  displayName,
-  noteCount,
-  isNoFolder,
-  isNew = false,
-  onBack,
-  onRename,
-  onDelete,
+const NO_FOLDER_ID = '__no_folder__';
+
+function SidebarNavBar({
+  mode,
+  setMode,
+  selectedFolderId,
+  setSelectedFolderId,
+  folders,
+  notes: _notes,
+  unfiledCount,
+  searchQuery,
+  onSearchChange,
+  onCreateNote,
+  onCreateFolder,
+  onCreateNoteInFolder,
+  onRenameFolder,
+  onOpenDeleteFolder,
+  onExpandUnfiled,
 }: {
-  displayName: string;
-  noteCount: number;
-  isNoFolder: boolean;
-  isNew?: boolean;
-  onBack: () => void;
-  onRename: (name: string) => void;
-  onDelete: () => void;
+  mode: Mode;
+  setMode: (m: Mode) => void;
+  selectedFolderId: string | null;
+  setSelectedFolderId: (id: string | null) => void;
+  folders: FolderType[];
+  notes: NoteWithDetails[];
+  unfiledCount: number;
+  searchQuery: string;
+  onSearchChange: (q: string) => void;
+  onCreateNote: (folderId?: string) => void;
+  onCreateFolder: (name: string, parentId: string | null) => void;
+  onCreateNoteInFolder: (folderId: string) => void;
+  onRenameFolder: (folderId: string, name: string) => void;
+  onOpenDeleteFolder: (folder: FolderType) => void;
+  onExpandUnfiled: () => void;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
+  const [searchOpen, setSearchOpen] = useState<boolean>(() => !!searchQuery);
+  const [plusOpen, setPlusOpen] = useState(false);
+  const [plusPos, setPlusPos] = useState<{ top: number; left: number } | null>(null);
+  const [crumbMenuOpen, setCrumbMenuOpen] = useState(false);
+  const [crumbMenuPos, setCrumbMenuPos] = useState<{ top: number; left: number } | null>(null);
   const [isRenaming, setIsRenaming] = useState(false);
-  const [renameValue, setRenameValue] = useState(displayName);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+
+  const plusRef = useRef<HTMLButtonElement | null>(null);
+  const crumbRef = useRef<HTMLButtonElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Sync mode -> localStorage
+  const persistMode = (m: Mode) => {
+    setMode(m);
+    setSelectedFolderId(null);
+    try { localStorage.setItem(MODE_STORAGE_KEY, m); } catch { /* noop */ }
+  };
+
+  // Auto-open mobile search when there's a query (e.g. restored)
+  useEffect(() => {
+    if (searchQuery && !searchOpen) setSearchOpen(true);
+  }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (
-        menuRef.current && !menuRef.current.contains(e.target as Node) &&
-        triggerRef.current && !triggerRef.current.contains(e.target as Node)
-      ) setMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [menuOpen]);
+    if (searchOpen && mobileSearchInputRef.current) {
+      mobileSearchInputRef.current.focus();
+    }
+  }, [searchOpen]);
 
-  const openMenu = () => {
-    const rect = triggerRef.current!.getBoundingClientRect();
-    const isMobile = window.innerWidth < 640;
-    const MENU_W = isMobile ? 230 : 200;
-    const MENU_H = isMobile ? 200 : 140;
+  // Close popovers on outside click / Escape
+  useEffect(() => {
+    if (!plusOpen && !crumbMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setPlusOpen(false); setCrumbMenuOpen(false); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [plusOpen, crumbMenuOpen]);
+
+  const openPlus = () => {
+    const rect = plusRef.current!.getBoundingClientRect();
+    const MENU_W = 220;
+    const MENU_H = 120;
     const MARGIN = 8;
     const left = Math.min(rect.right - MENU_W, window.innerWidth - MENU_W - MARGIN);
-    const top = Math.min(rect.bottom + 4, window.innerHeight - MENU_H - MARGIN);
-    setMenuPos({ top: Math.max(MARGIN, top), left: Math.max(MARGIN, left) });
-    setMenuOpen(true);
+    const top = Math.min(rect.bottom + 6, window.innerHeight - MENU_H - MARGIN);
+    setPlusPos({ top: Math.max(MARGIN, top), left: Math.max(MARGIN, left) });
+    setPlusOpen(true);
   };
 
-  const handleRename = () => {
-    if (renameValue.trim() && renameValue !== displayName) onRename(renameValue.trim());
-    setIsRenaming(false);
+  const openCrumbMenu = () => {
+    const rect = crumbRef.current!.getBoundingClientRect();
+    const MENU_W = 200;
+    const MENU_H = 130;
+    const MARGIN = 8;
+    const left = Math.min(rect.right - MENU_W, window.innerWidth - MENU_W - MARGIN);
+    const top = Math.min(rect.bottom + 6, window.innerHeight - MENU_H - MARGIN);
+    setCrumbMenuPos({ top: Math.max(MARGIN, top), left: Math.max(MARGIN, left) });
+    setCrumbMenuOpen(true);
   };
 
-  // Variant only tints a small accent dot next to the folder name.
-  // Everything else stays neutral/minimal so the header feels like part of the sidebar,
-  // not a heavy banner. iOS Notes-inspired: breadcrumb on top, large title below.
-  const variant = isNoFolder
-    ? { dot: 'bg-slate-500', nameColor: 'text-slate-300 italic', label: null as string | null }
-    : isNew
-    ? { dot: 'bg-amber-400', nameColor: 'text-white', label: 'NEW' }
-    : { dot: 'bg-emerald-400', nameColor: 'text-white', label: null };
+  // Which primary action?
+  const isNoFolder = selectedFolderId === NO_FOLDER_ID;
+  const insideFolder = !!selectedFolderId;
+  const currentFolder = insideFolder && !isNoFolder
+    ? folders.find((f) => f.id === selectedFolderId) ?? null
+    : null;
+
+  const handlePlusClick = () => {
+    if (mode === 'all') {
+      onCreateNote();
+      return;
+    }
+    if (insideFolder) {
+      if (isNoFolder) onCreateNote();
+      else if (currentFolder) onCreateNoteInFolder(currentFolder.id);
+      return;
+    }
+    // Folders mode, no folder open -> popover
+    plusOpen ? setPlusOpen(false) : openPlus();
+  };
+
+  // Breadcrumb variant (color dot)
+  const crumbInfo = (() => {
+    if (isNoFolder) {
+      return { name: 'No Folder', count: unfiledCount, dot: 'bg-slate-500', italic: true, canMenu: false, isNew: false };
+    }
+    if (currentFolder) {
+      const folderNoteCount = _notes.filter((n) => n.folder_id === currentFolder.id).length;
+      return {
+        name: currentFolder.name,
+        count: folderNoteCount,
+        dot: currentFolder.is_new ? 'bg-amber-400' : 'bg-emerald-400',
+        italic: false,
+        canMenu: true,
+        isNew: !!currentFolder.is_new,
+      };
+    }
+    return null;
+  })();
+
+  const showMobileSearchIcon = !searchOpen;
 
   return (
-    <div className="sticky top-0 z-20 -mx-3 mb-2 px-3 pt-2 pb-2.5 bg-slate-900/90 backdrop-blur-md border-b border-white/5">
-      {/* Row 1 — breadcrumb + menu */}
-      <div className="flex items-center justify-between h-7">
-        <button
-          onClick={onBack}
-          className="group -ml-1 flex items-center gap-0.5 h-7 px-1.5 rounded-md text-slate-400 hover:text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
-          aria-label="Back to folders"
-        >
-          <ChevronLeft className="w-4 h-4 -mr-0.5" />
-          <span className="text-[13px] font-medium">Folders</span>
-        </button>
+    <div className="relative border-b border-slate-700/50 bg-slate-800">
+      {/* Nav-row (44px) */}
+      <div className="relative h-11 px-2 flex items-center gap-1.5">
+        {/* LEFT: segmented control OR breadcrumb */}
+        {insideFolder && crumbInfo ? (
+          <div className="flex-1 min-w-0 flex items-center gap-1 h-10">
+            <button
+              onClick={() => setSelectedFolderId(null)}
+              className="group flex items-center gap-0.5 h-10 px-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 active:bg-slate-700/70 transition-colors flex-shrink-0"
+              aria-label="Back to folders"
+            >
+              <ChevronLeft className="w-4 h-4 -mr-0.5" />
+              <span className="text-[13px] font-medium">Folders</span>
+            </button>
 
-        {!isNoFolder && !isRenaming && (
+            <span className="flex-shrink-0 text-slate-600 text-xs px-0.5">/</span>
+
+            <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
+
+            {isRenaming && crumbInfo.canMenu && currentFolder ? (
+              <input
+                type="text"
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                onBlur={() => {
+                  const v = renameValue.trim();
+                  if (v && v !== currentFolder.name) onRenameFolder(currentFolder.id, v);
+                  setIsRenaming(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                  if (e.key === 'Escape') { setRenameValue(currentFolder.name); setIsRenaming(false); }
+                }}
+                className="flex-1 min-w-0 h-8 bg-slate-700/80 text-white rounded-md px-2 text-sm font-semibold outline-none border border-emerald-500/60"
+                autoFocus
+              />
+            ) : (
+              <>
+                <span className={`min-w-0 truncate text-sm font-semibold ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-white'}`}>
+                  {crumbInfo.name}
+                </span>
+                {crumbInfo.isNew && (
+                  <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
+                    New
+                  </span>
+                )}
+                <span className="flex-shrink-0 text-[12px] font-medium text-slate-500 tabular-nums">
+                  · {crumbInfo.count}
+                </span>
+                {crumbInfo.canMenu && (
+                  <button
+                    ref={crumbRef}
+                    onClick={(e) => { e.stopPropagation(); crumbMenuOpen ? setCrumbMenuOpen(false) : openCrumbMenu(); }}
+                    className="flex-shrink-0 flex items-center justify-center w-8 h-8 ml-0.5 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 active:bg-slate-700/70 transition-colors"
+                    aria-label="Folder options"
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="flex-1 min-w-0 flex gap-1 p-0.5 bg-slate-900/50 rounded-xl h-10">
+            <button
+              onClick={() => persistMode('all')}
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-[9px] text-[13px] font-semibold transition-all ${
+                mode === 'all' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
+              }`}
+            >
+              <LayoutList className="w-3.5 h-3.5" />
+              All Notes
+            </button>
+            <button
+              onClick={() => persistMode('folders')}
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-[9px] text-[13px] font-semibold transition-all ${
+                mode === 'folders' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
+              }`}
+            >
+              <FolderTreeIcon className="w-3.5 h-3.5" />
+              Folders
+            </button>
+          </div>
+        )}
+
+        {/* RIGHT: mobile search icon + primary New */}
+        {showMobileSearchIcon && (
           <button
-            ref={triggerRef}
-            onClick={(e) => { e.stopPropagation(); menuOpen ? setMenuOpen(false) : openMenu(); }}
-            className="folder-menu-btn -mr-1 flex items-center justify-center w-8 h-7 rounded-md text-slate-400 hover:text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
-            aria-label="Folder options"
+            onClick={() => setSearchOpen(true)}
+            className="sm:hidden flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 active:bg-slate-700/70 transition-colors"
+            aria-label="Search notes"
           >
-            <MoreHorizontal className="w-4 h-4" />
+            <Search className="w-4 h-4" />
           </button>
         )}
-      </div>
+        <button
+          ref={plusRef}
+          onClick={handlePlusClick}
+          className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-sm transition-colors"
+          aria-label={mode === 'folders' && !insideFolder ? 'Create new' : 'New note'}
+          title={mode === 'folders' && !insideFolder ? 'Create new…' : 'New note'}
+        >
+          <Plus className="w-5 h-5" />
+        </button>
 
-      {/* Row 2 — folder title */}
-      <div className="mt-0.5 flex items-baseline gap-2 min-w-0">
-        <span className={`flex-shrink-0 self-center w-1.5 h-1.5 rounded-full ${variant.dot}`} />
-        {isRenaming ? (
-          <input
-            type="text"
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
-            onBlur={handleRename}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleRename();
-              if (e.key === 'Escape') { setRenameValue(displayName); setIsRenaming(false); }
-            }}
-            className="folder-rename-input flex-1 min-w-0 h-7 bg-slate-800/80 text-white rounded-md px-1.5 text-[17px] font-semibold outline-none border border-emerald-500/60 ring-1 ring-emerald-500/20"
-            autoFocus
-          />
-        ) : (
-          <>
-            <h2 className={`text-[17px] font-semibold leading-tight truncate ${variant.nameColor}`}>
-              {displayName}
-            </h2>
-            {variant.label && (
-              <span className="flex-shrink-0 text-[9px] font-bold tracking-[0.08em] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
-                {variant.label}
-              </span>
-            )}
-            <span className="flex-shrink-0 text-[12px] font-medium text-slate-500 tabular-nums">
-              {noteCount === 1 ? '1 note' : `${noteCount} notes`}
-            </span>
-          </>
+        {/* Mobile search overlay */}
+        {searchOpen && (
+          <div className="sm:hidden absolute inset-x-2 top-1/2 -translate-y-1/2 z-10 flex items-center gap-1 bg-slate-800">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <input
+                ref={mobileSearchInputRef}
+                type="text"
+                placeholder="Search notes..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    onSearchChange('');
+                    setSearchOpen(false);
+                  }
+                }}
+                className="w-full h-10 bg-slate-900/70 border border-slate-700/50 rounded-xl pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-sm"
+              />
+            </div>
+            <button
+              onClick={() => { onSearchChange(''); setSearchOpen(false); }}
+              className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 active:bg-slate-700/70 transition-colors"
+              aria-label="Close search"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         )}
       </div>
 
-      {menuOpen && !isNoFolder && createPortal(
-            <>
-              <div className="fixed inset-0 z-[9998]" onClick={() => setMenuOpen(false)} />
-              <div
-                ref={menuRef}
-                style={{ position: 'fixed', top: menuPos!.top, left: menuPos!.left, zIndex: 9999 }}
-                className="folder-dropdown bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden
-                           shadow-[0_20px_60px_rgba(0,0,0,0.75),0_0_0_0.5px_rgba(255,255,255,0.07)]
-                           animate-[dropdownIn_0.18s_cubic-bezier(0.34,1.4,0.64,1)_both]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => { setRenameValue(displayName); setIsRenaming(true); setMenuOpen(false); }}
-                  className="folder-dropdown-item neutral w-full flex items-center text-slate-100 active:bg-white/12"
-                >
-                  <span className="folder-dropdown-icon flex items-center justify-center rounded-xl bg-slate-700/80 flex-shrink-0">
-                    <Pencil className="text-slate-200" />
-                  </span>
-                  Rename
-                </button>
-                <div className="h-px bg-white/8" />
-                <button
-                  onClick={() => { setMenuOpen(false); onDelete(); }}
-                  className="folder-dropdown-item danger w-full flex items-center text-red-400 active:bg-red-500/15"
-                >
-                  <span className="folder-dropdown-icon flex items-center justify-center rounded-xl bg-red-500/15 flex-shrink-0">
-                    <Trash2 className="text-red-400" />
-                  </span>
-                  Delete
-                </button>
-              </div>
-            </>,
-            document.body,
+      {/* Desktop persistent search */}
+      <div className="hidden sm:block px-3 pb-2.5 pt-0.5">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search notes..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full h-10 bg-slate-900/40 border border-slate-700/50 rounded-xl pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-sm transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => onSearchChange('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-500 hover:text-slate-300 transition-colors"
+              aria-label="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           )}
+        </div>
+      </div>
+
+      {/* Mobile: small bottom padding so the row breathes */}
+      <div className="sm:hidden h-2" />
+
+      {/* + New popover (Folders mode, no folder open) */}
+      {plusOpen && plusPos && createPortal(
+        <>
+          <div className="fixed inset-0 z-[9998]" onClick={() => setPlusOpen(false)} />
+          <div
+            style={{ position: 'fixed', top: plusPos.top, left: plusPos.left, zIndex: 9999, width: 220 }}
+            className="bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.75)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => {
+                setPlusOpen(false);
+                onCreateNote();
+                onExpandUnfiled();
+                setSelectedFolderId(NO_FOLDER_ID);
+              }}
+              className="w-full flex items-center gap-3 px-3 py-3 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
+            >
+              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-300">
+                <FileText className="w-4 h-4" />
+              </span>
+              <span className="text-sm font-medium">New Note</span>
+            </button>
+            <div className="h-px bg-white/8" />
+            <button
+              onClick={() => { setPlusOpen(false); onCreateFolder('New Folder', null); }}
+              className="w-full flex items-center gap-3 px-3 py-3 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
+            >
+              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-700/70 text-slate-200">
+                <FolderPlus className="w-4 h-4" />
+              </span>
+              <span className="text-sm font-medium">New Folder</span>
+            </button>
+          </div>
+        </>,
+        document.body,
+      )}
+
+      {/* Breadcrumb ⋯ popover (Rename / Delete) */}
+      {crumbMenuOpen && crumbMenuPos && currentFolder && createPortal(
+        <>
+          <div className="fixed inset-0 z-[9998]" onClick={() => setCrumbMenuOpen(false)} />
+          <div
+            style={{ position: 'fixed', top: crumbMenuPos.top, left: crumbMenuPos.left, zIndex: 9999, width: 200 }}
+            className="bg-slate-800/97 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.75)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => {
+                setCrumbMenuOpen(false);
+                setRenameValue(currentFolder.name);
+                setIsRenaming(true);
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
+            >
+              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/80 text-slate-200">
+                <Pencil className="w-4 h-4" />
+              </span>
+              <span className="text-sm font-medium">Rename</span>
+            </button>
+            <div className="h-px bg-white/8" />
+            <button
+              onClick={() => { setCrumbMenuOpen(false); onOpenDeleteFolder(currentFolder); }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-500/10 active:bg-red-500/15 transition-colors"
+            >
+              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/15 text-red-400">
+                <Trash2 className="w-4 h-4" />
+              </span>
+              <span className="text-sm font-medium">Delete</span>
+            </button>
+          </div>
+        </>,
+        document.body,
+      )}
     </div>
   );
 }
+
+
 
 /* ---------- Flat folder row (Folders mode) ---------- */
 
