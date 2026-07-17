@@ -479,9 +479,15 @@ function FolderSection({
     setIsRenaming(false);
   };
 
-  const sortedNotes = [...notes].sort((a, b) =>
-    (a.title || '').localeCompare(b.title || '')
-  );
+  const sortedNotes = [...notes].sort((a, b) => {
+    const aNew = a.is_new ?? false;
+    const bNew = b.is_new ?? false;
+    if (aNew !== bNew) return aNew ? -1 : 1;
+    if (aNew && bNew) {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+    return (a.title || '').localeCompare(b.title || '');
+  });
 
   return (
     <div className="mb-1">
@@ -1138,6 +1144,9 @@ export function UnifiedSidebar({
       const aNew = a.is_new ?? false;
       const bNew = b.is_new ?? false;
       if (aNew !== bNew) return aNew ? -1 : 1;
+      if (aNew && bNew) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
       return (a.title || '').localeCompare(b.title || '');
     }),
     [notes]
@@ -1148,6 +1157,9 @@ export function UnifiedSidebar({
       const aNew = a.is_new ?? false;
       const bNew = b.is_new ?? false;
       if (aNew !== bNew) return aNew ? -1 : 1;
+      if (aNew && bNew) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
       return (a.title || '').localeCompare(b.title || '');
     }),
     [notes]
@@ -1369,6 +1381,9 @@ export function UnifiedSidebar({
                     const aNew = a.is_new ?? false;
                     const bNew = b.is_new ?? false;
                     if (aNew !== bNew) return aNew ? -1 : 1;
+                    if (aNew && bNew) {
+                      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                    }
                     return (a.title || '').localeCompare(b.title || '');
                   });
                   const folderNotes = hasQuery ? baseNotes.filter((n) => noteMatches(n, q)) : baseNotes;
