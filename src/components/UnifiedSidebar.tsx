@@ -927,18 +927,17 @@ function FolderRowFlat({
           folder.is_new ? 'bg-amber-400/80' : 'bg-emerald-400/70 group-hover:bg-emerald-400'
         } transition-colors`}
       />
-      <button onClick={onSelect} className="flex items-center gap-3 flex-1 min-w-0 text-left">
-        <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
-          folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
-        }`}>
-          {folder.is_new ? (
-            <FolderPlus className="w-5 h-5 sm:w-4 sm:h-4 text-amber-300" />
-          ) : (
-            <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-400" />
-          )}
-        </div>
-
-        {isRenaming ? (
+      {isRenaming ? (
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
+            folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
+          }`}>
+            {folder.is_new ? (
+              <FolderPlus className="w-5 h-5 sm:w-4 sm:h-4 text-amber-300" />
+            ) : (
+              <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-400" />
+            )}
+          </div>
           <input
             type="text"
             value={renameValue}
@@ -956,16 +955,24 @@ function FolderRowFlat({
             className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded-lg px-2.5 py-1.5 outline-none border border-emerald-500/60 ring-2 ring-emerald-500/20"
             autoFocus
           />
-        ) : (
+        </div>
+      ) : (
+        <button onClick={onSelect} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+          <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
+            folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
+          }`}>
+            {folder.is_new ? (
+              <FolderPlus className="w-5 h-5 sm:w-4 sm:h-4 text-amber-300" />
+            ) : (
+              <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-400" />
+            )}
+          </div>
           <span className="folder-name flex-1 min-w-0 text-left text-[17px] sm:text-sm font-semibold text-white truncate">{folder.name}</span>
-        )}
-        {!isRenaming && (
           <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
             {count}
           </span>
-        )}
-
-      </button>
+        </button>
+      )}
 
       <button
         ref={triggerRef}
