@@ -384,7 +384,7 @@ function NoteCard({
           <div
             ref={menuRef}
             style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, zIndex: 9999 }}
-            className="w-[196px] bg-slate-800 border border-slate-600/60 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-1.5 overflow-hidden"
+            className="w-[196px] bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] py-1.5 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <button
