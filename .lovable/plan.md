@@ -1,72 +1,59 @@
-# Refactor: UnifiedSidebar middle section (v2)
+## Проблемы
 
-Scope: only the block between the Workspace header and the Storage footer in `src/components/UnifiedSidebar.tsx` (component `SidebarNavBar`, ~lines 603–985). No business logic changes.
+1. **Навигация исчезает внутри папки.** Сегментированный тогл `All Notes | Folders` заменяется на breadcrumb-пилюлю с маленькой `‹`. Пользователь теряет прямой доступ к «All Notes», особенно на мобиле.
+2. **Поиск не привязан к контексту.** Один и тот же фильтр по заметкам во всех трёх режимах, один плейсхолдер.
 
-## What's wrong today
+## Решение
 
-1. **Uneven vertical rhythm** — nav-row is `h-11` with `px-2`, desktop search sits in a separate block with `px-3 pb-2.5 pt-0.5`, mobile adds a random `h-2` spacer. Gutters and heights don't line up with the workspace header above or list rows below.
-2. **Two visual languages in one strip** — segmented toggle uses `bg-slate-900/50` pill with inner `rounded-[9px]`; the breadcrumb variant is flat text with a dot; the `+` button is a solid emerald square. Three different shapes, three different weights, all on the same 44px row.
-3. **Mobile awkwardness** — mobile search opens as an absolute overlay covering the toggle, which feels like a modal, not a control. Icon-only search button (`w-10`) sits next to a `w-10` emerald button with only `gap-1.5` — cramped.
-4. **Breadcrumb overloaded** — inside a folder the single row carries: back button + "Folders" label + `/` + dot + name + New badge + `· count` + `⋯` + (right side) search icon + `+`. Nine elements on a 44px mobile row. Truncation hits the folder name first — the most important item.
-5. **Desktop-only search** wastes a full row (~42px) even when unused; no visual separation from the nav row makes it read as a second, competing input area.
+### 1. Тогл `All Notes | Folders` всегда виден
 
-## New structure
+- Тогл остаётся на месте во всех трёх состояниях (All Notes / Folders list / Inside Folder). Клик по «All Notes» из папки → выходит из папки и переключает режим. Клик по «Folders» из папки → возвращает к списку папок.
+- Инфо о текущей папке (точка-акцент, имя, счётчик, `⋯` меню Rename/Delete) переезжает в **отдельную тонкую sub-строку** под nav-row, видимую только внутри папки. Высота ~36px, `px-3`, цвет точки по варианту (emerald / amber-New / slate-No Folder). Без `‹` и без «Folders /».
+- Кнопка `+` (создание заметки в папке) — справа в nav-row как сейчас.
 
-Two clean rows on mobile, one row on desktop. Consistent `px-3`, consistent `h-11`, consistent `rounded-xl`, one accent color (emerald) reserved for the primary action only.
-
-```text
-MOBILE (< sm)                              DESKTOP (>= sm)
-┌───────────────────────────────────────┐  ┌───────────────────────────────────────┐
-│ [All Notes | Folders]        🔍  [+] │  │ [All Notes | Folders]  [ search… ] [+]│
-├───────────────────────────────────────┤  └───────────────────────────────────────┘
-│ [ search…                          ✕ ]│     (single row, search inline)
-└───────────────────────────────────────┘
-```
-
-Inside a folder, the toggle slot is replaced by a compact breadcrumb of the **same height and shape** as the toggle — so the row's silhouette never jumps:
+Схема (мобилка, внутри папки):
 
 ```text
 ┌───────────────────────────────────────┐
-│ [‹  ● Folder name · 4     ⋯]   [+]   │
+│ [All Notes | Folders]        🔍  [+] │
+├───────────────────────────────────────┤
+│ ● Folder name · 4                  ⋯ │
 └───────────────────────────────────────┘
 ```
 
-### Row 1 — Nav row (always visible, `h-11`, `px-3`, `gap-2`)
+Активен таб «Folders» (мы всё ещё в режиме folders, просто углубились).
 
-- **Left slot** (flex-1, `h-9`, `rounded-xl`, `bg-slate-900/40`):
-  - Default: segmented `All Notes | Folders`, each half `rounded-lg`, active = `bg-slate-700 text-emerald-400`.
-  - Inside folder: breadcrumb pill using the *same* container — `‹` back (36×36 tap area), colored dot, folder name (truncate), `· count` tabular-nums, `⋯` menu. "New" badge only if folder was just created. Removes the `/` separator and the redundant "Folders" label (back arrow already means "up").
-- **Right slot**:
-  - Mobile: `🔍` toggle (36×36) + `+` primary (36×36 emerald `rounded-xl`).
-  - Desktop: inline search input (flex-basis ~180px, `h-9`, `rounded-xl`) + `+` primary (36×36).
-- Gap between left and right = `gap-2`. Both buttons align on the same optical baseline as the toggle/breadcrumb (all `h-9`).
+### 2. Контекстный поиск — строго ОДИН тип на режим
 
-### Row 2 — Mobile search (conditional, `h-11`, `px-3`, `pb-2`)
+Поиск ищет либо папки, либо заметки — не одновременно. Клиентский фильтр, без изменений в БД.
 
-- Renders in flow (not absolute overlay) when `searchOpen || searchQuery` is true.
-- Full-width `h-9 rounded-xl` input with leading search icon and trailing `✕`.
-- Smooth height transition (CSS, no libs) so opening feels like the row grows rather than a modal appearing.
+| Режим             | Что ищет                        | Плейсхолдер                  |
+| ----------------- | ------------------------------- | ---------------------------- |
+| All Notes         | Только заметки (все)            | `Search all notes…`           |
+| Folders (список)  | Только папки (по имени)         | `Search folders…`             |
+| Внутри папки      | Только заметки этой папки       | `Search in "<Folder name>"…`  |
 
-### Divider
+Реализация:
 
-- Single `border-b border-slate-700/50` under whichever row is last visible. Remove the `sm:hidden h-2` spacer.
+- В режиме **Folders list** `searchQuery` фильтрует массив папок по `folder.name` (case-insensitive). Заметки внутри свёрнутых папок в поиске не участвуют — папки не раскрываются автоматически.
+- В режиме **Inside folder** `searchQuery` применяется только к заметкам этой папки (включая `__unfiled__`).
+- В режиме **All Notes** — как сейчас: все заметки воркспейса.
+- Плейсхолдер инпута — производная от `mode` + имени текущей папки.
+- Если результатов 0 и `searchQuery` не пуст (в Folders-list или Inside folder), показываем короткий блок «No matches. [Search all notes]» — тап переключает в All Notes с тем же запросом (единственный способ «расширить» поиск, чтобы не смешивать типы).
 
-## Visual tokens (unchanged palette, tightened usage)
+### Что НЕ меняем
 
-- Surfaces: `bg-slate-800` (strip), `bg-slate-900/40` (inset controls).
-- Text: `text-slate-100` active, `text-slate-400` idle, `text-slate-500` meta/count.
-- Accent: emerald reserved for (a) active toggle text, (b) the `+` button, (c) focus ring. Folder dot colors (emerald / amber / slate) stay as the only other hue and shrink to `w-2 h-2`.
-- Radii: `rounded-xl` for containers and primary button, `rounded-lg` for inner segments — consistent scale.
-- All interactive elements: min 36×36 tap target on mobile, 32×32 on desktop where space is tight, always with `active:` state.
+Стили, палитра, размеры кнопок, `+` меню, mobile-search (in-place swap с Cancel), footer/Storage, workspace header, ряды заметок/папок. Только структура nav-row + поведение фильтра.
 
-## Behavior (unchanged)
+## Технические заметки
 
-- Mode persistence, `+` popover in folders-list mode, breadcrumb `⋯` Rename/Delete, "No Folder" italic + slate dot, "New" amber badge — all preserved as-is. This is a presentation-only pass.
+Файл — только `src/components/UnifiedSidebar.tsx`:
 
-## Technical notes
+- `SidebarNavBar`: убрать ветку «внутри папки → breadcrumb вместо тогла». Тогл рендерим всегда. Клик «All Notes» — сброс `currentFolderId` + `setMode('all')`; клик «Folders» — сброс `currentFolderId` + `setMode('folders')`.
+- Новый `FolderContextStrip` (под nav-row при `mode === 'folders' && currentFolderId`): точка-акцент по варианту, имя (truncate), `· count` (tabular-nums), `⋯` popover (Rename / Delete).
+- Мемо-фильтры:
+  - `filteredFolders` — по `folder.name` только в folders-list.
+  - `filteredNotes` — по `mode` + `currentFolderId` + `searchQuery`, но НЕ применяется в folders-list.
+- Плейсхолдер и empty-state «No matches / Search all notes» — из `mode` и текущей папки.
 
-- Edit only `SidebarNavBar` in `src/components/UnifiedSidebar.tsx` (lines ~603–985).
-- Replace the current three-region JSX (nav-row / desktop-search / mobile-overlay) with the two-row structure above.
-- Remove the mobile absolute-overlay branch and the `h-2` spacer.
-- Keep all props, refs, popovers, portals, and handlers identical.
-- No changes to `UnifiedSidebar` root, folder rows, note rows, workspace header, or storage footer.
+Никаких изменений в props компонента, в БД, в других файлах.
