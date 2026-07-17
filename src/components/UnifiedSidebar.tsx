@@ -1525,11 +1525,22 @@ export function UnifiedSidebar({
             </div>
           );
         })()}
+        </div>
+
+        {/* FAB — contextual create */}
+        {!hideFab && (
+          <SidebarFab
+            fabMode={fabMode}
+            onCreateNote={handleFabCreateNote}
+            onCreateFolder={handleFabCreateFolder}
+          />
+        )}
       </div>
 
 
       {/* Footer: Storage */}
       <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenSettings} />
+
 
       {/* Delete note confirmation */}
       {noteToDelete && (
