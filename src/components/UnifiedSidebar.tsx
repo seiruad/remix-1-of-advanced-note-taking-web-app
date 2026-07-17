@@ -989,15 +989,24 @@ function FolderRowFlat({
   const count = notes.filter((n) => n.folder_id === folder.id).length;
 
   return (
-    <div className="group folder-row w-full flex items-center gap-3 px-4 py-3.5 sm:px-3 sm:py-2.5 bg-slate-700/40 hover:bg-slate-700/70 active:bg-slate-700 border border-slate-700/50 hover:border-emerald-500/40 rounded-xl transition-all">
+    <div className="group folder-row relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/50 hover:bg-slate-700/70 active:bg-slate-700 rounded-xl transition-colors overflow-hidden">
+      {/* Left accent bar — folder's identity color */}
+      <span
+        className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full ${
+          folder.is_new ? 'bg-amber-400/80' : 'bg-emerald-400/70 group-hover:bg-emerald-400'
+        } transition-colors`}
+      />
       <button onClick={onSelect} className="flex items-center gap-3 flex-1 min-w-0 text-left">
-        <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-emerald-600/10 flex-shrink-0">
+        <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
+          folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
+        }`}>
           {folder.is_new ? (
-            <FolderPlus className="w-5 h-5 sm:w-4.5 sm:h-4.5 text-amber-400/80 group-hover:text-amber-400 transition-colors" />
+            <FolderPlus className="w-5 h-5 sm:w-4 sm:h-4 text-amber-300" />
           ) : (
-            <FolderIcon className="w-5 h-5 sm:w-4.5 sm:h-4.5 text-emerald-400/70 group-hover:text-emerald-400 transition-colors" />
+            <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-400" />
           )}
         </div>
+
         {isRenaming ? (
           <input
             type="text"
