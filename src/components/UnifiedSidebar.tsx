@@ -689,7 +689,7 @@ function SidebarNavBar({
     <div className="border-b border-slate-700/50 bg-slate-800">
       {/* Full-width segmented navigation — the only element in this row */}
       <div className="h-11 px-3 flex items-center">
-        <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-xl bg-slate-900/40">
+        <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-lg bg-slate-900/60">
           <button
             onClick={() => persistMode('all')}
             className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
