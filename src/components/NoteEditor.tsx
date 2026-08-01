@@ -314,64 +314,61 @@ export function NoteEditor({
         </div>
       )}
 
-      {/* ===== FIXED SUPERBLOCK: title + toolbar ===== */}
-      <div className="flex-shrink-0 bg-slate-900/95 backdrop-blur-md border-b border-slate-700 z-30">
-        {/* Mobile-only breadcrumb row (workspace + folder, no back arrow) */}
-        {onBack && (
-          <div className="lg:hidden flex items-center gap-2 px-4 pt-3 pb-2 min-w-0 overflow-hidden">
+      {/* ===== FIXED SUPERBLOCK: context + title + toolbar ===== */}
+      <div className="flex-shrink-0 bg-slate-800/95 backdrop-blur-md border-b border-slate-700/50 z-30">
+        {/* Context bar — mirrors the sidebar workspace header (56px) */}
+        <div className="h-14 px-3 sm:px-6 flex items-center gap-2 border-b border-slate-700/50">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="lg:hidden flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+              title="Back to notes"
+              aria-label="Back to notes"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
+
+          <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-5 h-5 text-emerald-400" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">Note</p>
             {(() => {
               const workspace = workspaces.find((w) => w.id === note.workspace_id);
               const folder = folders.find((f) => f.id === note.folder_id);
               return (
-                <>
+                <div className="flex items-center gap-1.5 min-w-0">
                   {workspace && (
-                    <span className="flex items-center gap-1.5 min-w-0">
-                      <Building2 className="w-4 h-4 flex-shrink-0 text-slate-500" />
-                      <span className="truncate max-w-[120px] text-sm text-slate-400">{workspace.name}</span>
-                    </span>
+                    <>
+                      <Building2 className="w-3.5 h-3.5 flex-shrink-0 text-slate-500" />
+                      <span className="truncate max-w-[140px] text-[13px] text-slate-300">{workspace.name}</span>
+                      <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-600" />
+                    </>
                   )}
-                  {workspace && (
-                    <ChevronRight className="w-4 h-4 flex-shrink-0 text-slate-600" />
-                  )}
-                  {folder ? (
-                    <span className="flex items-center gap-1.5 min-w-0">
-                      <FolderIcon className="w-4 h-4 flex-shrink-0 text-slate-500" />
-                      <span className="truncate max-w-[120px] text-sm text-slate-400">{folder.name}</span>
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1.5">
-                      <FolderIcon className="w-4 h-4 flex-shrink-0 text-slate-600" />
-                      <span className="text-sm text-slate-600">No Folder</span>
-                    </span>
-                  )}
-                </>
+                  <FolderIcon className={`w-3.5 h-3.5 flex-shrink-0 ${folder ? 'text-slate-500' : 'text-slate-600'}`} />
+                  <span className={`truncate max-w-[140px] text-[13px] ${folder ? 'text-slate-300' : 'text-slate-500'}`}>
+                    {folder ? folder.name : 'No Folder'}
+                  </span>
+                </div>
               );
             })()}
           </div>
-        )}
-
-        {/* Title row — mobile: back arrow + title; desktop: title only */}
-        <div className="px-4 sm:px-8 pt-2 sm:pt-6 pb-3 sm:pb-4">
-          <div className="flex items-center gap-1 sm:block">
-            {onBack && (
-              <button
-                onClick={onBack}
-                className="lg:hidden flex-shrink-0 flex items-center justify-center w-11 h-11 -ml-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 active:bg-slate-700 transition-colors"
-                title="Back to notes"
-              >
-                <ArrowLeft className="w-6 h-6" />
-              </button>
-            )}
-            <input
-              type="text"
-              value={localTitle}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="Untitled"
-              className="flex-1 min-w-0 text-xl sm:text-3xl font-bold bg-transparent border-none outline-none text-white placeholder-slate-600 focus:ring-0 cursor-text"
-              disabled={!canEdit}
-            />
-          </div>
         </div>
+
+        {/* Title row */}
+        <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 sm:pb-3">
+          <input
+            type="text"
+            value={localTitle}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            placeholder="Untitled"
+            className="w-full min-w-0 text-xl sm:text-2xl font-bold bg-transparent border-none outline-none text-slate-100 placeholder-slate-600 focus:ring-0 cursor-text"
+            disabled={!canEdit}
+          />
+        </div>
+
 
         {/* Toolbar */}
         {canEdit && (
