@@ -14,6 +14,8 @@ import {
   ChevronUp,
   ChevronDown,
   File as FileIcon,
+  FileText,
+  MoreHorizontal,
   MoreVertical,
   Bold,
   Italic,
