@@ -16,7 +16,7 @@ import {
   File as FileIcon,
   FileText,
   MoreHorizontal,
-  MoreVertical,
+  
   Bold,
   Italic,
   Strikethrough,
