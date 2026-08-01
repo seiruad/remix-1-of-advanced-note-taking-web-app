@@ -473,7 +473,7 @@ export function NoteEditor({
                 </button>
 
                 {moreMenuOpen && (
-                  <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 p-1.5 animate-fadeIn min-w-[160px]">
+                  <div className="absolute right-0 top-full mt-1.5 w-[196px] bg-slate-800/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] z-50 py-1.5 animate-fadeIn overflow-hidden">
                     <button
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
@@ -481,7 +481,8 @@ export function NoteEditor({
                         editorInstance?.chain().focus().toggleStrike().run();
                         setMoreMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-sm text-slate-200 hover:bg-slate-700/70 active:bg-slate-700 transition-colors text-left"
+
                     >
                       <Strikethrough className="w-4 h-4 flex-shrink-0" />
                       Strikethrough
@@ -493,7 +494,8 @@ export function NoteEditor({
                         editorInstance?.chain().focus().toggleBlockquote().run();
                         setMoreMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-sm text-slate-200 hover:bg-slate-700/70 active:bg-slate-700 transition-colors text-left"
+
                     >
                       <Quote className="w-4 h-4 flex-shrink-0" />
                       Quote
@@ -505,12 +507,12 @@ export function NoteEditor({
                         editorInstance?.chain().focus().toggleCodeBlock().run();
                         setMoreMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-sm text-slate-200 hover:bg-slate-700/70 active:bg-slate-700 transition-colors text-left"
                     >
                       <CodeSquare className="w-4 h-4 flex-shrink-0" />
                       Code Block
                     </button>
-                    <div className="my-1 border-t border-slate-700" />
+                    <div className="mx-3 my-1 border-t border-slate-700/60" />
                     <button
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
@@ -518,7 +520,7 @@ export function NoteEditor({
                         editorInstance?.chain().focus().clearNodes().unsetAllMarks().run();
                         setMoreMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-700 hover:text-white transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-sm text-slate-400 hover:bg-slate-700/70 hover:text-slate-200 transition-colors text-left"
                     >
                       <RemoveFormatting className="w-4 h-4 flex-shrink-0" />
                       Clear Format
