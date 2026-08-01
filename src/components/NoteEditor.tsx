@@ -561,36 +561,41 @@ export function NoteEditor({
       </div>
 
       {/* ===== BOTTOM BAR: Attach + collapsible attachments ===== */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 bg-slate-900/95 backdrop-blur-md border-t border-slate-700">
+      <div className="absolute bottom-0 left-0 right-0 z-20 bg-slate-800/95 backdrop-blur-md border-t border-slate-700/50">
         {files.length > 0 && attachmentsExpanded && (
-          <div className="px-4 sm:px-8 pt-3 pb-2 max-h-[40vh] overflow-y-auto border-b border-slate-700/50 animate-fadeIn">
-            <div className="space-y-1.5">
+          <div className="px-3 sm:px-5 pt-3 pb-2 max-h-[40vh] overflow-y-auto border-b border-slate-700/50 animate-fadeIn">
+            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium px-1 mb-1.5">
+              Attachments
+            </p>
+            <div className="space-y-1">
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className="flex items-center gap-3 bg-slate-800/60 rounded-lg p-2.5 border border-slate-700/50"
+                  className="group/file flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-700/40"
                 >
-                  <span className="text-lg flex-shrink-0">{getFileIcon(file.file_type)}</span>
+                  <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
+                    {getFileIcon(file.file_type)}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{file.filename}</p>
-                    <p className="text-xs text-slate-500">{formatFileSize(file.file_size)}</p>
+                    <p className="text-sm font-semibold text-slate-100 truncate leading-snug">{file.filename}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{formatFileSize(file.file_size)}</p>
                   </div>
 
                   <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
                     <button
                       onClick={() => handleDownload(file)}
-                      className="p-1.5 hover:bg-slate-700 rounded-md transition-colors"
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors sm:opacity-0 sm:group-hover/file:opacity-100"
                       title="Download"
                     >
-                      <Download className="w-4 h-4 text-slate-400" />
+                      <Download className="w-4 h-4" />
                     </button>
                     {canEdit && (
                       <button
                         onClick={() => setConfirmDelete(file.id)}
-                        className="p-1.5 hover:bg-red-600/20 rounded-md transition-colors"
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors sm:opacity-0 sm:group-hover/file:opacity-100"
                         title="Unlink from note"
                       >
-                        <Trash2 className="w-4 h-4 text-red-400" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     )}
                   </div>
@@ -603,33 +608,41 @@ export function NoteEditor({
                       onClick={() =>
                         setOpenMenuId(openMenuId === file.id ? null : file.id)
                       }
-                      className="p-1.5 hover:bg-slate-700 rounded-md transition-colors"
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                        openMenuId === file.id
+                          ? 'bg-slate-600/60 text-slate-200'
+                          : 'text-slate-500 hover:text-slate-300 hover:bg-slate-700/60'
+                      }`}
+                      title="File options"
                     >
-                      <MoreVertical className="w-4 h-4 text-slate-400" />
+                      <MoreHorizontal className="w-4 h-4" />
                     </button>
                     {openMenuId === file.id && (
-                      <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 min-w-[130px] py-1">
+                      <div className="absolute right-0 bottom-full mb-1.5 w-[196px] bg-slate-800/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] z-50 py-1.5 overflow-hidden">
                         <button
                           onClick={() => {
                             handleDownload(file);
                             setOpenMenuId(null);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors text-left"
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-slate-700/70 active:bg-slate-700 transition-colors text-left"
                         >
-                          <Download className="w-4 h-4" />
+                          <Download className="w-4 h-4 text-slate-400 flex-shrink-0" />
                           Download
                         </button>
                         {canEdit && (
-                          <button
-                            onClick={() => {
-                              setConfirmDelete(file.id);
-                              setOpenMenuId(null);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-600/10 transition-colors text-left"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            Unlink
-                          </button>
+                          <>
+                            <div className="mx-3 border-t border-slate-700/60" />
+                            <button
+                              onClick={() => {
+                                setConfirmDelete(file.id);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 active:bg-red-500/20 transition-colors text-left"
+                            >
+                              <Trash2 className="w-4 h-4 flex-shrink-0" />
+                              Unlink
+                            </button>
+                          </>
                         )}
                       </div>
                     )}
@@ -640,7 +653,7 @@ export function NoteEditor({
           </div>
         )}
 
-        <div className="flex items-center gap-2 px-4 sm:px-8 py-3">
+        <div className="flex items-center gap-2 px-3 sm:px-5 py-2.5">
           {canEdit && (
             <>
               <input
@@ -652,13 +665,15 @@ export function NoteEditor({
               <button
                 onClick={() => setAttachDialogOpen(true)}
                 disabled={uploading}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-emerald-600/90 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-all disabled:opacity-50 shadow-sm hover:shadow flex-shrink-0"
+                className={`flex items-center justify-center gap-2 h-11 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-600 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex-shrink-0 ${
+                  files.length > 0 ? '' : 'flex-1'
+                }`}
               >
                 {uploading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="hidden sm:inline">Uploading...</span>
-                    <span className="sm:hidden">...</span>
+                    <span className="hidden sm:inline">Uploading…</span>
+                    <span className="sm:hidden">…</span>
                   </>
                 ) : (
                   <>
@@ -674,7 +689,11 @@ export function NoteEditor({
           {files.length > 0 && (
             <button
               onClick={() => setAttachmentsExpanded(!attachmentsExpanded)}
-              className="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors flex-1 min-w-0 justify-between"
+              className={`flex items-center gap-2 h-11 px-3 rounded-xl text-sm font-medium transition-colors flex-1 min-w-0 justify-between ${
+                attachmentsExpanded
+                  ? 'bg-emerald-500/15 text-emerald-300'
+                  : 'bg-slate-700/40 text-slate-300 hover:bg-slate-700/60'
+              }`}
             >
               <span className="flex items-center gap-2 min-w-0">
                 <FileIcon className="w-4 h-4 flex-shrink-0" />
@@ -691,6 +710,7 @@ export function NoteEditor({
           )}
         </div>
       </div>
+
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
