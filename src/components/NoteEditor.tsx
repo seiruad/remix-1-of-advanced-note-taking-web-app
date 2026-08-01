@@ -466,10 +466,15 @@ export function NoteEditor({
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setMoreMenuOpen((o) => !o)}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-all"
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                    moreMenuOpen
+                      ? 'bg-emerald-500/15 text-emerald-300'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
+                  }`}
                   title="More"
                 >
-                  <MoreVertical className="w-4 h-4" />
+                  <MoreHorizontal className="w-4 h-4" />
+
                 </button>
 
                 {moreMenuOpen && (
