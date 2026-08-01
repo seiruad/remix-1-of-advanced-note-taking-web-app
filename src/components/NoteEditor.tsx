@@ -76,7 +76,8 @@ function ToolbarButton({ onClick, disabled, title, children }: ToolbarButtonProp
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className="w-9 h-9 rounded-lg transition-all flex items-center justify-center text-slate-400 hover:bg-slate-700 hover:text-slate-200 active:bg-emerald-600/30 active:text-emerald-400 disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+      aria-label={title}
+      className="w-9 h-9 rounded-lg transition-colors flex items-center justify-center text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-emerald-500/15 active:text-emerald-300 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 disabled:cursor-not-allowed flex-shrink-0"
     >
       {children}
     </button>
@@ -84,8 +85,9 @@ function ToolbarButton({ onClick, disabled, title, children }: ToolbarButtonProp
 }
 
 function ToolbarDivider() {
-  return <div className="w-px h-6 bg-slate-700 mx-1.5 flex-shrink-0" />;
+  return <div className="w-px h-5 bg-slate-700/60 mx-1.5 flex-shrink-0" />;
 }
+
 
 export function NoteEditor({
   note,
