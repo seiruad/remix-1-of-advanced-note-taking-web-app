@@ -361,8 +361,8 @@ export function NoteEditor({
           </div>
         </div>
 
-        {/* Title row */}
-        <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 sm:pb-3">
+        {/* Title row — on desktop align with the UnifiedSidebar padding (px-3) */}
+        <div className="px-4 sm:px-6 lg:px-3 pt-3 sm:pt-4 lg:pt-3 pb-2 sm:pb-3 lg:pb-2">
           <input
             type="text"
             value={localTitle}
@@ -374,11 +374,11 @@ export function NoteEditor({
         </div>
 
 
-        {/* Toolbar */}
+        {/* Toolbar — on desktop align with sidebar and use its segmented-control style */}
         {canEdit && (
-          <div className="px-3 sm:px-6 pb-3 sm:pb-4">
-            {/* Single fixed-height row, left-aligned */}
-            <div className="flex items-center gap-0.5 sm:gap-1">
+          <div className="px-3 sm:px-6 lg:px-3 pb-3 sm:pb-4 lg:pb-3">
+            {/* Single fixed-height row, left-aligned; desktop gets the sidebar pill background */}
+            <div className="flex items-center gap-0.5 sm:gap-1 lg:gap-1 lg:p-1 lg:rounded-lg lg:bg-slate-900/60">
               {/* --- Undo / Redo (always visible) --- */}
               <ToolbarButton
                 onClick={() => editorInstance?.chain().focus().undo().run()}
