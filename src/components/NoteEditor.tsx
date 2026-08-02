@@ -371,7 +371,7 @@ export function NoteEditor({
             value={localTitle}
             onChange={(e) => handleTitleChange(e.target.value)}
             placeholder="Untitled"
-            className="w-full min-w-0 text-xl sm:text-2xl font-bold bg-transparent border-none outline-none text-slate-100 placeholder-slate-600 focus:ring-0 cursor-text lg:leading-none"
+            className="w-full min-w-0 text-xl sm:text-2xl font-bold bg-transparent border-none outline-none text-slate-100 placeholder-slate-600 focus:ring-0 cursor-text lg:leading-none lg:mt-0.5"
             disabled={!canEdit}
           />
         </div>
