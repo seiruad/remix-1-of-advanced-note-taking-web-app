@@ -361,8 +361,8 @@ export function NoteEditor({
           </div>
         </div>
 
-        {/* Title row */}
-        <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 sm:pb-3">
+        {/* Title row — on desktop align with the UnifiedSidebar padding (px-3) */}
+        <div className="px-4 sm:px-6 lg:px-3 pt-3 sm:pt-4 lg:pt-3 pb-2 sm:pb-3 lg:pb-2">
           <input
             type="text"
             value={localTitle}
