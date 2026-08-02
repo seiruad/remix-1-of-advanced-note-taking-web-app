@@ -318,8 +318,10 @@ export function NoteEditor({
 
       {/* ===== FIXED SUPERBLOCK: context + title + toolbar ===== */}
       <div className="flex-shrink-0 bg-slate-800/95 backdrop-blur-md border-b border-slate-700/50 z-30">
-        {/* Context bar — mirrors the sidebar workspace header (56px) */}
-        <div className="h-14 px-3 sm:px-6 flex items-center gap-2 border-b border-slate-700/50">
+        {/* Context bar — mirrors the sidebar workspace header (56px).
+            Shown on mobile/tablet (editor full-width); hidden on desktop
+            where the UnifiedSidebar already displays the same context. */}
+        <div className="h-14 px-3 sm:px-6 flex items-center gap-2 border-b border-slate-700/50 lg:hidden">
           {onBack && (
             <button
               onClick={onBack}
