@@ -362,7 +362,10 @@ export function NoteEditor({
         </div>
 
         {/* Title row — on desktop match the sidebar workspace header (56 px) */}
-        <div className="px-4 sm:px-6 lg:px-3 pt-3 sm:pt-4 pb-2 sm:pb-3 lg:pt-0 lg:pb-0 lg:h-14 lg:flex lg:items-center">
+        <div className="px-4 sm:px-6 lg:px-3 pt-3 sm:pt-4 pb-2 sm:pb-3 lg:pt-0 lg:pb-0 lg:h-14 lg:flex lg:flex-col lg:justify-center">
+          <p className="hidden lg:block text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">
+            Note
+          </p>
           <input
             type="text"
             value={localTitle}
