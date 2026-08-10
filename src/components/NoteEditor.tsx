@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { RichTextEditor } from './RichTextEditor';
 import { AttachFileDialog } from './AttachFileDialog';
+import { FilePreviewModal, isPreviewable } from './FilePreviewModal';
 import { Note, FileItem, Folder, Workspace } from '../types/database';
 import { supabase } from '../lib/supabase';
 import {
@@ -109,6 +110,7 @@ export function NoteEditor({
   const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
+  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -612,13 +614,21 @@ export function NoteEditor({
                   key={file.id}
                   className="group/file flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-700/40"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
-                    {getFileIcon(file.file_type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-100 truncate leading-snug">{file.filename}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{formatFileSize(file.file_size)}</p>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => isPreviewable(file) && setPreviewFile(file)}
+                    disabled={!isPreviewable(file)}
+                    className="flex items-center gap-3 flex-1 min-w-0 text-left disabled:cursor-default"
+                    title={isPreviewable(file) ? 'Preview' : undefined}
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
+                      {getFileIcon(file.file_type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-100 truncate leading-snug">{file.filename}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{formatFileSize(file.file_size)}</p>
+                    </div>
+                  </button>
 
                   <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
                     <button
@@ -784,6 +794,12 @@ export function NoteEditor({
 
         </div>
       )}
+
+      <FilePreviewModal
+        file={previewFile}
+        onClose={() => setPreviewFile(null)}
+        onDownload={handleDownload}
+      />
 
       <AttachFileDialog
         open={attachDialogOpen}

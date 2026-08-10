@@ -19,6 +19,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
+import { FilePreviewModal, isPreviewable } from './FilePreviewModal';
 
 interface StoragePageProps {
   onBack: () => void;
@@ -57,6 +58,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
@@ -387,6 +389,13 @@ export function StoragePage({ onBack }: StoragePageProps) {
                   key={file.id}
                   className="group flex items-center gap-3 sm:gap-4 bg-slate-800/50 hover:bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700 transition-colors"
                 >
+                  <button
+                    type="button"
+                    onClick={() => isPreviewable(file) && setPreviewFile(file)}
+                    disabled={!isPreviewable(file)}
+                    className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 text-left disabled:cursor-default"
+                    title={isPreviewable(file) ? 'Preview' : undefined}
+                  >
                   <span className="text-xl sm:text-2xl flex-shrink-0">
                     {getFileIcon(file.file_type)}
                   </span>
@@ -422,6 +431,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
                       </span>
                     </div>
                   </div>
+                  </button>
 
                   {/* Desktop actions */}
                   <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -485,6 +495,12 @@ export function StoragePage({ onBack }: StoragePageProps) {
           </div>
         )}
       </div>
+
+      <FilePreviewModal
+        file={previewFile}
+        onClose={() => setPreviewFile(null)}
+        onDownload={handleDownload}
+      />
 
       {/* Delete confirmation */}
       {confirmDelete && (
