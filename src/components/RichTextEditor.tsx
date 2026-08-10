@@ -25,6 +25,8 @@ export function RichTextEditor({
     onReadyRef.current = onEditorReady;
   }, [onChange, onEditorReady]);
 
+  const isEditingRef = useRef(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -45,6 +47,7 @@ export function RichTextEditor({
     content: content || '',
     editable,
     onUpdate: ({ editor }) => {
+      isEditingRef.current = true;
       onChangeRef.current(editor.getJSON());
     },
   });
@@ -57,12 +60,16 @@ export function RichTextEditor({
 
   useEffect(() => {
     if (!editor) return;
+    // Never overwrite the document while the user is typing in it —
+    // remote/echoed props would reset the cursor and cause visible lag.
+    if (isEditingRef.current || editor.isFocused) return;
     const currentJSON = JSON.stringify(editor.getJSON());
     const newJSON = JSON.stringify(content || '');
     if (currentJSON !== newJSON) {
       editor.commands.setContent(content || '', { emitUpdate: false });
     }
   }, [content, editor]);
+
 
   useEffect(() => {
     if (editor) {

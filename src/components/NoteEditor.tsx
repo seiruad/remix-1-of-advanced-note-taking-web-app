@@ -128,11 +128,26 @@ export function NoteEditor({
   }, [moreMenuOpen]);
   const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
+  const isTypingRef = useRef(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
-    if (note) {
+    if (note && !isTypingRef.current) {
       setLocalTitle(note.title);
     }
   }, [note?.id, note?.title]);
+
+  useEffect(() => {
+    // reset local typing state when switching notes
+    isTypingRef.current = false;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+  }, [note?.id]);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!openMenuId) return;
@@ -149,13 +164,35 @@ export function NoteEditor({
     return () => document.removeEventListener('mousedown', handler);
   }, [openMenuId]);
 
-  const handleTitleChange = useCallback(
-    (newTitle: string) => {
-      setLocalTitle(newTitle);
-      onUpdateNote({ title: newTitle });
-    },
-    [onUpdateNote]
-  );
+  const onUpdateNoteRef = useRef(onUpdateNote);
+  useEffect(() => {
+    onUpdateNoteRef.current = onUpdateNote;
+  }, [onUpdateNote]);
+
+  const handleTitleChange = useCallback((newTitle: string) => {
+    isTypingRef.current = true;
+    setLocalTitle(newTitle);
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      isTypingRef.current = false;
+      onUpdateNoteRef.current({ title: newTitle });
+    }, 600);
+  }, []);
+
+  const contentTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (contentTimerRef.current) clearTimeout(contentTimerRef.current);
+    };
+  }, []);
+
+  const handleContentChange = useCallback((content: Record<string, unknown>) => {
+    if (contentTimerRef.current) clearTimeout(contentTimerRef.current);
+    contentTimerRef.current = setTimeout(() => {
+      onUpdateNoteRef.current({ content });
+    }, 600);
+  }, []);
+
 
   const uploadAndLink = async (file: File) => {
     if (!note || !user) return;
@@ -544,7 +581,7 @@ export function NoteEditor({
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-32 sm:pb-28">
         <RichTextEditor
           content={note.content}
-          onChange={(content) => onUpdateNote({ content })}
+          onChange={handleContentChange}
           editable={canEdit}
           onEditorReady={setEditorInstance}
         />
