@@ -48,6 +48,7 @@ interface FilePreviewModalProps {
 
 export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModalProps) {
   const [url, setUrl] = useState<string | null>(null);
+  const [blob, setBlob] = useState<Blob | null>(null);
   const [textContent, setTextContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +64,7 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
       setLoading(true);
       setError(null);
       setUrl(null);
+      setBlob(null);
       setTextContent(null);
       const { data, error: dlError } = await supabase.storage
         .from('attachments')
@@ -75,16 +77,20 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
         return;
       }
 
-      if (getPreviewKind(file) === 'text') {
+      const k = getPreviewKind(file);
+      if (k === 'text') {
         const text = await data.text();
         if (cancelled) return;
         setTextContent(text.slice(0, 200000));
+      } else if (k === 'pdf') {
+        setBlob(data);
       } else {
         objectUrl = URL.createObjectURL(data);
         setUrl(objectUrl);
       }
       setLoading(false);
     };
+
 
     load();
 
