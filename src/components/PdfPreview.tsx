@@ -21,16 +21,30 @@ export function PdfPreview({ data }: PdfPreviewProps) {
 
   useEffect(() => {
     let cancelled = false;
-    let doc: any = null;
+    let loadingTask: any = null;
+
+    const destroyTask = () => {
+      try {
+        if (loadingTask && typeof loadingTask.destroy === 'function') {
+          const res = loadingTask.destroy();
+          if (res && typeof res.catch === 'function') res.catch(() => {});
+        }
+      } catch {
+        /* ignore */
+      }
+      loadingTask = null;
+    };
 
     (async () => {
       try {
         setLoading(true);
         setError(null);
         const buf = await data.arrayBuffer();
-        doc = await pdfjsLib.getDocument({ data: buf }).promise;
+        if (cancelled) return;
+        loadingTask = pdfjsLib.getDocument({ data: buf });
+        const doc = await loadingTask.promise;
         if (cancelled) {
-          doc.destroy();
+          destroyTask();
           return;
         }
         docRef.current = doc;
@@ -47,10 +61,11 @@ export function PdfPreview({ data }: PdfPreviewProps) {
 
     return () => {
       cancelled = true;
-      if (doc) doc.destroy();
       docRef.current = null;
+      destroyTask();
     };
   }, [data]);
+
 
   useEffect(() => {
     let cancelled = false;
