@@ -95,7 +95,11 @@ export function PdfPreview({ data }: PdfPreviewProps) {
   }, [page, numPages, loading]);
 
   if (loading) {
-    return <Loader2 className="w-8 h-8 text-slate-500 animate-spin" />;
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-slate-500 animate-spin" />
+      </div>
+    );
   }
   if (error) {
     return <p className="text-sm text-red-400 px-6 py-10 text-center">{error}</p>;
