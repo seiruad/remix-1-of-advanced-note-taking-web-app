@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
-// @ts-expect-error - vite worker url import
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
