@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { X, Download, Loader2, FileQuestion } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FileItem } from '../types/database';
+import { PdfPreview } from './PdfPreview';
+
 
 export type PreviewKind = 'image' | 'pdf' | 'video' | 'audio' | 'text' | 'none';
 
@@ -46,6 +48,7 @@ interface FilePreviewModalProps {
 
 export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModalProps) {
   const [url, setUrl] = useState<string | null>(null);
+  const [blob, setBlob] = useState<Blob | null>(null);
   const [textContent, setTextContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +64,7 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
       setLoading(true);
       setError(null);
       setUrl(null);
+      setBlob(null);
       setTextContent(null);
       const { data, error: dlError } = await supabase.storage
         .from('attachments')
@@ -73,16 +77,20 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
         return;
       }
 
-      if (getPreviewKind(file) === 'text') {
+      const k = getPreviewKind(file);
+      if (k === 'text') {
         const text = await data.text();
         if (cancelled) return;
         setTextContent(text.slice(0, 200000));
+      } else if (k === 'pdf') {
+        setBlob(data);
       } else {
         objectUrl = URL.createObjectURL(data);
         setUrl(objectUrl);
       }
       setLoading(false);
     };
+
 
     load();
 
@@ -147,8 +155,11 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
             <p className="text-sm text-red-400 px-6 py-10 text-center">{error}</p>
           ) : kind === 'image' && url ? (
             <img src={url} alt={file.filename} className="max-w-full max-h-full object-contain" />
-          ) : kind === 'pdf' && url ? (
-            <iframe src={url} title={file.filename} className="w-full h-full min-h-[70vh] bg-white" />
+          ) : kind === 'pdf' && blob ? (
+            <div className="w-full h-full min-h-[70vh] self-stretch">
+              <PdfPreview data={blob} />
+            </div>
+
           ) : kind === 'video' && url ? (
             <video src={url} controls className="max-w-full max-h-full" />
           ) : kind === 'audio' && url ? (
