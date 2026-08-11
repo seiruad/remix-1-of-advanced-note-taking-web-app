@@ -155,8 +155,11 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
             <p className="text-sm text-red-400 px-6 py-10 text-center">{error}</p>
           ) : kind === 'image' && url ? (
             <img src={url} alt={file.filename} className="max-w-full max-h-full object-contain" />
-          ) : kind === 'pdf' && url ? (
-            <iframe src={url} title={file.filename} className="w-full h-full min-h-[70vh] bg-white" />
+          ) : kind === 'pdf' && blob ? (
+            <div className="w-full h-full min-h-[70vh] self-stretch">
+              <PdfPreview data={blob} />
+            </div>
+
           ) : kind === 'video' && url ? (
             <video src={url} controls className="max-w-full max-h-full" />
           ) : kind === 'audio' && url ? (
