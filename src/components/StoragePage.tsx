@@ -193,6 +193,31 @@ export function StoragePage({ onBack }: StoragePageProps) {
     setConfirmDelete(null);
   };
 
+  const startRename = (file: FileItem) => {
+    setRenamingId(file.id);
+    setRenameValue(file.filename);
+  };
+
+  const submitRename = async () => {
+    const id = renamingId;
+    const name = renameValue.trim();
+    if (!id) return;
+    setRenamingId(null);
+    const current = files.find((f) => f.id === id);
+    if (!name || !current || name === current.filename) return;
+
+    setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, filename: name } : f)));
+    const { error: updateError } = await supabase
+      .from('files')
+      .update({ filename: name })
+      .eq('id', id);
+    if (updateError) {
+      setError('Failed to rename file');
+      setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, filename: current.filename } : f)));
+    }
+  };
+
+
   const handleDownload = async (file: FileItem) => {
     const { data, error } = await supabase.storage
       .from('attachments')
