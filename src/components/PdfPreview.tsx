@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { ZoomPanSurface } from './ZoomPanSurface';
+
 
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
@@ -107,9 +109,12 @@ export function PdfPreview({ data }: PdfPreviewProps) {
 
   return (
     <div ref={containerRef} className="w-full h-full flex flex-col">
-      <div className="flex-1 min-h-0 overflow-auto flex justify-center p-2">
-        <canvas ref={canvasRef} className="shadow-lg bg-white h-fit" />
+      <div className="flex-1 min-h-0 overflow-hidden p-2">
+        <ZoomPanSurface resetKey={page}>
+          <canvas ref={canvasRef} className="shadow-lg bg-white block max-w-full max-h-full" />
+        </ZoomPanSurface>
       </div>
+
       {numPages > 1 && (
         <div className="h-12 flex-shrink-0 flex items-center justify-center gap-3 border-t border-slate-700/60 bg-slate-800/80">
           <button
