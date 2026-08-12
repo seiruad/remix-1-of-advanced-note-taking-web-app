@@ -718,6 +718,16 @@ export function NoteEditor({
                     </button>
                     {canEdit && (
                       <button
+                        onClick={() => startRename(file)}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors sm:opacity-0 sm:group-hover/file:opacity-100"
+                        title="Rename"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    )}
+                    {canEdit && (
+
+                      <button
                         onClick={() => setConfirmDelete(file.id)}
                         className="w-9 h-9 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors sm:opacity-0 sm:group-hover/file:opacity-100"
                         title="Unlink from note"
