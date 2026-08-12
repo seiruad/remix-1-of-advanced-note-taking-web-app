@@ -557,6 +557,17 @@ export function StoragePage({ onBack }: StoragePageProps) {
                         </button>
                         <button
                           onClick={() => {
+                            startRename(file);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors text-left"
+                        >
+                          <Pencil className="w-4 h-4" />
+                          Rename
+                        </button>
+                        <button
+
+                          onClick={() => {
                             setConfirmDelete(file.id);
                             setOpenMenuId(null);
                           }}
