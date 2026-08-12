@@ -647,7 +647,44 @@ export function NoteEditor({
               Attachments
             </p>
             <div className="space-y-1">
-              {files.map((file) => (
+              {files.map((file) =>
+                renamingId === file.id ? (
+                  <div
+                    key={file.id}
+                    className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-slate-700/40 border border-emerald-500/40"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
+                      {getFileIcon(file.file_type)}
+                    </div>
+                    <input
+                      autoFocus
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') submitRename();
+                        if (e.key === 'Escape') setRenamingId(null);
+                      }}
+                      onBlur={submitRename}
+                      className="flex-1 min-w-0 bg-slate-900/70 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={submitRename}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-emerald-400 hover:bg-emerald-500/10 transition-colors flex-shrink-0"
+                      title="Save"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => setRenamingId(null)}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700/60 transition-colors flex-shrink-0"
+                      title="Cancel"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
                 <div
                   key={file.id}
                   className="group/file flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-700/40"
@@ -663,10 +700,13 @@ export function NoteEditor({
                       {getFileIcon(file.file_type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-100 truncate leading-snug">{file.filename}</p>
+                      <p className="text-sm font-semibold text-slate-100 truncate leading-snug">
+                        {renamedNames[file.id] ?? file.filename}
+                      </p>
                       <p className="text-xs text-slate-500 mt-0.5">{formatFileSize(file.file_size)}</p>
                     </div>
                   </button>
+
 
                   <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
                     <button
