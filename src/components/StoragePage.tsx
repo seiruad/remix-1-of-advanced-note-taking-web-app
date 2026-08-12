@@ -415,11 +415,51 @@ export function StoragePage({ onBack }: StoragePageProps) {
           <div className="space-y-2">
             {sortedFilteredFiles.map((file) => {
               const count = noteCounts[file.id] || 0;
+              if (renamingId === file.id) {
+                return (
+                  <div
+                    key={file.id}
+                    className="flex items-center gap-2 bg-slate-800 rounded-xl p-3 sm:p-4 border border-emerald-500/40"
+                  >
+                    <span className="text-xl sm:text-2xl flex-shrink-0">
+                      {getFileIcon(file.file_type)}
+                    </span>
+                    <input
+                      autoFocus
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') submitRename();
+                        if (e.key === 'Escape') setRenamingId(null);
+                      }}
+                      onBlur={submitRename}
+                      className="flex-1 min-w-0 bg-slate-900/70 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={submitRename}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-emerald-400 hover:bg-emerald-500/10 transition-colors flex-shrink-0"
+                      title="Save"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => setRenamingId(null)}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700 transition-colors flex-shrink-0"
+                      title="Cancel"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              }
               return (
                 <div
                   key={file.id}
                   className="group flex items-center gap-3 sm:gap-4 bg-slate-800/50 hover:bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700 transition-colors"
                 >
+
                   <button
                     type="button"
                     onClick={() => isPreviewable(file) && setPreviewFile(file)}
