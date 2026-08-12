@@ -514,6 +514,14 @@ export function StoragePage({ onBack }: StoragePageProps) {
                       <Download className="w-4 h-4 text-slate-400" />
                     </button>
                     <button
+                      onClick={() => startRename(file)}
+                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                      title="Rename"
+                    >
+                      <Pencil className="w-4 h-4 text-slate-400" />
+                    </button>
+                    <button
+
                       onClick={() => setConfirmDelete(file.id)}
                       className="p-2 hover:bg-red-600/20 rounded-lg transition-colors"
                       title="Delete"
