@@ -17,6 +17,9 @@ import {
   File as FileIcon,
   FileText,
   MoreHorizontal,
+  Pencil,
+  Check,
+
   
   Bold,
   Italic,
@@ -112,6 +115,9 @@ export function NoteEditor({
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+
   const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
