@@ -117,6 +117,8 @@ export function NoteEditor({
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [renamedNames, setRenamedNames] = useState<Record<string, string>>({});
+
 
   const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -303,6 +305,36 @@ export function NoteEditor({
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const startRename = (file: FileItem) => {
+    setRenamingId(file.id);
+    setRenameValue(renamedNames[file.id] ?? file.filename);
+  };
+
+  const submitRename = async () => {
+    const id = renamingId;
+    const name = renameValue.trim();
+    if (!id) return;
+    setRenamingId(null);
+    const current = files.find((f) => f.id === id);
+    const currentName = current ? renamedNames[id] ?? current.filename : '';
+    if (!name || !current || name === currentName) return;
+
+    setRenamedNames((prev) => ({ ...prev, [id]: name }));
+    const { error: updateError } = await supabase
+      .from('files')
+      .update({ filename: name })
+      .eq('id', id);
+    if (updateError) {
+      setError('Failed to rename file');
+      setRenamedNames((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
+  };
+
 
   const handleUnlinkFile = async (fileId: string) => {
     if (!note) return;
