@@ -15,6 +15,9 @@ import {
   ArrowUp,
   Paperclip,
   MoreVertical,
+  Pencil,
+  Check,
+
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -58,7 +61,10 @@ export function StoragePage({ onBack }: StoragePageProps) {
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
