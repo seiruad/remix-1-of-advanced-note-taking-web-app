@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { ZoomPanSurface } from './ZoomPanSurface';
+
 
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
