@@ -771,6 +771,18 @@ export function NoteEditor({
                             <div className="mx-3 border-t border-slate-700/60" />
                             <button
                               onClick={() => {
+                                startRename(file);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-slate-700/70 active:bg-slate-700 transition-colors text-left"
+                            >
+                              <Pencil className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                              Rename
+                            </button>
+                            <div className="mx-3 border-t border-slate-700/60" />
+                            <button
+
+                              onClick={() => {
                                 setConfirmDelete(file.id);
                                 setOpenMenuId(null);
                               }}
