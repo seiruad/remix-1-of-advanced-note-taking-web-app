@@ -17,6 +17,9 @@ import {
   File as FileIcon,
   FileText,
   MoreHorizontal,
+  Pencil,
+  Check,
+
   
   Bold,
   Italic,
@@ -112,6 +115,11 @@ export function NoteEditor({
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [renamedNames, setRenamedNames] = useState<Record<string, string>>({});
+
+
   const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -297,6 +305,36 @@ export function NoteEditor({
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const startRename = (file: FileItem) => {
+    setRenamingId(file.id);
+    setRenameValue(renamedNames[file.id] ?? file.filename);
+  };
+
+  const submitRename = async () => {
+    const id = renamingId;
+    const name = renameValue.trim();
+    if (!id) return;
+    setRenamingId(null);
+    const current = files.find((f) => f.id === id);
+    const currentName = current ? renamedNames[id] ?? current.filename : '';
+    if (!name || !current || name === currentName) return;
+
+    setRenamedNames((prev) => ({ ...prev, [id]: name }));
+    const { error: updateError } = await supabase
+      .from('files')
+      .update({ filename: name })
+      .eq('id', id);
+    if (updateError) {
+      setError('Failed to rename file');
+      setRenamedNames((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
+  };
+
 
   const handleUnlinkFile = async (fileId: string) => {
     if (!note) return;
@@ -609,7 +647,44 @@ export function NoteEditor({
               Attachments
             </p>
             <div className="space-y-1">
-              {files.map((file) => (
+              {files.map((file) =>
+                renamingId === file.id ? (
+                  <div
+                    key={file.id}
+                    className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-slate-700/40 border border-emerald-500/40"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
+                      {getFileIcon(file.file_type)}
+                    </div>
+                    <input
+                      autoFocus
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') submitRename();
+                        if (e.key === 'Escape') setRenamingId(null);
+                      }}
+                      onBlur={submitRename}
+                      className="flex-1 min-w-0 bg-slate-900/70 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={submitRename}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-emerald-400 hover:bg-emerald-500/10 transition-colors flex-shrink-0"
+                      title="Save"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => setRenamingId(null)}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700/60 transition-colors flex-shrink-0"
+                      title="Cancel"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
                 <div
                   key={file.id}
                   className="group/file flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-700/40"
@@ -625,10 +700,13 @@ export function NoteEditor({
                       {getFileIcon(file.file_type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-100 truncate leading-snug">{file.filename}</p>
+                      <p className="text-sm font-semibold text-slate-100 truncate leading-snug">
+                        {renamedNames[file.id] ?? file.filename}
+                      </p>
                       <p className="text-xs text-slate-500 mt-0.5">{formatFileSize(file.file_size)}</p>
                     </div>
                   </button>
+
 
                   <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
                     <button
@@ -639,6 +717,16 @@ export function NoteEditor({
                       <Download className="w-4 h-4" />
                     </button>
                     {canEdit && (
+                      <button
+                        onClick={() => startRename(file)}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors sm:opacity-0 sm:group-hover/file:opacity-100"
+                        title="Rename"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    )}
+                    {canEdit && (
+
                       <button
                         onClick={() => setConfirmDelete(file.id)}
                         className="w-9 h-9 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-colors sm:opacity-0 sm:group-hover/file:opacity-100"
@@ -682,6 +770,18 @@ export function NoteEditor({
                           <>
                             <div className="mx-3 border-t border-slate-700/60" />
                             <button
+                              onClick={() => {
+                                startRename(file);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-200 hover:bg-slate-700/70 active:bg-slate-700 transition-colors text-left"
+                            >
+                              <Pencil className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                              Rename
+                            </button>
+                            <div className="mx-3 border-t border-slate-700/60" />
+                            <button
+
                               onClick={() => {
                                 setConfirmDelete(file.id);
                                 setOpenMenuId(null);

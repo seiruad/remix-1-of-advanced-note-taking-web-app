@@ -15,6 +15,9 @@ import {
   ArrowUp,
   Paperclip,
   MoreVertical,
+  Pencil,
+  Check,
+
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -58,7 +61,10 @@ export function StoragePage({ onBack }: StoragePageProps) {
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
@@ -186,6 +192,31 @@ export function StoragePage({ onBack }: StoragePageProps) {
     }
     setConfirmDelete(null);
   };
+
+  const startRename = (file: FileItem) => {
+    setRenamingId(file.id);
+    setRenameValue(file.filename);
+  };
+
+  const submitRename = async () => {
+    const id = renamingId;
+    const name = renameValue.trim();
+    if (!id) return;
+    setRenamingId(null);
+    const current = files.find((f) => f.id === id);
+    if (!name || !current || name === current.filename) return;
+
+    setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, filename: name } : f)));
+    const { error: updateError } = await supabase
+      .from('files')
+      .update({ filename: name })
+      .eq('id', id);
+    if (updateError) {
+      setError('Failed to rename file');
+      setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, filename: current.filename } : f)));
+    }
+  };
+
 
   const handleDownload = async (file: FileItem) => {
     const { data, error } = await supabase.storage
@@ -384,11 +415,51 @@ export function StoragePage({ onBack }: StoragePageProps) {
           <div className="space-y-2">
             {sortedFilteredFiles.map((file) => {
               const count = noteCounts[file.id] || 0;
+              if (renamingId === file.id) {
+                return (
+                  <div
+                    key={file.id}
+                    className="flex items-center gap-2 bg-slate-800 rounded-xl p-3 sm:p-4 border border-emerald-500/40"
+                  >
+                    <span className="text-xl sm:text-2xl flex-shrink-0">
+                      {getFileIcon(file.file_type)}
+                    </span>
+                    <input
+                      autoFocus
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') submitRename();
+                        if (e.key === 'Escape') setRenamingId(null);
+                      }}
+                      onBlur={submitRename}
+                      className="flex-1 min-w-0 bg-slate-900/70 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={submitRename}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-emerald-400 hover:bg-emerald-500/10 transition-colors flex-shrink-0"
+                      title="Save"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => setRenamingId(null)}
+                      className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700 transition-colors flex-shrink-0"
+                      title="Cancel"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              }
               return (
                 <div
                   key={file.id}
                   className="group flex items-center gap-3 sm:gap-4 bg-slate-800/50 hover:bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700 transition-colors"
                 >
+
                   <button
                     type="button"
                     onClick={() => isPreviewable(file) && setPreviewFile(file)}
@@ -443,6 +514,14 @@ export function StoragePage({ onBack }: StoragePageProps) {
                       <Download className="w-4 h-4 text-slate-400" />
                     </button>
                     <button
+                      onClick={() => startRename(file)}
+                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                      title="Rename"
+                    >
+                      <Pencil className="w-4 h-4 text-slate-400" />
+                    </button>
+                    <button
+
                       onClick={() => setConfirmDelete(file.id)}
                       className="p-2 hover:bg-red-600/20 rounded-lg transition-colors"
                       title="Delete"
@@ -477,6 +556,17 @@ export function StoragePage({ onBack }: StoragePageProps) {
                           Download
                         </button>
                         <button
+                          onClick={() => {
+                            startRename(file);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors text-left"
+                        >
+                          <Pencil className="w-4 h-4" />
+                          Rename
+                        </button>
+                        <button
+
                           onClick={() => {
                             setConfirmDelete(file.id);
                             setOpenMenuId(null);
