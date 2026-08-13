@@ -110,8 +110,8 @@ export function PdfPreview({ data }: PdfPreviewProps) {
   return (
     <div ref={containerRef} className="w-full h-full flex flex-col">
       <div className="flex-1 min-h-0 overflow-hidden p-2">
-        <ZoomPanSurface resetKey={page}>
-          <canvas ref={canvasRef} className="shadow-lg bg-white block max-w-full max-h-full" />
+        <ZoomPanSurface resetKey={page} scrollable>
+          <canvas ref={canvasRef} className="shadow-lg bg-white block max-w-full" />
         </ZoomPanSurface>
       </div>
 
