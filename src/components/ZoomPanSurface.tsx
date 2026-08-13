@@ -158,8 +158,10 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
         } else {
           const next = 2.5;
           const k = next / cur.scale;
-          commitTransform(next, p.x - (p.x - cur.x) * k, p.y - (p.y - cur.y) * k);
+          const q = toContentDelta(e.clientX, e.clientY);
+          commitTransform(next, cur.x + q.x * (1 - k), cur.y + q.y * (1 - k));
         }
+
         lastTapRef.current = null;
         gestureRef.current.mode = 'none';
         return;
