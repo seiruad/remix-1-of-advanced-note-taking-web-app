@@ -22,7 +22,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
-import { FilePreviewModal, isPreviewable } from './FilePreviewModal';
+import { FilePreviewModal } from './FilePreviewModal';
 
 interface StoragePageProps {
   onBack: () => void;
@@ -462,10 +462,9 @@ export function StoragePage({ onBack }: StoragePageProps) {
 
                   <button
                     type="button"
-                    onClick={() => isPreviewable(file) && setPreviewFile(file)}
-                    disabled={!isPreviewable(file)}
-                    className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 text-left disabled:cursor-default"
-                    title={isPreviewable(file) ? 'Preview' : undefined}
+                    onClick={() => setPreviewFile(file)}
+                    className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 text-left"
+                    title="Preview"
                   >
                   <span className="text-xl sm:text-2xl flex-shrink-0">
                     {getFileIcon(file.file_type)}

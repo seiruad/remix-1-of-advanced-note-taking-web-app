@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { RichTextEditor } from './RichTextEditor';
 import { AttachFileDialog } from './AttachFileDialog';
-import { FilePreviewModal, isPreviewable } from './FilePreviewModal';
+import { FilePreviewModal } from './FilePreviewModal';
 import { Note, FileItem, Folder, Workspace } from '../types/database';
 import { supabase } from '../lib/supabase';
 import {
@@ -691,10 +691,9 @@ export function NoteEditor({
                 >
                   <button
                     type="button"
-                    onClick={() => isPreviewable(file) && setPreviewFile(file)}
-                    disabled={!isPreviewable(file)}
-                    className="flex items-center gap-3 flex-1 min-w-0 text-left disabled:cursor-default"
-                    title={isPreviewable(file) ? 'Preview' : undefined}
+                    onClick={() => setPreviewFile(file)}
+                    className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                    title="Preview"
                   >
                     <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
                       {getFileIcon(file.file_type)}
