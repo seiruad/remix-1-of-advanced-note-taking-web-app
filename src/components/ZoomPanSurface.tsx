@@ -100,6 +100,19 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
     return { x: clientX - rect.left - rect.width / 2, y: clientY - rect.top - rect.height / 2 };
   }, []);
 
+  /**
+   * Offset of a screen point from the content's *current* visual center.
+   * Scaling happens around that center (transform-origin: 50% 50%), so the
+   * anchor math must be expressed relative to it — otherwise zoom drifts to
+   * the middle whenever the content isn't centered (scrollable / tall pages).
+   */
+  const toContentDelta = useCallback((clientX: number, clientY: number) => {
+    const content = contentRef.current;
+    if (!content) return { x: 0, y: 0 };
+    const r = content.getBoundingClientRect();
+    return { x: clientX - (r.left + r.width / 2), y: clientY - (r.top + r.height / 2) };
+  }, []);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -110,13 +123,14 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
       const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
       const cur = transformRef.current;
       const next = clampZoom(cur.scale * Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0015)));
-      const p = toLocal(e.clientX, e.clientY);
       const k = next / cur.scale;
-      commitTransform(next, p.x - (p.x - cur.x) * k, p.y - (p.y - cur.y) * k);
+      const q = toContentDelta(e.clientX, e.clientY);
+      commitTransform(next, cur.x + q.x * (1 - k), cur.y + q.y * (1 - k));
     };
     container.addEventListener('wheel', onWheel, { passive: false });
     return () => container.removeEventListener('wheel', onWheel);
-  }, [commitTransform, toLocal, scrollable]);
+  }, [commitTransform, toContentDelta, scrollable]);
+
 
   const getMidpoint = () => {
     const pts = Array.from(pointersRef.current.values());
