@@ -41,6 +41,8 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
     startTranslate: { x: 0, y: 0 },
     startPointer: { x: 0, y: 0 },
     center: { x: 0, y: 0 },
+    startDelta: { x: 0, y: 0 },
+
   });
 
   const clampTranslate = useCallback((scale: number, x: number, y: number) => {
