@@ -238,7 +238,7 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
     >
       <div
         ref={contentRef}
-        className="max-w-full max-h-full"
+        className={`max-w-full ${scrollable ? 'flex-shrink-0' : 'max-h-full'}`}
         style={{
           transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
           transition: isGesturing ? 'none' : 'transform 0.2s ease-out',
