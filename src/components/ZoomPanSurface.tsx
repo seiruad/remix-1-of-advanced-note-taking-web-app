@@ -14,6 +14,11 @@ interface ZoomPanSurfaceProps {
   className?: string;
   /** Change this to reset the transform (e.g. new file / new page) */
   resetKey?: string | number;
+  /**
+   * Keep native vertical scrolling available while not zoomed
+   * (used for tall PDF pages). Wheel scrolls, ctrl+wheel / pinch zooms.
+   */
+  scrollable?: boolean;
 }
 
 /**
