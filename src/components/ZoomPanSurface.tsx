@@ -181,13 +181,19 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
     } else if (pointersRef.current.size === 2) {
       const [p1, p2] = Array.from(pointersRef.current.values());
       setIsGesturing(true);
+      const mid = getMidpoint();
+      const rect = containerRef.current.getBoundingClientRect();
       gestureRef.current = {
         mode: 'pinch',
         startDist: Math.hypot(p2.x - p1.x, p2.y - p1.y) || 1,
         startScale: transformRef.current.scale,
         startTranslate: { ...transformRef.current },
         startPointer: p,
-        center: getMidpoint(),
+        center: mid,
+        startDelta: toContentDelta(
+          mid.x + rect.left + rect.width / 2,
+          mid.y + rect.top + rect.height / 2
+        ),
       };
     }
   };
@@ -211,12 +217,15 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
       const next = clampZoom(g.startScale * (dist / g.startDist));
       const mid = getMidpoint();
       const k = next / g.startScale;
-      // anchor the initial midpoint, and follow the moving midpoint (two-finger pan)
+      // keep the pinched content point under the fingers, and follow the
+      // moving midpoint so two fingers can pan at the same time
       commitTransform(
         next,
-        mid.x - (g.center.x - g.startTranslate.x) * k,
-        mid.y - (g.center.y - g.startTranslate.y) * k
+        g.startTranslate.x + g.startDelta.x * (1 - k) + (mid.x - g.center.x),
+        g.startTranslate.y + g.startDelta.y * (1 - k) + (mid.y - g.center.y)
       );
+    }
+
     }
   };
 
