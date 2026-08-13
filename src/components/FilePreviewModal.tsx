@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { X, Download, Loader2, FileQuestion, Music } from 'lucide-react';
+import { X, Download, Loader2, FileQuestion } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FileItem } from '../types/database';
 import { PdfPreview } from './PdfPreview';
 import { ZoomPanSurface } from './ZoomPanSurface';
+import { AudioPlayer } from './AudioPlayer';
+
 
 
 
@@ -183,22 +185,12 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
           ) : kind === 'video' && url ? (
             <video src={url} controls className="max-w-full max-h-full" />
           ) : kind === 'audio' && url ? (
-            <div className="w-full max-w-md mx-auto px-5 sm:px-6 py-10">
-              <div className="rounded-2xl border border-slate-700/70 bg-gradient-to-b from-slate-800 to-slate-800/60 p-6 shadow-xl">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-20 h-20 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-4">
-                    <Music className="w-9 h-9 text-emerald-400" />
-                  </div>
-                  <p className="text-sm font-semibold text-slate-100 break-all leading-snug">
-                    {file.filename}
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {formatFileSize(file.file_size)}
-                  </p>
-                </div>
-                <audio src={url} controls className="w-full mt-5" />
-              </div>
-            </div>
+            <AudioPlayer
+              src={url}
+              title={file.filename}
+              subtitle={formatFileSize(file.file_size)}
+            />
+
           ) : kind === 'text' && textContent !== null ? (
             <pre className="w-full h-full text-xs text-slate-300 p-4 whitespace-pre-wrap break-words font-mono">
               {textContent}

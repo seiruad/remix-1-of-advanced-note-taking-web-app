@@ -41,6 +41,8 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
     startTranslate: { x: 0, y: 0 },
     startPointer: { x: 0, y: 0 },
     center: { x: 0, y: 0 },
+    startDelta: { x: 0, y: 0 },
+
   });
 
   const clampTranslate = useCallback((scale: number, x: number, y: number) => {
@@ -100,6 +102,19 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
     return { x: clientX - rect.left - rect.width / 2, y: clientY - rect.top - rect.height / 2 };
   }, []);
 
+  /**
+   * Offset of a screen point from the content's *current* visual center.
+   * Scaling happens around that center (transform-origin: 50% 50%), so the
+   * anchor math must be expressed relative to it — otherwise zoom drifts to
+   * the middle whenever the content isn't centered (scrollable / tall pages).
+   */
+  const toContentDelta = useCallback((clientX: number, clientY: number) => {
+    const content = contentRef.current;
+    if (!content) return { x: 0, y: 0 };
+    const r = content.getBoundingClientRect();
+    return { x: clientX - (r.left + r.width / 2), y: clientY - (r.top + r.height / 2) };
+  }, []);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -110,13 +125,14 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
       const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
       const cur = transformRef.current;
       const next = clampZoom(cur.scale * Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0015)));
-      const p = toLocal(e.clientX, e.clientY);
       const k = next / cur.scale;
-      commitTransform(next, p.x - (p.x - cur.x) * k, p.y - (p.y - cur.y) * k);
+      const q = toContentDelta(e.clientX, e.clientY);
+      commitTransform(next, cur.x + q.x * (1 - k), cur.y + q.y * (1 - k));
     };
     container.addEventListener('wheel', onWheel, { passive: false });
     return () => container.removeEventListener('wheel', onWheel);
-  }, [commitTransform, toLocal, scrollable]);
+  }, [commitTransform, toContentDelta, scrollable]);
+
 
   const getMidpoint = () => {
     const pts = Array.from(pointersRef.current.values());
@@ -142,8 +158,10 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
         } else {
           const next = 2.5;
           const k = next / cur.scale;
-          commitTransform(next, p.x - (p.x - cur.x) * k, p.y - (p.y - cur.y) * k);
+          const q = toContentDelta(e.clientX, e.clientY);
+          commitTransform(next, cur.x + q.x * (1 - k), cur.y + q.y * (1 - k));
         }
+
         lastTapRef.current = null;
         gestureRef.current.mode = 'none';
         return;
@@ -163,13 +181,19 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
     } else if (pointersRef.current.size === 2) {
       const [p1, p2] = Array.from(pointersRef.current.values());
       setIsGesturing(true);
+      const mid = getMidpoint();
+      const rect = containerRef.current.getBoundingClientRect();
       gestureRef.current = {
         mode: 'pinch',
         startDist: Math.hypot(p2.x - p1.x, p2.y - p1.y) || 1,
         startScale: transformRef.current.scale,
         startTranslate: { ...transformRef.current },
         startPointer: p,
-        center: getMidpoint(),
+        center: mid,
+        startDelta: toContentDelta(
+          mid.x + rect.left + rect.width / 2,
+          mid.y + rect.top + rect.height / 2
+        ),
       };
     }
   };
@@ -193,14 +217,16 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
       const next = clampZoom(g.startScale * (dist / g.startDist));
       const mid = getMidpoint();
       const k = next / g.startScale;
-      // anchor the initial midpoint, and follow the moving midpoint (two-finger pan)
+      // keep the pinched content point under the fingers, and follow the
+      // moving midpoint so two fingers can pan at the same time
       commitTransform(
         next,
-        mid.x - (g.center.x - g.startTranslate.x) * k,
-        mid.y - (g.center.y - g.startTranslate.y) * k
+        g.startTranslate.x + g.startDelta.x * (1 - k) + (mid.x - g.center.x),
+        g.startTranslate.y + g.startDelta.y * (1 - k) + (mid.y - g.center.y)
       );
     }
   };
+
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     pointersRef.current.delete(e.pointerId);
