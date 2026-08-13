@@ -25,7 +25,7 @@ interface ZoomPanSurfaceProps {
  * Generic pinch / wheel / double-tap zoom + pan surface.
  * Zoom is anchored at the pointer (or pinch midpoint), not the center.
  */
-export function ZoomPanSurface({ children, className = '', resetKey }: ZoomPanSurfaceProps) {
+export function ZoomPanSurface({ children, className = '', resetKey, scrollable = false }: ZoomPanSurfaceProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const transformRef = useRef({ scale: 1, x: 0, y: 0 });
@@ -104,6 +104,8 @@ export function ZoomPanSurface({ children, className = '', resetKey }: ZoomPanSu
     const container = containerRef.current;
     if (!container) return;
     const onWheel = (e: WheelEvent) => {
+      // While unzoomed in scrollable mode let the browser scroll normally
+      if (scrollable && !e.ctrlKey && transformRef.current.scale <= 1.001) return;
       e.preventDefault();
       const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
       const cur = transformRef.current;
@@ -114,7 +116,7 @@ export function ZoomPanSurface({ children, className = '', resetKey }: ZoomPanSu
     };
     container.addEventListener('wheel', onWheel, { passive: false });
     return () => container.removeEventListener('wheel', onWheel);
-  }, [commitTransform, toLocal]);
+  }, [commitTransform, toLocal, scrollable]);
 
   const getMidpoint = () => {
     const pts = Array.from(pointersRef.current.values());
@@ -122,8 +124,11 @@ export function ZoomPanSurface({ children, className = '', resetKey }: ZoomPanSu
     return { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
   };
 
+  const isScrollMode = scrollable && transform.scale <= 1.001;
+
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
+    if (scrollable && e.pointerType !== 'touch' && transformRef.current.scale <= 1.001) return;
     const p = toLocal(e.clientX, e.clientY);
     pointersRef.current.set(e.pointerId, p);
 
@@ -220,7 +225,11 @@ export function ZoomPanSurface({ children, className = '', resetKey }: ZoomPanSu
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full overflow-hidden flex items-center justify-center touch-none select-none ${className}`}
+      className={`w-full h-full flex justify-center select-none ${
+        isScrollMode
+          ? 'overflow-y-auto overflow-x-hidden items-start touch-pan-y'
+          : 'overflow-hidden items-center touch-none'
+      } ${className}`}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
