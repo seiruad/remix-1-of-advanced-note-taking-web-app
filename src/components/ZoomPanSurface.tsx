@@ -225,9 +225,8 @@ export function ZoomPanSurface({ children, className = '', resetKey, scrollable 
         g.startTranslate.y + g.startDelta.y * (1 - k) + (mid.y - g.center.y)
       );
     }
-
-    }
   };
+
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     pointersRef.current.delete(e.pointerId);
