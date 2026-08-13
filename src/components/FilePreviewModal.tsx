@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { X, Download, Loader2, FileQuestion } from 'lucide-react';
+import { X, Download, Loader2, FileQuestion, Music } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FileItem } from '../types/database';
 import { PdfPreview } from './PdfPreview';
@@ -77,6 +77,10 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
     let cancelled = false;
 
     const load = async () => {
+      if (getPreviewKind(file) === 'none') {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError(null);
       setUrl(null);
@@ -179,18 +183,52 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
           ) : kind === 'video' && url ? (
             <video src={url} controls className="max-w-full max-h-full" />
           ) : kind === 'audio' && url ? (
-            <div className="w-full px-6 py-10">
-              <audio src={url} controls className="w-full" />
+            <div className="w-full max-w-md mx-auto px-5 sm:px-6 py-10">
+              <div className="rounded-2xl border border-slate-700/70 bg-gradient-to-b from-slate-800 to-slate-800/60 p-6 shadow-xl">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-20 h-20 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-4">
+                    <Music className="w-9 h-9 text-emerald-400" />
+                  </div>
+                  <p className="text-sm font-semibold text-slate-100 break-all leading-snug">
+                    {file.filename}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    {formatFileSize(file.file_size)}
+                  </p>
+                </div>
+                <audio src={url} controls className="w-full mt-5" />
+              </div>
             </div>
           ) : kind === 'text' && textContent !== null ? (
             <pre className="w-full h-full text-xs text-slate-300 p-4 whitespace-pre-wrap break-words font-mono">
               {textContent}
             </pre>
           ) : (
-            <div className="flex flex-col items-center text-slate-500 px-6 py-14 text-center">
-              <FileQuestion className="w-12 h-12 mb-3 opacity-40" />
-              <p className="text-sm">Предпросмотр для этого формата недоступен</p>
-              <p className="text-xs mt-1">Скачайте файл, чтобы открыть его</p>
+            <div className="w-full max-w-md mx-auto px-5 sm:px-6 py-10">
+              <div className="rounded-2xl border border-slate-700/70 bg-slate-800/60 p-6 text-center shadow-xl">
+                <div className="w-16 h-16 rounded-2xl bg-slate-700/50 border border-slate-600/50 flex items-center justify-center mx-auto mb-4">
+                  <FileQuestion className="w-8 h-8 text-slate-400" />
+                </div>
+                <p className="text-sm font-semibold text-slate-100">
+                  Предпросмотр недоступен
+                </p>
+                <p className="text-xs text-slate-500 mt-1.5 break-all">
+                  {file.filename}
+                  {file.file_size ? ` · ${formatFileSize(file.file_size)}` : ''}
+                </p>
+                <p className="text-xs text-slate-500 mt-3">
+                  Этот формат нельзя показать в браузере — скачайте файл, чтобы открыть его.
+                </p>
+                {onDownload && (
+                  <button
+                    onClick={() => onDownload(file)}
+                    className="mt-5 w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Скачать файл
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
