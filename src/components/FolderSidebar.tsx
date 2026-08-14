@@ -280,6 +280,7 @@ export function FolderSidebar({
   onRenameFolder,
   totalStorageBytes,
   onOpenStorage,
+  onOpenAccount,
 }: FolderSidebarProps) {
   const [isCreatingRoot, setIsCreatingRoot] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
