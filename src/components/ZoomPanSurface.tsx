@@ -22,10 +22,188 @@ interface ZoomPanSurfaceProps {
 }
 
 /**
+ * Scrollable variant (tall PDF pages): the content is laid out inside a sizer
+ * whose size grows with the zoom, so the browser keeps native scrolling.
+ * Zoom is anchored by adjusting scrollLeft / scrollTop, which is exact even
+ * when the content is much taller than the viewport.
+ */
+function ScrollZoomSurface({ children, className = '', resetKey }: ZoomPanSurfaceProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sizerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const scaleRef = useRef(1);
+  const [zoomed, setZoomed] = useState(false);
+  const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const pinchRef = useRef<{ dist: number; mid: { x: number; y: number } } | null>(null);
+  const panRef = useRef<{ x: number; y: number; scrollLeft: number; scrollTop: number } | null>(null);
+  const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null);
+
+  const applyScale = useCallback((raw: number, clientX: number, clientY: number) => {
+    const container = containerRef.current;
+    const sizer = sizerRef.current;
+    const content = contentRef.current;
+    if (!container || !sizer || !content) return;
+    const next = clampZoom(raw);
+    const cur = scaleRef.current;
+    if (next === cur) return;
+
+    const rect = container.getBoundingClientRect();
+    // point in the (scaled) content coordinate space
+    const px = clientX - rect.left + container.scrollLeft;
+    const py = clientY - rect.top + container.scrollTop;
+    const k = next / cur;
+
+    scaleRef.current = next;
+    const bw = content.offsetWidth;
+    const bh = content.offsetHeight;
+    sizer.style.width = `${bw * next}px`;
+    sizer.style.height = `${bh * next}px`;
+    content.style.transform = `scale(${next})`;
+
+    container.scrollLeft = px * k - (clientX - rect.left);
+    container.scrollTop = py * k - (clientY - rect.top);
+    setZoomed(next > 1.001);
+  }, []);
+
+  const reset = useCallback(() => {
+    const container = containerRef.current;
+    const sizer = sizerRef.current;
+    const content = contentRef.current;
+    scaleRef.current = 1;
+    if (sizer) {
+      sizer.style.width = '';
+      sizer.style.height = '';
+    }
+    if (content) content.style.transform = 'scale(1)';
+    if (container) {
+      container.scrollLeft = 0;
+      container.scrollTop = 0;
+    }
+    setZoomed(false);
+  }, []);
+
+  useEffect(() => {
+    reset();
+  }, [resetKey, reset]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return; // plain wheel keeps native scrolling
+      e.preventDefault();
+      const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
+      applyScale(scaleRef.current * Math.exp(-dy * 0.01), e.clientX, e.clientY);
+    };
+    container.addEventListener('wheel', onWheel, { passive: false });
+    return () => container.removeEventListener('wheel', onWheel);
+  }, [applyScale]);
+
+  const midpoint = () => {
+    const pts = Array.from(pointersRef.current.values());
+    if (pts.length < 2) return pts[0] ?? { x: 0, y: 0 };
+    return { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'touch' && scaleRef.current <= 1.001) return;
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointersRef.current.size === 1) {
+      const now = Date.now();
+      const last = lastTapRef.current;
+      if (
+        last &&
+        now - last.time < DOUBLE_TAP_MS &&
+        Math.hypot(e.clientX - last.x, e.clientY - last.y) < DOUBLE_TAP_DISTANCE_PX
+      ) {
+        lastTapRef.current = null;
+        if (scaleRef.current > 1.2) reset();
+        else applyScale(2.5, e.clientX, e.clientY);
+        return;
+      }
+      lastTapRef.current = { time: now, x: e.clientX, y: e.clientY };
+      const container = containerRef.current;
+      if (container && scaleRef.current > 1.001) {
+        panRef.current = {
+          x: e.clientX,
+          y: e.clientY,
+          scrollLeft: container.scrollLeft,
+          scrollTop: container.scrollTop,
+        };
+      }
+    } else if (pointersRef.current.size === 2) {
+      const [p1, p2] = Array.from(pointersRef.current.values());
+      pinchRef.current = { dist: Math.hypot(p2.x - p1.x, p2.y - p1.y) || 1, mid: midpoint() };
+      panRef.current = null;
+    }
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!pointersRef.current.has(e.pointerId)) return;
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointersRef.current.size >= 2 && pinchRef.current) {
+      const [p1, p2] = Array.from(pointersRef.current.values());
+      const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y) || 1;
+      const mid = midpoint();
+      const prev = pinchRef.current;
+      // pan with the moving midpoint
+      const container = containerRef.current;
+      if (container && scaleRef.current > 1.001) {
+        container.scrollLeft -= mid.x - prev.mid.x;
+        container.scrollTop -= mid.y - prev.mid.y;
+      }
+      applyScale(scaleRef.current * (dist / prev.dist), mid.x, mid.y);
+      pinchRef.current = { dist, mid };
+    } else if (panRef.current && scaleRef.current > 1.001) {
+      const container = containerRef.current;
+      if (!container) return;
+      container.scrollLeft = panRef.current.scrollLeft - (e.clientX - panRef.current.x);
+      container.scrollTop = panRef.current.scrollTop - (e.clientY - panRef.current.y);
+    }
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    pointersRef.current.delete(e.pointerId);
+    if (pointersRef.current.size < 2) pinchRef.current = null;
+    if (pointersRef.current.size === 0) panRef.current = null;
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className={`w-full h-full overflow-auto select-none ${className}`}
+      style={{ touchAction: zoomed ? 'none' : 'pan-y', overscrollBehavior: 'contain' }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerUp}
+      onPointerCancel={onPointerUp}
+    >
+      <div ref={sizerRef} className="mx-auto w-fit">
+        <div
+          ref={contentRef}
+          className="w-fit"
+          style={{ transform: 'scale(1)', transformOrigin: '0 0', cursor: zoomed ? 'grab' : 'default' }}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Generic pinch / wheel / double-tap zoom + pan surface.
  * Zoom is anchored at the pointer (or pinch midpoint), not the center.
  */
-export function ZoomPanSurface({ children, className = '', resetKey, scrollable = false }: ZoomPanSurfaceProps) {
+export function ZoomPanSurface(props: ZoomPanSurfaceProps) {
+  if (props.scrollable) return <ScrollZoomSurface {...props} />;
+  return <TransformZoomSurface {...props} />;
+}
+
+function TransformZoomSurface({ children, className = '', resetKey, scrollable = false }: ZoomPanSurfaceProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const transformRef = useRef({ scale: 1, x: 0, y: 0 });
