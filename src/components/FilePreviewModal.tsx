@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { X, Download, Loader2, FileQuestion, Minus, Plus, Maximize2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Download, Loader2, FileQuestion } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FileItem } from '../types/database';
 import { PdfPreview } from './PdfPreview';
-import { ZoomPanSurface, ZoomPanSurfaceRef } from './ZoomPanSurface';
+import { ZoomPanSurface } from './ZoomPanSurface';
 import { AudioPlayer } from './AudioPlayer';
 import { VideoPlayer } from './VideoPlayer';
 
@@ -45,55 +45,6 @@ function formatFileSize(bytes: number) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-function ImagePreview({ src, alt }: { src: string; alt: string }) {
-  const surfaceRef = useRef<ZoomPanSurfaceRef>(null);
-  const [scale, setScale] = useState(1);
-
-  return (
-    <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
-      {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
-
-      <ZoomPanSurface ref={surfaceRef} resetKey={src} onZoomChange={setScale}>
-        <img
-          src={src}
-          alt={alt}
-          draggable={false}
-          className="max-w-full max-h-full object-contain select-none block rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 bg-slate-900"
-        />
-      </ZoomPanSurface>
-
-      {/* Floating glass dock */}
-      <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 p-1.5 bg-slate-900/70 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl ring-1 ring-black/50">
-        <button
-          onClick={() => surfaceRef.current?.zoomOut()}
-          className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition-colors active:scale-90"
-          title="Zoom out"
-        >
-          <Minus className="w-4 h-4" />
-        </button>
-        <div className="px-3 py-1.5 min-w-[3.5rem] text-center bg-white/5 rounded-xl border border-white/5">
-          <span className="text-[13px] font-bold text-white tabular-nums">{Math.round(scale * 100)}%</span>
-        </div>
-        <button
-          onClick={() => surfaceRef.current?.zoomIn()}
-          className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition-colors active:scale-90"
-          title="Zoom in"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-        <div className="w-px h-5 bg-white/10 mx-1" />
-        <button
-          onClick={() => surfaceRef.current?.reset()}
-          className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition-colors active:scale-90"
-          title="Fit to screen"
-        >
-          <Maximize2 className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
-  );
-}
 
 
 interface FilePreviewModalProps {
@@ -222,7 +173,18 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
           ) : error ? (
             <p className="text-sm text-red-400 px-6 py-10 text-center">{error}</p>
           ) : kind === 'image' && url ? (
-            <ImagePreview src={url} alt={file.filename} />
+            <div className="w-full max-w-3xl mx-auto p-4 sm:p-6 flex items-center justify-center">
+              <div className="w-full rounded-2xl border border-slate-700/70 bg-gradient-to-b from-slate-800 to-slate-800/50 shadow-xl p-2 sm:p-3">
+                <ZoomPanSurface resetKey={url}>
+                  <img
+                    src={url}
+                    alt={file.filename}
+                    draggable={false}
+                    className="max-w-full max-h-[70vh] object-contain select-none block"
+                  />
+                </ZoomPanSurface>
+              </div>
+            </div>
           ) : kind === 'pdf' && blob ? (
             <div className="w-full h-full min-h-[70vh] self-stretch">
               <PdfPreview data={blob} />
