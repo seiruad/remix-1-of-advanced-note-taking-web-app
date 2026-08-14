@@ -21,7 +21,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
 import { buildFileUrl } from './FilePreviewPage';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { UnifiedMenu } from './UnifiedMenu';
 
 interface StoragePageProps {
@@ -63,6 +63,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -469,7 +470,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
                 >
                   <button
                     type="button"
-                    onClick={() => navigate(buildFileUrl(file.id, { kind: 'storage' }))}
+                    onClick={() => navigate(buildFileUrl(file.id, { kind: 'storage' }), { state: { background: location } })}
                     className="flex items-center gap-2 flex-1 min-w-0 text-left"
                     title="Preview"
                   >

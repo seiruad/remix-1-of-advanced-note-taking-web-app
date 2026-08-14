@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { RichTextEditor } from './RichTextEditor';
 import { AttachFileDialog } from './AttachFileDialog';
 import { buildFileUrl } from './FilePreviewPage';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Note, FileItem, Folder, Workspace } from '../types/database';
 import { supabase } from '../lib/supabase';
 import {
@@ -115,6 +115,7 @@ export function NoteEditor({
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
@@ -692,7 +693,7 @@ export function NoteEditor({
                 >
                   <button
                     type="button"
-                    onClick={() => note && navigate(buildFileUrl(file.id, { kind: 'note', noteId: note.id }))}
+                    onClick={() => note && navigate(buildFileUrl(file.id, { kind: 'note', noteId: note.id }), { state: { background: location } })}
                     className="flex items-center gap-3 flex-1 min-w-0 text-left"
                     title="Preview"
                   >
