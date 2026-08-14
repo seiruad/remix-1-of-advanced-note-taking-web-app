@@ -7,21 +7,24 @@ import { FilePreviewModal } from './FilePreviewModal';
 
 /**
  * Route: /file/:fileId?source=storage
- *        /file/:fileId?source=note&<noteId>
+ *        /file/:fileId?source=note&noteId=:noteId
  */
 export function parseFileSource(search: string): { kind: 'storage' | 'note' | 'unknown'; noteId?: string } {
-  const raw = new URLSearchParams(search).get('source') || '';
-  if (raw === 'storage') return { kind: 'storage' };
-  if (raw.startsWith('note&')) {
-    const noteId = raw.slice('note&'.length);
+  const params = new URLSearchParams(search);
+  const source = params.get('source') || '';
+  if (source === 'storage') return { kind: 'storage' };
+  if (source === 'note') {
+    const noteId = params.get('noteId') || '';
     return noteId ? { kind: 'note', noteId } : { kind: 'unknown' };
   }
   return { kind: 'unknown' };
 }
 
 export function buildFileUrl(fileId: string, source: { kind: 'storage' } | { kind: 'note'; noteId: string }) {
-  const value = source.kind === 'storage' ? 'storage' : `note&${source.noteId}`;
-  return `/file/${fileId}?source=${encodeURIComponent(value)}`;
+  if (source.kind === 'storage') {
+    return `/file/${fileId}?source=storage`;
+  }
+  return `/file/${fileId}?source=note&noteId=${encodeURIComponent(source.noteId)}`;
 }
 
 export function FilePreviewPage() {
