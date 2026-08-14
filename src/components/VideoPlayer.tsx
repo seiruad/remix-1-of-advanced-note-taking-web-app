@@ -122,8 +122,8 @@ export function VideoPlayer({ src, title }: VideoPlayerProps) {
       if (e.key === ' ' || e.key === 'k') {
         e.preventDefault();
         toggle();
-      } else if (e.key === 'ArrowRight') skip(5);
-      else if (e.key === 'ArrowLeft') skip(-5);
+      } else if (e.key === 'ArrowRight') skip(10);
+      else if (e.key === 'ArrowLeft') skip(-10);
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -235,25 +235,25 @@ export function VideoPlayer({ src, title }: VideoPlayerProps) {
           {/* Buttons row */}
           <div className="mt-1 flex items-center gap-1 sm:gap-1.5">
             <button
+              onClick={() => skip(-10)}
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/15 transition-colors flex-shrink-0"
+              title="-10s"
+            >
+              <RotateCcw className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            </button>
+            <button
               onClick={toggle}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-white hover:bg-white/15 transition-colors flex-shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-white hover:bg-white/15 transition-colors flex-shrink-0"
               title={playing ? 'Pause' : 'Play'}
             >
               {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 translate-x-[1px]" />}
             </button>
             <button
-              onClick={() => skip(-10)}
-              className="w-9 h-9 rounded-lg hidden xs:flex sm:flex items-center justify-center text-white/85 hover:text-white hover:bg-white/15 transition-colors flex-shrink-0"
-              title="-10s"
-            >
-              <RotateCcw className="w-4.5 h-4.5" />
-            </button>
-            <button
               onClick={() => skip(10)}
-              className="w-9 h-9 rounded-lg hidden xs:flex sm:flex items-center justify-center text-white/85 hover:text-white hover:bg-white/15 transition-colors flex-shrink-0"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/15 transition-colors flex-shrink-0"
               title="+10s"
             >
-              <RotateCw className="w-4.5 h-4.5" />
+              <RotateCw className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </button>
 
             <span className="ml-1 text-[11px] text-white/80 tabular-nums whitespace-nowrap">
