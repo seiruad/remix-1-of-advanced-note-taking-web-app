@@ -501,6 +501,11 @@ function NotesApp() {
           <SettingsPage onBack={() => navigate('/')} />
         </div>
       } />
+      <Route path="/account" element={
+        <div className="h-screen bg-slate-900">
+          <AccountPage onBack={() => navigate('/')} />
+        </div>
+      } />
       <Route path="/note/:noteId" element={
         <div className="flex h-screen bg-slate-900">
           <div
