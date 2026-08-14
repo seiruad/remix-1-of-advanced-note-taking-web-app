@@ -136,7 +136,11 @@ export function VideoPlayer({ src, title }: VideoPlayerProps) {
     <div className="w-full h-full flex items-center justify-center p-0 sm:p-4">
       <div
         ref={wrapRef}
-        className="relative w-full max-w-3xl bg-black sm:rounded-2xl overflow-hidden sm:border sm:border-slate-700/70 sm:shadow-2xl group"
+        className={`relative bg-black overflow-hidden group ${
+          fullscreen
+            ? 'w-screen h-screen flex items-center justify-center rounded-none border-0'
+            : 'w-full max-w-3xl sm:rounded-2xl sm:border sm:border-slate-700/70 sm:shadow-2xl'
+        }`}
         onMouseMove={bumpControls}
         onPointerDown={bumpControls}
       >
@@ -146,7 +150,9 @@ export function VideoPlayer({ src, title }: VideoPlayerProps) {
           playsInline
           muted={muted}
           preload="metadata"
-          className="w-full max-h-[70vh] bg-black block"
+          className={`bg-black block ${
+            fullscreen ? 'w-full h-full object-contain' : 'w-full max-h-[70vh]'
+          }`}
           onClick={toggle}
           onLoadedMetadata={(e) => {
             setDuration(e.currentTarget.duration || 0);
