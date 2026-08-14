@@ -5,6 +5,7 @@ import { FileItem } from '../types/database';
 import { PdfPreview } from './PdfPreview';
 import { ZoomPanSurface } from './ZoomPanSurface';
 import { AudioPlayer } from './AudioPlayer';
+import { VideoPlayer } from './VideoPlayer';
 
 
 
