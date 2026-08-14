@@ -73,7 +73,7 @@ export function StorageUsage({ totalBytes, onOpen, onOpenSettings }: StorageUsag
           aria-label="Settings"
           title="Settings"
         >
-          <Settings className="w-4 h-4" />
+          <Settings className="w-5 h-5 sm:w-4 sm:h-4" />
         </button>
         <button
           onClick={signOut}
@@ -81,7 +81,7 @@ export function StorageUsage({ totalBytes, onOpen, onOpenSettings }: StorageUsag
           aria-label="Sign out"
           title="Sign out"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-5 h-5 sm:w-4 sm:h-4" />
         </button>
       </div>
     </div>
