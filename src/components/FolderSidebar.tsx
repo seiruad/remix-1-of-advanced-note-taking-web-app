@@ -360,7 +360,7 @@ export function FolderSidebar({
         />
       </div>
 
-      <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenStorage} />
+      <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenStorage} onOpenAccount={onOpenAccount} />
     </div>
   );
 }
