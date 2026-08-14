@@ -1292,14 +1292,13 @@ export function UnifiedSidebar({
                     )}
                     <div className="space-y-2.5">
                       {showUnfiled && (
-                        <div className="group relative w-full flex items-center gap-2 overflow-hidden pr-2">
-                          <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-slate-500/70" />
+                        <div className="group relative w-full flex items-center gap-1 overflow-hidden rounded-xl bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700/60 transition-colors">
                           <button
                             onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
-                            className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700 transition-colors overflow-hidden"
+                            className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 overflow-hidden"
                           >
                             <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
-                              <Inbox className="w-5 h-5 sm:w-4 sm:h-4 text-slate-300" />
+                              <Inbox className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-300" />
                             </div>
                             <span className="flex-1 min-w-0 text-left text-base sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
                             <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
