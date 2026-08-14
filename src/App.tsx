@@ -32,8 +32,13 @@ function NotesApp() {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [, setLoading] = useState(true);
 
-  const noteMatch = location.pathname.match(/^\/note\/(.+)$/);
+  const navState = location.state as { background?: Location } | null;
+  const backgroundLocation = navState?.background;
+  // When the file preview is shown as an overlay, keep the underlying page (and active note) intact.
+  const basePathname = backgroundLocation?.pathname || location.pathname;
+  const noteMatch = basePathname.match(/^\/note\/(.+)$/);
   const currentNoteId = noteMatch ? noteMatch[1] : null;
+
 
   const currentNote = notes.find((n) => n.id === currentNoteId) || null;
 
@@ -446,8 +451,8 @@ function NotesApp() {
     return <AuthPage />;
   }
 
-  const navState = location.state as { background?: Location } | null;
-  const backgroundLocation = navState?.background;
+
+
 
   return (
     <>

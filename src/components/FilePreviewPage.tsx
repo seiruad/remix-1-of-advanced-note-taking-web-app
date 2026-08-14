@@ -37,6 +37,15 @@ export function FilePreviewPage() {
   const source = parseFileSource(location.search);
   const backTo =
     source.kind === 'note' && source.noteId ? `/note/${source.noteId}` : source.kind === 'storage' ? '/storage' : '/';
+  // Lock background scrolling while the preview overlay is mounted (prevents a second scrollbar).
+  useEffect(() => {
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, []);
+
 
   useEffect(() => {
     let cancelled = false;
