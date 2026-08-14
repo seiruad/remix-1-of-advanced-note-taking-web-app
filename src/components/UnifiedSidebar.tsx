@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { UnifiedMenu } from './UnifiedMenu';
 import {
   Folder as FolderIcon,
   ChevronRight,
@@ -261,39 +262,8 @@ function NoteCard({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [moveSheetOpen, setMoveSheetOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (
-        menuRef.current && !menuRef.current.contains(e.target as Node) &&
-        triggerRef.current && !triggerRef.current.contains(e.target as Node)
-      ) setMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [menuOpen]);
 
   const folderName = folders.find((f) => f.id === note.folder_id)?.name || null;
-
-  const openMenu = () => {
-    if (triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      const menuW = 196;
-      const menuH = 108;
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const openUp = spaceBelow < menuH + 8 && rect.top > menuH + 8;
-      const left = Math.min(rect.right - menuW, window.innerWidth - menuW - 8);
-      setMenuPos({
-        top: openUp ? rect.top - menuH - 4 : rect.bottom + 4,
-        left: Math.max(8, left),
-      });
-    }
-    setMenuOpen(true);
-  };
 
   const isNew = note.is_new ?? false;
 
@@ -361,65 +331,26 @@ function NoteCard({
 
 
         {/* Action button */}
-        <div className="flex items-center pr-2 flex-shrink-0">
-          <button
-            ref={triggerRef}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (menuOpen) {
-                setMenuOpen(false);
-              } else {
-                openMenu();
-              }
-            }}
-            className={`p-2 rounded-lg transition-colors ${
-              menuOpen
-                ? 'bg-slate-600/60 text-slate-200'
-                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 sm:opacity-0 sm:group-hover/card:opacity-100'
+        <div className="flex items-center pr-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+          <UnifiedMenu
+            ariaLabel="Note options"
+            onOpenChange={setMenuOpen}
+            triggerClassName={`w-9 h-9 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
+              menuOpen ? '' : 'sm:opacity-0 sm:group-hover/card:opacity-100'
             }`}
-            title="Note options"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
+            iconClassName="w-5 h-5 sm:w-4 sm:h-4"
+            items={[
+              {
+                id: 'move',
+                label: 'Move to folder',
+                icon: FolderInput,
+                onSelect: () => setMoveSheetOpen(true),
+              },
+              { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
+            ]}
+          />
         </div>
       </div>
-
-      {menuOpen && menuPos && createPortal(
-        <>
-          <div className="fixed inset-0 z-[9998]" onClick={() => setMenuOpen(false)} />
-          <div
-            ref={menuRef}
-            style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, zIndex: 9999 }}
-            className="w-[196px] bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] py-1.5 overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuOpen(false);
-                setMoveSheetOpen(true);
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-sm text-slate-200 hover:bg-slate-700/70 active:bg-slate-700 transition-colors"
-            >
-              <FolderInput className="w-4 h-4 text-slate-400 flex-shrink-0" />
-              Move to folder
-            </button>
-            <div className="mx-3 border-t border-slate-700/60" />
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuOpen(false);
-                onDelete();
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-sm text-red-400 hover:bg-red-500/10 active:bg-red-500/20 transition-colors"
-            >
-              <Trash2 className="w-4 h-4 flex-shrink-0" />
-              Delete
-            </button>
-          </div>
-        </>,
-        document.body
-      )}
 
       {moveSheetOpen && (
         <NoteFolderLinker
@@ -774,58 +705,33 @@ function SidebarNavBar({
                 </span>
               </div>
 
-              {crumbInfo.canMenu && (
-                <button
-                  ref={crumbRef}
-                  onClick={(e) => { e.stopPropagation(); crumbMenuOpen ? setCrumbMenuOpen(false) : openCrumbMenu(); }}
-                  className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-all"
-                  aria-label="Folder options"
-                >
-                  <MoreHorizontal className="w-5 h-5" strokeWidth={2.5} />
-                </button>
+              {crumbInfo.canMenu && currentFolder && (
+                <UnifiedMenu
+                  ariaLabel="Folder options"
+                  triggerClassName="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700/60"
+                  iconClassName="w-5 h-5"
+                  items={[
+                    {
+                      id: 'rename',
+                      label: 'Rename',
+                      icon: Pencil,
+                      onSelect: () => { setRenameValue(currentFolder.name); setIsRenaming(true); },
+                    },
+                    {
+                      id: 'delete',
+                      label: 'Delete',
+                      icon: Trash2,
+                      danger: true,
+                      onSelect: () => onOpenDeleteFolder(currentFolder),
+                    },
+                  ]}
+                />
               )}
             </>
           )}
         </div>
       )}
 
-      {/* Breadcrumb ⋯ popover (Rename / Delete) */}
-      {crumbMenuOpen && crumbMenuPos && currentFolder && createPortal(
-        <>
-          <div className="fixed inset-0 z-[9998]" onClick={() => setCrumbMenuOpen(false)} />
-          <div
-            style={{ position: 'fixed', top: crumbMenuPos.top, left: crumbMenuPos.left, zIndex: 9999, width: 200 }}
-            className="bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
-
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => {
-                setCrumbMenuOpen(false);
-                setRenameValue(currentFolder.name);
-                setIsRenaming(true);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-100 hover:bg-white/5 active:bg-white/10 transition-colors"
-            >
-              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/80 text-slate-200">
-                <Pencil className="w-4 h-4" />
-              </span>
-              <span className="text-sm font-medium">Rename</span>
-            </button>
-            <div className="h-px bg-white/8" />
-            <button
-              onClick={() => { setCrumbMenuOpen(false); onOpenDeleteFolder(currentFolder); }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-500/10 active:bg-red-500/15 transition-colors"
-            >
-              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/15 text-red-400">
-                <Trash2 className="w-4 h-4" />
-              </span>
-              <span className="text-sm font-medium">Delete</span>
-            </button>
-          </div>
-        </>,
-        document.body,
-      )}
     </div>
   );
 }
@@ -886,11 +792,8 @@ function FolderRowFlat({
   onDelete: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const [isRenaming, setIsRenaming] = useState(folder.is_new ?? false);
   const [renameValue, setRenameValue] = useState(folder.name);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const renameInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -899,30 +802,6 @@ function FolderRowFlat({
       renameInputRef.current.select();
     }
   }, [folder.is_new]);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (
-        menuRef.current && !menuRef.current.contains(e.target as Node) &&
-        triggerRef.current && !triggerRef.current.contains(e.target as Node)
-      ) setMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [menuOpen]);
-
-  const openMenu = () => {
-    const rect = triggerRef.current!.getBoundingClientRect();
-    const isMobile = window.innerWidth < 640;
-    const MENU_W = isMobile ? 230 : 200;
-    const MENU_H = isMobile ? 200 : 140;
-    const MARGIN = 8;
-    const left = Math.min(rect.right - MENU_W, window.innerWidth - MENU_W - MARGIN);
-    const top = Math.min(rect.bottom + 4, window.innerHeight - MENU_H - MARGIN);
-    setMenuPos({ top: Math.max(MARGIN, top), left: Math.max(MARGIN, left) });
-    setMenuOpen(true);
-  };
 
   const handleRename = () => {
     if (renameValue.trim() && renameValue !== folder.name) onRename(renameValue.trim());
@@ -986,49 +865,23 @@ function FolderRowFlat({
         </button>
       )}
 
-      <button
-        ref={triggerRef}
-        onClick={(e) => { e.stopPropagation(); menuOpen ? setMenuOpen(false) : openMenu(); }}
-        className="folder-menu-btn flex-shrink-0 flex items-center justify-center w-10 h-10 sm:w-8 sm:h-8 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-        title="Folder options"
-      >
-        <MoreHorizontal className="folder-menu-icon" />
-      </button>
-
-      {menuOpen && createPortal(
-        <>
-          <div className="fixed inset-0 z-[9998]" onClick={() => setMenuOpen(false)} />
-          <div
-            ref={menuRef}
-            style={{ position: 'fixed', top: menuPos!.top, left: menuPos!.left, zIndex: 9999 }}
-            className="folder-dropdown bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)]
-                       animate-[dropdownIn_0.18s_cubic-bezier(0.34,1.4,0.64,1)_both]"
-
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => { setRenameValue(folder.name); setIsRenaming(true); setMenuOpen(false); }}
-              className="folder-dropdown-item neutral w-full flex items-center text-slate-100 active:bg-white/12"
-            >
-              <span className="folder-dropdown-icon flex items-center justify-center rounded-xl bg-slate-700/80 flex-shrink-0">
-                <Pencil className="text-slate-200" />
-              </span>
-              Rename
-            </button>
-            <div className="h-px bg-white/8" />
-            <button
-              onClick={() => { setMenuOpen(false); onDelete(); }}
-              className="folder-dropdown-item danger w-full flex items-center text-red-400 active:bg-red-500/15"
-            >
-              <span className="folder-dropdown-icon flex items-center justify-center rounded-xl bg-red-500/15 flex-shrink-0">
-                <Trash2 className="text-red-400" />
-              </span>
-              Delete
-            </button>
-          </div>
-        </>,
-        document.body,
-      )}
+      <UnifiedMenu
+        ariaLabel="Folder options"
+        onOpenChange={setMenuOpen}
+        triggerClassName={`w-10 h-10 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
+          menuOpen ? '' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
+        }`}
+        iconClassName="folder-menu-icon"
+        items={[
+          {
+            id: 'rename',
+            label: 'Rename',
+            icon: Pencil,
+            onSelect: () => { setRenameValue(folder.name); setIsRenaming(true); },
+          },
+          { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
+        ]}
+      />
     </div>
   );
 }
