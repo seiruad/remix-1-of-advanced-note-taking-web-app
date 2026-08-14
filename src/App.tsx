@@ -451,8 +451,8 @@ function NotesApp() {
     return <AuthPage />;
   }
 
-  const navState = location.state as { background?: Location } | null;
-  const backgroundLocation = navState?.background;
+
+
 
   return (
     <>
