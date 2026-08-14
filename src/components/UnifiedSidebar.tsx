@@ -47,6 +47,7 @@ interface UnifiedSidebarProps {
   onOpenStorage: () => void;
   onOpenWorkspaceManagement: () => void;
   onOpenSettings: () => void;
+  onOpenAccount: () => void;
 }
 
 type Mode = 'all' | 'folders';
