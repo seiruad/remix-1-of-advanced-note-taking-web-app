@@ -47,6 +47,7 @@ interface UnifiedSidebarProps {
   onOpenStorage: () => void;
   onOpenWorkspaceManagement: () => void;
   onOpenSettings: () => void;
+  onOpenAccount: () => void;
 }
 
 type Mode = 'all' | 'folders';
@@ -884,6 +885,7 @@ export function UnifiedSidebar({
   onOpenStorage,
   onOpenWorkspaceManagement,
   onOpenSettings,
+  onOpenAccount,
 }: UnifiedSidebarProps) {
   const [mode, setMode] = useState<Mode>(() => {
     try {
@@ -1344,7 +1346,7 @@ export function UnifiedSidebar({
 
 
       {/* Footer: Storage */}
-      <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenSettings} />
+      <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenSettings} onOpenAccount={onOpenAccount} />
 
 
       {/* Delete note confirmation */}

@@ -12,6 +12,7 @@ interface FolderSidebarProps {
   onRenameFolder: (folderId: string, name: string) => void;
   totalStorageBytes: number;
   onOpenStorage: () => void;
+  onOpenAccount: () => void;
 }
 
 interface FolderTreeItemProps {
@@ -279,6 +280,7 @@ export function FolderSidebar({
   onRenameFolder,
   totalStorageBytes,
   onOpenStorage,
+  onOpenAccount,
 }: FolderSidebarProps) {
   const [isCreatingRoot, setIsCreatingRoot] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -358,7 +360,7 @@ export function FolderSidebar({
         />
       </div>
 
-      <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenStorage} />
+      <StorageUsage totalBytes={totalStorageBytes} onOpen={onOpenStorage} onOpenSettings={onOpenStorage} onOpenAccount={onOpenAccount} />
     </div>
   );
 }

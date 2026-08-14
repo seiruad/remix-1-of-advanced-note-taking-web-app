@@ -1,10 +1,11 @@
-import { HardDrive, LogOut, ChevronRight, Settings } from 'lucide-react';
+import { HardDrive, LogOut, ChevronRight, Settings, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface StorageUsageProps {
   totalBytes: number;
   onOpen: () => void;
   onOpenSettings: () => void;
+  onOpenAccount: () => void;
 }
 
 const STORAGE_LIMIT = 100 * 1024 * 1024;
@@ -15,7 +16,7 @@ function formatSize(bytes: number) {
   return `${mb.toFixed(1)} MB`;
 }
 
-export function StorageUsage({ totalBytes, onOpen, onOpenSettings }: StorageUsageProps) {
+export function StorageUsage({ totalBytes, onOpen, onOpenSettings, onOpenAccount }: StorageUsageProps) {
   const { user, signOut } = useAuth();
 
   const percentage = Math.min((totalBytes / STORAGE_LIMIT) * 100, 100);
@@ -63,9 +64,18 @@ export function StorageUsage({ totalBytes, onOpen, onOpenSettings }: StorageUsag
         </div>
       </button>
 
-      {/* Account footer — one clean row, mobile-first tap targets */}
-      <div className="h-11 px-3 flex items-center gap-2 border-t border-slate-700/50">
-        <span className="flex-1 text-xs text-slate-500 truncate min-w-0 px-1">
+      {/* Account footer — mobile-first: account icon, email, settings, sign out */}
+      <div className="h-11 px-2 flex items-center gap-1 border-t border-slate-700/50">
+        <button
+          onClick={onOpenAccount}
+          className="flex items-center justify-center w-9 h-9 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/50 active:bg-slate-700/80 transition-colors"
+          aria-label="Account"
+          title="Account"
+        >
+          <User className="w-5 h-5 sm:w-4 sm:h-4" />
+        </button>
+
+        <span className="flex-1 text-xs text-slate-500 truncate min-w-0 px-1 text-center">
           {email}
         </span>
 

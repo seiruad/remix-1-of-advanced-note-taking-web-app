@@ -10,6 +10,7 @@ import { StoragePage } from './components/StoragePage';
 import { FilePreviewPage } from './components/FilePreviewPage';
 import { WorkspaceManagement } from './components/WorkspaceManagement';
 import { SettingsPage, getAutoActivateNewNote } from './components/SettingsPage';
+import { AccountPage } from './components/AccountPage';
 import { supabase } from './lib/supabase';
 import { FileItem, NoteWithDetails, Folder, Workspace } from './types/database';
 
@@ -500,6 +501,11 @@ function NotesApp() {
           <SettingsPage onBack={() => navigate('/')} />
         </div>
       } />
+      <Route path="/account" element={
+        <div className="h-screen bg-slate-900">
+          <AccountPage onBack={() => navigate('/')} />
+        </div>
+      } />
       <Route path="/note/:noteId" element={
         <div className="flex h-screen bg-slate-900">
           <div
@@ -525,6 +531,7 @@ function NotesApp() {
               onOpenStorage={() => navigate('/storage')}
               onOpenWorkspaceManagement={() => navigate('/workspaces')}
               onOpenSettings={() => navigate('/settings')}
+              onOpenAccount={() => navigate('/account')}
             />
           </div>
           <div className={`flex-1 flex flex-col min-w-0 ${isMobile && !sidebarOpen ? 'flex' : 'hidden lg:flex'}`}>
@@ -573,6 +580,7 @@ function NotesApp() {
               onOpenStorage={() => navigate('/storage')}
               onOpenWorkspaceManagement={() => navigate('/workspaces')}
               onOpenSettings={() => navigate('/settings')}
+              onOpenAccount={() => navigate('/account')}
             />
           </div>
           <div className={`flex-1 flex flex-col min-w-0 ${isMobile && !sidebarOpen ? 'flex' : 'hidden lg:flex'}`}>
