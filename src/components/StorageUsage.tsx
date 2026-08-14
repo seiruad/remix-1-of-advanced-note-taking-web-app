@@ -75,9 +75,14 @@ export function StorageUsage({ totalBytes, onOpen, onOpenSettings, onOpenAccount
           <User className="w-5 h-5 sm:w-4 sm:h-4" />
         </button>
 
-        <span className="flex-1 text-xs text-slate-500 truncate min-w-0 px-1 text-center">
+        <button
+          onClick={onOpenAccount}
+          className="flex-1 text-xs text-slate-500 truncate min-w-0 px-1 text-center bg-transparent border-none p-0 m-0 cursor-pointer hover:text-slate-500"
+          aria-label="Open account"
+          title={email || 'Account'}
+        >
           {email}
-        </span>
+        </button>
 
         <button
           onClick={onOpenSettings}
