@@ -3,7 +3,7 @@ import { X, Download, Loader2, FileQuestion } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FileItem } from '../types/database';
 import { PdfPreview } from './PdfPreview';
-import { ZoomPanSurface, ZoomPanSurfaceRef } from './ZoomPanSurface';
+import { ZoomPanSurface } from './ZoomPanSurface';
 import { AudioPlayer } from './AudioPlayer';
 import { VideoPlayer } from './VideoPlayer';
 
