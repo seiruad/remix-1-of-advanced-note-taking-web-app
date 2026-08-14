@@ -150,7 +150,9 @@ export function VideoPlayer({ src, title }: VideoPlayerProps) {
           playsInline
           muted={muted}
           preload="metadata"
-          className="w-full max-h-[70vh] bg-black block"
+          className={`bg-black block ${
+            fullscreen ? 'w-full h-full object-contain' : 'w-full max-h-[70vh]'
+          }`}
           onClick={toggle}
           onLoadedMetadata={(e) => {
             setDuration(e.currentTarget.duration || 0);
