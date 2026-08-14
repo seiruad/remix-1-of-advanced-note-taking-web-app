@@ -246,45 +246,47 @@ export function StoragePage({ onBack }: StoragePageProps) {
 
   return (
     <div className="flex flex-col h-full bg-slate-800">
-      {/* Header — same 56px height and rhythm as the sidebar Workspace header */}
-      <div className="h-14 px-3 border-b border-slate-700/50 flex items-center gap-3 flex-shrink-0">
-        <button
-          onClick={onBack}
-          className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
-          aria-label="Back"
-          title="Back"
-        >
-          <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
-        </button>
+      {/* Header + usage bar — one unified block */}
+      <div className="flex-shrink-0 border-b border-slate-700/50">
+        <div className="h-14 px-3 flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+            aria-label="Back"
+            title="Back"
+          >
+            <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+          </button>
 
-        <div className="flex-1 min-w-0 flex items-center gap-3">
-          <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center">
-            <HardDrive className="w-5 h-5 text-emerald-400" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">
-              Storage
-            </p>
-            <p
-              className={`text-sm font-semibold tabular-nums ${
-                isNearLimit ? 'text-amber-400' : 'text-slate-200'
-              }`}
-            >
-              {formatFileSize(totalBytes)} / {formatFileSize(STORAGE_LIMIT)}
-            </p>
+          <div className="flex-1 min-w-0 flex items-center gap-3">
+            <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+              <HardDrive className="w-5 h-5 text-emerald-400" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">
+                Storage
+              </p>
+              <p
+                className={`text-sm font-semibold tabular-nums ${
+                  isNearLimit ? 'text-amber-400' : 'text-slate-200'
+                }`}
+              >
+                {formatFileSize(totalBytes)} / {formatFileSize(STORAGE_LIMIT)}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Usage bar — inset to match sidebar rhythm */}
-      <div className="px-3 pb-2 border-b border-slate-700/50 flex-shrink-0">
-        <div className="h-1.5 bg-slate-700/70 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              isNearLimit ? 'bg-amber-500' : 'bg-emerald-500'
-            }`}
-            style={{ width: `${percentage}%` }}
-          />
+        {/* Usage bar — sits inside the header, not between separators */}
+        <div className="px-3 pb-3">
+          <div className="h-1.5 bg-slate-700/70 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                isNearLimit ? 'bg-amber-500' : 'bg-emerald-500'
+              }`}
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
         </div>
       </div>
 
