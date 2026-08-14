@@ -789,16 +789,14 @@ function FolderRowFlat({
 
   const count = notes.filter((n) => n.folder_id === folder.id).length;
 
+  const folderBtnClasses = folder.is_new
+    ? 'bg-amber-500/[0.06] hover:bg-amber-500/10 active:bg-amber-500/15'
+    : 'hover:bg-slate-700/40 active:bg-slate-700/60';
+
   return (
-    <div className="group folder-row relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/50 hover:bg-slate-700/70 active:bg-slate-700 rounded-xl transition-colors overflow-hidden">
-      {/* Left accent bar — folder's identity color */}
-      <span
-        className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full ${
-          folder.is_new ? 'bg-amber-400/80' : 'bg-emerald-400/70 group-hover:bg-emerald-400'
-        } transition-colors`}
-      />
+    <div className="group folder-row relative w-full flex items-center gap-2 overflow-hidden pr-2">
       {isRenaming ? (
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex items-center gap-3 flex-1 min-w-0 rounded-xl py-3.5 sm:py-3 pl-4 pr-2">
           <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
             folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
           }`}>
@@ -827,7 +825,7 @@ function FolderRowFlat({
           />
         </div>
       ) : (
-        <button onClick={onSelect} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+        <button onClick={onSelect} className={`flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 transition-colors ${folderBtnClasses}`}>
           <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
             folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
           }`}>
@@ -837,7 +835,7 @@ function FolderRowFlat({
               <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-400" />
             )}
           </div>
-          <span className="folder-name flex-1 min-w-0 text-left text-[17px] sm:text-sm font-semibold text-white truncate">{folder.name}</span>
+          <span className="folder-name flex-1 min-w-0 text-left text-base sm:text-sm font-semibold text-white truncate">{folder.name}</span>
           <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
             {count}
           </span>
@@ -847,7 +845,7 @@ function FolderRowFlat({
       <UnifiedMenu
         ariaLabel="Folder options"
         onOpenChange={setMenuOpen}
-        triggerClassName={`w-10 h-10 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
+        triggerClassName={`w-9 h-9 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
           menuOpen ? '' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
         }`}
         iconClassName="folder-menu-icon"
@@ -1294,21 +1292,21 @@ export function UnifiedSidebar({
                     )}
                     <div className="space-y-2.5">
                       {showUnfiled && (
-                        <div className="group relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700 rounded-xl transition-colors overflow-hidden">
+                        <div className="group relative w-full flex items-center gap-2 overflow-hidden pr-2">
                           <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-slate-500/70" />
                           <button
                             onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
-                            className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                            className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700 transition-colors overflow-hidden"
                           >
                             <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
                               <Inbox className="w-5 h-5 sm:w-4 sm:h-4 text-slate-300" />
                             </div>
-                            <span className="flex-1 min-w-0 text-left text-[17px] sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
+                            <span className="flex-1 min-w-0 text-left text-base sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
                             <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
                               {unfiledNotes.length}
                             </span>
                           </button>
-                          <span aria-hidden className="flex-shrink-0 w-10 h-10 sm:w-8 sm:h-8" />
+                          <span aria-hidden className="flex-shrink-0 w-9 h-9 sm:w-8 sm:h-8" />
                         </div>
                       )}
 
