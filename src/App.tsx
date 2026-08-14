@@ -6,6 +6,7 @@ import { UnifiedSidebar } from './components/UnifiedSidebar';
 import { NoteEditor } from './components/NoteEditor';
 import { ShareDialog } from './components/ShareDialog';
 import { StoragePage } from './components/StoragePage';
+import { FilePreviewPage } from './components/FilePreviewPage';
 import { WorkspaceManagement } from './components/WorkspaceManagement';
 import { SettingsPage, getAutoActivateNewNote } from './components/SettingsPage';
 import { supabase } from './lib/supabase';
@@ -446,6 +447,7 @@ function NotesApp() {
 
   return (
     <Routes>
+      <Route path="/file/:fileId" element={<FilePreviewPage />} />
       <Route path="/storage" element={
         <div className="h-screen bg-slate-900">
           <StoragePage onBack={() => navigate('/')} />

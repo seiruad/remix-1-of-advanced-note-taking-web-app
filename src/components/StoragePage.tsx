@@ -20,7 +20,8 @@ import {
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
-import { FilePreviewModal } from './FilePreviewModal';
+import { buildFileUrl } from './FilePreviewPage';
+import { useNavigate } from 'react-router-dom';
 import { UnifiedMenu } from './UnifiedMenu';
 
 interface StoragePageProps {
@@ -61,7 +62,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
-  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const navigate = useNavigate();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -468,7 +469,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
                 >
                   <button
                     type="button"
-                    onClick={() => setPreviewFile(file)}
+                    onClick={() => navigate(buildFileUrl(file.id, { kind: 'storage' }))}
                     className="flex items-center gap-2 flex-1 min-w-0 text-left"
                     title="Preview"
                   >
@@ -547,11 +548,6 @@ export function StoragePage({ onBack }: StoragePageProps) {
         )}
       </div>
 
-      <FilePreviewModal
-        file={previewFile}
-        onClose={() => setPreviewFile(null)}
-        onDownload={handleDownload}
-      />
 
       {/* Delete confirmation */}
       {confirmDelete && (
