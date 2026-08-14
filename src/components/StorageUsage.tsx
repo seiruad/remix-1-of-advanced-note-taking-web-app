@@ -49,14 +49,16 @@ export function StorageUsage({ totalBytes, onOpen, onOpenSettings }: StorageUsag
         <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors flex-shrink-0" />
       </button>
 
-      {/* Thin usage bar — same colors as before, just cleaner edge-to-edge line */}
-      <div className="h-1 bg-slate-700/70 overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-500 ${
-            isNearLimit ? 'bg-amber-500' : 'bg-emerald-500'
-          }`}
-          style={{ width: `${percentage}%` }}
-        />
+      {/* Usage bar — inset to match the px-3 rhythm of the rest of the sidebar */}
+      <div className="px-3 pb-2">
+        <div className="h-1.5 bg-slate-700/70 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              isNearLimit ? 'bg-amber-500' : 'bg-emerald-500'
+            }`}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
       </div>
 
       {/* Account footer — one clean row, mobile-first tap targets */}
