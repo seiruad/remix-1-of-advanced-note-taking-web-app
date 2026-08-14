@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import type { Location } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthPage } from './components/Auth';
 import { UnifiedSidebar } from './components/UnifiedSidebar';
@@ -445,8 +446,12 @@ function NotesApp() {
     return <AuthPage />;
   }
 
+  const navState = location.state as { background?: Location } | null;
+  const backgroundLocation = navState?.background;
+
   return (
-    <Routes>
+    <>
+    <Routes location={backgroundLocation || location}>
       <Route path="/file/:fileId" element={<FilePreviewPage />} />
       <Route path="/storage" element={
         <div className="h-screen bg-slate-900">
@@ -588,6 +593,12 @@ function NotesApp() {
       } />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    {backgroundLocation && (
+      <Routes>
+        <Route path="/file/:fileId" element={<FilePreviewPage />} />
+      </Routes>
+    )}
+    </>
   );
 }
 
