@@ -3,7 +3,7 @@ import { X, Download, Loader2, FileQuestion, Minus, Plus, Maximize2 } from 'luci
 import { supabase } from '../lib/supabase';
 import { FileItem } from '../types/database';
 import { PdfPreview } from './PdfPreview';
-import { ZoomPanSurface } from './ZoomPanSurface';
+import { ZoomPanSurface, ZoomPanSurfaceRef } from './ZoomPanSurface';
 import { AudioPlayer } from './AudioPlayer';
 import { VideoPlayer } from './VideoPlayer';
 
