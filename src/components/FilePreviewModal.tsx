@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { X, Download, Loader2, FileQuestion, Minus, Plus, Maximize2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Download, Loader2, FileQuestion } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FileItem } from '../types/database';
 import { PdfPreview } from './PdfPreview';
