@@ -1332,7 +1332,7 @@ export function UnifiedSidebar({
 
         {/* FAB — contextual create */}
         {!hideFab && (
-          <div className="px-3 pt-2 pb-3 bg-slate-800 border-t border-slate-700/30">
+          <div className="px-3 pt-2 pb-3 bg-slate-800 border-t border-slate-700/50 flex-shrink-0">
             <SidebarFab
               fabMode={fabMode}
               onCreateNote={handleFabCreateNote}
