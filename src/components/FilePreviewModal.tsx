@@ -173,7 +173,18 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
           ) : error ? (
             <p className="text-sm text-red-400 px-6 py-10 text-center">{error}</p>
           ) : kind === 'image' && url ? (
-            <ImagePreview src={url} alt={file.filename} />
+            <div className="w-full max-w-3xl mx-auto p-4 sm:p-6 flex items-center justify-center">
+              <div className="w-full rounded-2xl border border-slate-700/70 bg-gradient-to-b from-slate-800 to-slate-800/50 shadow-xl p-2 sm:p-3">
+                <ZoomPanSurface resetKey={url}>
+                  <img
+                    src={url}
+                    alt={file.filename}
+                    draggable={false}
+                    className="max-w-full max-h-[70vh] object-contain select-none block"
+                  />
+                </ZoomPanSurface>
+              </div>
+            </div>
           ) : kind === 'pdf' && blob ? (
             <div className="w-full h-full min-h-[70vh] self-stretch">
               <PdfPreview data={blob} />
