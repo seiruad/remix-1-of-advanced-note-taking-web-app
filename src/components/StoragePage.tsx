@@ -290,8 +290,8 @@ export function StoragePage({ onBack }: StoragePageProps) {
         </div>
       </div>
 
-      {/* Toolbar / nav bar — 44px, same as sidebar segmented control */}
-      <div className="h-11 px-3 border-b border-slate-700/50 flex items-center gap-2 flex-shrink-0">
+      {/* Toolbar / nav bar — roomier on mobile */}
+      <div className="h-auto px-3 py-3 sm:py-2 border-b border-slate-700/50 flex items-center gap-2 flex-shrink-0">
         <div className="relative flex-1 min-w-0 h-9">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
           <input
