@@ -261,39 +261,8 @@ function NoteCard({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [moveSheetOpen, setMoveSheetOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (
-        menuRef.current && !menuRef.current.contains(e.target as Node) &&
-        triggerRef.current && !triggerRef.current.contains(e.target as Node)
-      ) setMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [menuOpen]);
 
   const folderName = folders.find((f) => f.id === note.folder_id)?.name || null;
-
-  const openMenu = () => {
-    if (triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      const menuW = 196;
-      const menuH = 108;
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const openUp = spaceBelow < menuH + 8 && rect.top > menuH + 8;
-      const left = Math.min(rect.right - menuW, window.innerWidth - menuW - 8);
-      setMenuPos({
-        top: openUp ? rect.top - menuH - 4 : rect.bottom + 4,
-        left: Math.max(8, left),
-      });
-    }
-    setMenuOpen(true);
-  };
 
   const isNew = note.is_new ?? false;
 
@@ -361,65 +330,26 @@ function NoteCard({
 
 
         {/* Action button */}
-        <div className="flex items-center pr-2 flex-shrink-0">
-          <button
-            ref={triggerRef}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (menuOpen) {
-                setMenuOpen(false);
-              } else {
-                openMenu();
-              }
-            }}
-            className={`p-2 rounded-lg transition-colors ${
-              menuOpen
-                ? 'bg-slate-600/60 text-slate-200'
-                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 sm:opacity-0 sm:group-hover/card:opacity-100'
+        <div className="flex items-center pr-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+          <UnifiedMenu
+            ariaLabel="Note options"
+            onOpenChange={setMenuOpen}
+            triggerClassName={`w-9 h-9 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
+              menuOpen ? '' : 'sm:opacity-0 sm:group-hover/card:opacity-100'
             }`}
-            title="Note options"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
+            iconClassName="w-5 h-5 sm:w-4 sm:h-4"
+            items={[
+              {
+                id: 'move',
+                label: 'Move to folder',
+                icon: FolderInput,
+                onSelect: () => setMoveSheetOpen(true),
+              },
+              { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
+            ]}
+          />
         </div>
       </div>
-
-      {menuOpen && menuPos && createPortal(
-        <>
-          <div className="fixed inset-0 z-[9998]" onClick={() => setMenuOpen(false)} />
-          <div
-            ref={menuRef}
-            style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, zIndex: 9999 }}
-            className="w-[196px] bg-slate-800/95 backdrop-blur-xl border border-white/8 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] py-1.5 overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuOpen(false);
-                setMoveSheetOpen(true);
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-sm text-slate-200 hover:bg-slate-700/70 active:bg-slate-700 transition-colors"
-            >
-              <FolderInput className="w-4 h-4 text-slate-400 flex-shrink-0" />
-              Move to folder
-            </button>
-            <div className="mx-3 border-t border-slate-700/60" />
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuOpen(false);
-                onDelete();
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-sm text-red-400 hover:bg-red-500/10 active:bg-red-500/20 transition-colors"
-            >
-              <Trash2 className="w-4 h-4 flex-shrink-0" />
-              Delete
-            </button>
-          </div>
-        </>,
-        document.body
-      )}
 
       {moveSheetOpen && (
         <NoteFolderLinker
