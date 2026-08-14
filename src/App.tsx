@@ -10,6 +10,7 @@ import { StoragePage } from './components/StoragePage';
 import { FilePreviewPage } from './components/FilePreviewPage';
 import { WorkspaceManagement } from './components/WorkspaceManagement';
 import { SettingsPage, getAutoActivateNewNote } from './components/SettingsPage';
+import { AccountPage } from './components/AccountPage';
 import { supabase } from './lib/supabase';
 import { FileItem, NoteWithDetails, Folder, Workspace } from './types/database';
 
