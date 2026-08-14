@@ -24,7 +24,7 @@ export function StorageUsage({ totalBytes, onOpen, onOpenSettings }: StorageUsag
 
   return (
     <div className="flex-shrink-0 border-t border-slate-700/50 bg-slate-800">
-      {/* Storage row — clickable block with inline usage bar */}
+      {/* Storage row — clickable block with inset usage bar */}
       <button
         onClick={onOpen}
         className="group w-full px-3 py-2.5 flex flex-col gap-2 hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors"
@@ -50,8 +50,8 @@ export function StorageUsage({ totalBytes, onOpen, onOpenSettings }: StorageUsag
           <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors flex-shrink-0" />
         </div>
 
-        {/* Usage bar — lives inside the clickable row, aligned with the text block */}
-        <div className="pl-12 pr-7">
+        {/* Usage bar — inset like before, but inside the clickable row */}
+        <div className="w-full">
           <div className="h-1.5 bg-slate-700/70 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
