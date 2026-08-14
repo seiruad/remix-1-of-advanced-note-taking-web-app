@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { RichTextEditor } from './RichTextEditor';
 import { AttachFileDialog } from './AttachFileDialog';
-import { FilePreviewModal } from './FilePreviewModal';
+import { buildFileUrl } from './FilePreviewPage';
+import { useNavigate } from 'react-router-dom';
 import { Note, FileItem, Folder, Workspace } from '../types/database';
 import { supabase } from '../lib/supabase';
 import {
@@ -113,7 +114,7 @@ export function NoteEditor({
   const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
-  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const navigate = useNavigate();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
@@ -691,7 +692,7 @@ export function NoteEditor({
                 >
                   <button
                     type="button"
-                    onClick={() => setPreviewFile(file)}
+                    onClick={() => note && navigate(buildFileUrl(file.id, { kind: 'note', noteId: note.id }))}
                     className="flex items-center gap-3 flex-1 min-w-0 text-left"
                     title="Preview"
                   >
@@ -894,11 +895,6 @@ export function NoteEditor({
         </div>
       )}
 
-      <FilePreviewModal
-        file={previewFile}
-        onClose={() => setPreviewFile(null)}
-        onDownload={handleDownload}
-      />
 
       <AttachFileDialog
         open={attachDialogOpen}
