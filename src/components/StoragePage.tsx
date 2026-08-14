@@ -421,11 +421,10 @@ export function StoragePage({ onBack }: StoragePageProps) {
                 return (
                   <div
                     key={file.id}
-                    className="relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/60 rounded-xl overflow-hidden border border-emerald-500/40"
+                    className="w-full flex items-center gap-2 px-3 py-2 bg-slate-700/60 rounded-xl border border-emerald-500/40"
                   >
-                    <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-emerald-400" />
-                    <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-emerald-500/15 flex-shrink-0">
-                      <span className="text-xl sm:text-2xl">{getFileIcon(file.file_type)}</span>
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-7 sm:h-7 rounded-md bg-emerald-500/15 flex-shrink-0">
+                      <span className="text-lg sm:text-xl">{getFileIcon(file.file_type)}</span>
                     </div>
                     <input
                       ref={renameInputRef}
@@ -438,12 +437,12 @@ export function StoragePage({ onBack }: StoragePageProps) {
                         if (e.key === 'Escape') cancelRename();
                       }}
                       onBlur={submitRename}
-                      className="flex-1 min-w-0 bg-slate-700/80 text-white rounded-lg px-2.5 py-1.5 text-[17px] sm:text-sm font-semibold outline-none border border-emerald-500/60 ring-2 ring-emerald-500/20"
+                      className="flex-1 min-w-0 bg-slate-700/80 text-white rounded-lg px-2 py-1 text-sm font-semibold outline-none border border-emerald-500/60 ring-2 ring-emerald-500/20"
                     />
                     <button
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={submitRename}
-                      className="w-9 h-9 rounded-lg flex items-center justify-center text-emerald-400 hover:bg-emerald-500/10 transition-colors flex-shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-emerald-400 hover:bg-emerald-500/10 transition-colors flex-shrink-0"
                       title="Save"
                     >
                       <Check className="w-4 h-4" />
@@ -451,7 +450,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
                     <button
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={cancelRename}
-                      className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700 transition-colors flex-shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700 transition-colors flex-shrink-0"
                       title="Cancel"
                     >
                       <X className="w-4 h-4" />
