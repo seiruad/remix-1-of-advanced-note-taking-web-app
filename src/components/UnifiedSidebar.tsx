@@ -885,6 +885,7 @@ export function UnifiedSidebar({
   onOpenStorage,
   onOpenWorkspaceManagement,
   onOpenSettings,
+  onOpenAccount,
 }: UnifiedSidebarProps) {
   const [mode, setMode] = useState<Mode>(() => {
     try {
