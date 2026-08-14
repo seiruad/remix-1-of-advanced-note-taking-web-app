@@ -62,11 +62,15 @@ export function FilePreviewPage() {
     URL.revokeObjectURL(url);
   };
 
-  const close = () => navigate(backTo);
+  const hasBackground = !!(location.state as { background?: unknown } | null)?.background;
+  const close = () => {
+    if (hasBackground) navigate(-1);
+    else navigate(backTo, { replace: true });
+  };
 
   if (loading) {
     return (
-      <div className="h-screen bg-slate-900 flex items-center justify-center">
+      <div className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-slate-500 animate-spin" />
       </div>
     );
@@ -74,7 +78,7 @@ export function FilePreviewPage() {
 
   if (!file) {
     return (
-      <div className="h-screen bg-slate-900 flex flex-col items-center justify-center gap-4 px-6 text-center">
+      <div className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 px-6 text-center">
         <p className="text-sm text-slate-400">Файл не найден</p>
         <button
           onClick={close}
@@ -86,9 +90,5 @@ export function FilePreviewPage() {
     );
   }
 
-  return (
-    <div className="h-screen bg-slate-900">
-      <FilePreviewModal file={file} onClose={close} onDownload={handleDownload} />
-    </div>
-  );
+  return <FilePreviewModal file={file} onClose={close} onDownload={handleDownload} />;
 }
