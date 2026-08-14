@@ -100,6 +100,7 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
       if (cancelled) return;
       if (dlError || !data) {
         setError('Не удалось загрузить файл для предпросмотра');
+        setLoadedId(file.id);
         setLoading(false);
         return;
       }
@@ -115,7 +116,9 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
         objectUrl = URL.createObjectURL(data);
         setUrl(objectUrl);
       }
+      setLoadedId(file.id);
       setLoading(false);
+
     };
 
 
