@@ -276,6 +276,18 @@ export function StoragePage({ onBack }: StoragePageProps) {
         </div>
       </div>
 
+      {/* Usage bar — inset to match sidebar rhythm */}
+      <div className="px-3 pb-2 border-b border-slate-700/50 flex-shrink-0">
+        <div className="h-1.5 bg-slate-700/70 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              isNearLimit ? 'bg-amber-500' : 'bg-emerald-500'
+            }`}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </div>
+
       {/* Toolbar / nav bar — 44px, same as sidebar segmented control */}
       <div className="h-11 px-3 border-b border-slate-700/50 flex items-center gap-2 flex-shrink-0">
         <div className="relative flex-1 min-w-0 h-9">
