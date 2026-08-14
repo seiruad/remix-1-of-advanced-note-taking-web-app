@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { UnifiedMenu } from './UnifiedMenu';
 import {
   Folder as FolderIcon,
