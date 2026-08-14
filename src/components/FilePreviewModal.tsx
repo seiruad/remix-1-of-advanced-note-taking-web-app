@@ -70,8 +70,11 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
   const [textContent, setTextContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadedId, setLoadedId] = useState<string | null>(null);
 
   const kind = file ? getPreviewKind(file) : 'none';
+  // Данные принадлежат текущему файлу только если id совпадает
+  const isReady = !!file && loadedId === file.id;
 
   useEffect(() => {
     if (!file) return;
@@ -79,15 +82,17 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
     let cancelled = false;
 
     const load = async () => {
-      if (getPreviewKind(file) === 'none') {
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       setError(null);
       setUrl(null);
       setBlob(null);
       setTextContent(null);
+      if (getPreviewKind(file) === 'none') {
+        setLoadedId(file.id);
+        setLoading(false);
+        return;
+      }
+
       const { data, error: dlError } = await supabase.storage
         .from('attachments')
         .download(file.storage_path);
