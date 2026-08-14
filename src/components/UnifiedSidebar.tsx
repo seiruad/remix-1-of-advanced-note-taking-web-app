@@ -794,16 +794,16 @@ function FolderRowFlat({
     : 'hover:bg-slate-700/40 active:bg-slate-700/60';
 
   return (
-    <div className="group folder-row relative w-full flex items-center gap-2 overflow-hidden pr-2">
+    <div className={`group folder-row relative w-full flex items-center gap-1 overflow-hidden rounded-xl transition-colors ${folderBtnClasses}`}>
       {isRenaming ? (
-        <div className="flex items-center gap-3 flex-1 min-w-0 rounded-xl py-3.5 sm:py-3 pl-4 pr-2">
+        <div className="flex items-center gap-3 flex-1 min-w-0 py-3.5 sm:py-3 pl-4 pr-2">
           <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
             folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
           }`}>
             {folder.is_new ? (
-              <FolderPlus className="w-5 h-5 sm:w-4 sm:h-4 text-amber-300" />
+              <FolderPlus className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-300" />
             ) : (
-              <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-400" />
+              <FolderIcon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400" />
             )}
           </div>
           <input
@@ -825,14 +825,14 @@ function FolderRowFlat({
           />
         </div>
       ) : (
-        <button onClick={onSelect} className={`flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 transition-colors ${folderBtnClasses}`}>
+        <button onClick={onSelect} className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2">
           <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
             folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
           }`}>
             {folder.is_new ? (
-              <FolderPlus className="w-5 h-5 sm:w-4 sm:h-4 text-amber-300" />
+              <FolderPlus className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-300" />
             ) : (
-              <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-400" />
+              <FolderIcon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400" />
             )}
           </div>
           <span className="folder-name flex-1 min-w-0 text-left text-base sm:text-sm font-semibold text-white truncate">{folder.name}</span>
