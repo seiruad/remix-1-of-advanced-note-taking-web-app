@@ -179,7 +179,7 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
 
         {/* Body */}
         <div className="flex-1 min-h-0 overflow-auto bg-slate-900/60 flex items-center justify-center">
-          {kind !== 'none' && (loading || (!error && url === null && blob === null && textContent === null)) ? (
+          {kind !== 'none' && (loading || !isReady) ? (
             <Loader2 className="w-8 h-8 text-slate-500 animate-spin" />
           ) : error ? (
             <p className="text-sm text-red-400 px-6 py-10 text-center">{error}</p>
