@@ -12,6 +12,7 @@ interface FolderSidebarProps {
   onRenameFolder: (folderId: string, name: string) => void;
   totalStorageBytes: number;
   onOpenStorage: () => void;
+  onOpenAccount?: () => void;
 }
 
 interface FolderTreeItemProps {
