@@ -222,7 +222,7 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
           ) : error ? (
             <p className="text-sm text-red-400 px-6 py-10 text-center">{error}</p>
           ) : kind === 'image' && url ? (
-            <ZoomableImage src={url} alt={file.filename} />
+            <ImagePreview src={url} alt={file.filename} />
           ) : kind === 'pdf' && blob ? (
             <div className="w-full h-full min-h-[70vh] self-stretch">
               <PdfPreview data={blob} />
