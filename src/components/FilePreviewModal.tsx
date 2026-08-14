@@ -68,7 +68,7 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
   const [url, setUrl] = useState<string | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
   const [textContent, setTextContent] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const kind = file ? getPreviewKind(file) : 'none';
@@ -171,7 +171,7 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
 
         {/* Body */}
         <div className="flex-1 min-h-0 overflow-auto bg-slate-900/60 flex items-center justify-center">
-          {loading ? (
+          {kind !== 'none' && (loading || (!error && url === null && blob === null && textContent === null)) ? (
             <Loader2 className="w-8 h-8 text-slate-500 animate-spin" />
           ) : error ? (
             <p className="text-sm text-red-400 px-6 py-10 text-center">{error}</p>
