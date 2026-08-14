@@ -462,24 +462,22 @@ export function StoragePage({ onBack }: StoragePageProps) {
               return (
                 <div
                   key={file.id}
-                  className="group file-row relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/50 hover:bg-slate-700/70 active:bg-slate-700 rounded-xl transition-colors overflow-hidden"
+                  className="group file-row w-full flex items-center gap-2 px-3 py-2 bg-slate-700/50 hover:bg-slate-700/70 active:bg-slate-700 rounded-xl transition-colors"
                 >
-                  <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-emerald-400/70 group-hover:bg-emerald-400 transition-colors" />
-
                   <button
                     type="button"
                     onClick={() => setPreviewFile(file)}
-                    className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                    className="flex items-center gap-2 flex-1 min-w-0 text-left"
                     title="Preview"
                   >
-                    <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-emerald-500/15 flex-shrink-0">
-                      <span className="text-xl sm:text-2xl">{getFileIcon(file.file_type)}</span>
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-7 sm:h-7 rounded-md bg-emerald-500/15 flex-shrink-0">
+                      <span className="text-lg sm:text-xl">{getFileIcon(file.file_type)}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[17px] sm:text-sm font-semibold text-white truncate">
+                      <p className="text-sm font-semibold text-white truncate">
                         {file.filename}
                       </p>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-sm sm:text-xs text-slate-500">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0 text-xs text-slate-500">
                         <span>{formatFileSize(file.file_size)}</span>
                         <span className="hidden sm:inline">•</span>
                         <span className="hidden sm:inline truncate max-w-[120px]">
@@ -489,9 +487,9 @@ export function StoragePage({ onBack }: StoragePageProps) {
                         <span>{new Date(file.created_at).toLocaleDateString()}</span>
                       </div>
                       {/* Note count badge */}
-                      <div className="flex items-center gap-1 mt-1.5">
+                      <div className="flex items-center gap-1 mt-0.5">
                         <span
-                          className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full font-medium ${
+                          className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0 rounded-full font-medium ${
                             count > 0
                               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                               : 'bg-slate-700/50 text-slate-500 border border-slate-600/30'
@@ -502,7 +500,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
                               : 'Not linked to any note'
                           }
                         >
-                          <Paperclip className="w-2.5 h-2.5" />
+                          <Paperclip className="w-2 h-2" />
                           {count}
                         </span>
                       </div>
@@ -513,10 +511,10 @@ export function StoragePage({ onBack }: StoragePageProps) {
                     <UnifiedMenu
                       ariaLabel="File options"
                       onOpenChange={(open) => setMenuOpenId(open ? file.id : null)}
-                      triggerClassName={`w-10 h-10 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
+                      triggerClassName={`w-8 h-8 sm:w-7 sm:h-7 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
                         menuOpenId === file.id ? '' : 'sm:opacity-0 sm:group-hover:opacity-100'
                       }`}
-                      iconClassName="w-5 h-5 sm:w-4 sm:h-4"
+                      iconClassName="w-4 h-4 sm:w-3.5 sm:h-3.5"
                       items={[
                         {
                           id: 'download',
