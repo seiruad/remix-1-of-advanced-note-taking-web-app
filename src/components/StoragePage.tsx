@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Search,
   UploadCloud,
   Download,
@@ -14,15 +14,15 @@ import {
   ArrowDown,
   ArrowUp,
   Paperclip,
-  MoreVertical,
   Pencil,
   Check,
-
+  MoreHorizontal,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
 import { FilePreviewModal } from './FilePreviewModal';
+import { UnifiedMenu } from './UnifiedMenu';
 
 interface StoragePageProps {
   onBack: () => void;
@@ -60,13 +60,13 @@ export function StoragePage({ onBack }: StoragePageProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const renameInputRef = useRef<HTMLInputElement | null>(null);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -116,22 +116,6 @@ export function StoragePage({ onBack }: StoragePageProps) {
       supabase.removeChannel(channel);
     };
   }, [loadFiles]);
-
-  // Close mobile menu on outside click
-  useEffect(() => {
-    if (!openMenuId) return;
-    const handler = (e: MouseEvent) => {
-      const btn = menuRefs.current[openMenuId];
-      if (btn && !btn.contains(e.target as Node)) {
-        const menu = btn.nextElementSibling;
-        if (menu && !menu.contains(e.target as Node)) {
-          setOpenMenuId(null);
-        }
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [openMenuId]);
 
   const totalBytes = files.reduce((sum, f) => sum + f.file_size, 0);
   const percentage = Math.min((totalBytes / STORAGE_LIMIT) * 100, 100);
@@ -217,6 +201,10 @@ export function StoragePage({ onBack }: StoragePageProps) {
     }
   };
 
+  const cancelRename = () => {
+    setRenamingId(null);
+    setRenameValue('');
+  };
 
   const handleDownload = async (file: FileItem) => {
     const { data, error } = await supabase.storage
@@ -258,69 +246,68 @@ export function StoragePage({ onBack }: StoragePageProps) {
     });
 
   return (
-    <div className="flex flex-col h-full bg-slate-900">
-      {/* Header */}
-      <div className="border-b border-slate-700 px-4 sm:px-8 py-4 sm:py-6">
-        <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <button
-            onClick={onBack}
-            className="p-2 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5 text-slate-400" />
-          </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">Storage</h1>
-        </div>
+    <div className="flex flex-col h-full bg-slate-800">
+      {/* Header — same 56px height and rhythm as the sidebar Workspace header */}
+      <div className="h-14 px-3 border-b border-slate-700/50 flex items-center gap-3 flex-shrink-0">
+        <button
+          onClick={onBack}
+          className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
+          aria-label="Back"
+          title="Back"
+        >
+          <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+        </button>
 
-        {/* Storage usage bar */}
-        <div className="bg-slate-800/50 rounded-xl p-3 sm:p-4 border border-slate-700">
-          <div className="flex items-center justify-between mb-2 gap-2">
-            <div className="flex items-center gap-2 text-slate-300 min-w-0">
-              <HardDrive className="w-4 h-4 flex-shrink-0" />
-              <span className="text-sm font-medium truncate">Total Usage</span>
-            </div>
-            <span
-              className={`text-xs sm:text-sm font-medium flex-shrink-0 ${
-                isNearLimit ? 'text-amber-400' : 'text-emerald-400'
+        <div className="flex-1 min-w-0 flex items-center gap-3">
+          <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+            <HardDrive className="w-5 h-5 text-emerald-400" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">
+              Storage
+            </p>
+            <p
+              className={`text-sm font-semibold tabular-nums ${
+                isNearLimit ? 'text-amber-400' : 'text-slate-200'
               }`}
             >
               {formatFileSize(totalBytes)} / {formatFileSize(STORAGE_LIMIT)}
-            </span>
+            </p>
           </div>
-          <div className="w-full h-2.5 bg-slate-700 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                isNearLimit ? 'bg-amber-500' : 'bg-emerald-500'
-              }`}
-              style={{ width: `${percentage}%` }}
-            />
-          </div>
-          <p className="text-xs text-slate-500 mt-2">
-            {files.length} file{files.length !== 1 ? 's' : ''} in storage
-          </p>
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="px-4 sm:px-8 py-3 sm:py-4 flex items-center gap-2 sm:gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[140px] sm:min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+      {/* Toolbar / nav bar — 44px, same as sidebar segmented control */}
+      <div className="h-11 px-3 border-b border-slate-700/50 flex items-center gap-2 flex-shrink-0">
+        <div className="relative flex-1 min-w-0 h-9">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search files..."
+            placeholder="Search files…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+            className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-8 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px] transition-colors"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-md text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
+              aria-label="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-slate-900/60">
           <button
             onClick={() => toggleSort('name')}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg border text-sm transition-colors ${
+            className={`flex items-center justify-center gap-1 px-2.5 h-7 rounded-md text-[13px] font-semibold transition-all ${
               sortMode === 'name'
-                ? 'bg-emerald-600/20 border-emerald-500 text-emerald-400'
-                : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                ? 'bg-slate-700 text-emerald-400 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
+            title="Sort by name"
           >
             <span className="hidden sm:inline">Name</span>
             {sortMode === 'name' ? (
@@ -333,14 +320,14 @@ export function StoragePage({ onBack }: StoragePageProps) {
               <ArrowUpDown className="w-3.5 h-3.5 opacity-50" />
             )}
           </button>
-
           <button
             onClick={() => toggleSort('size')}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg border text-sm transition-colors ${
+            className={`flex items-center justify-center gap-1 px-2.5 h-7 rounded-md text-[13px] font-semibold transition-all ${
               sortMode === 'size'
-                ? 'bg-emerald-600/20 border-emerald-500 text-emerald-400'
-                : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                ? 'bg-slate-700 text-emerald-400 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
+            title="Sort by size"
           >
             <span className="hidden sm:inline">Size</span>
             {sortMode === 'size' ? (
@@ -367,27 +354,20 @@ export function StoragePage({ onBack }: StoragePageProps) {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex-shrink-0"
+          className="flex items-center justify-center gap-2 h-9 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm font-semibold transition-colors flex-shrink-0"
         >
           {uploading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="hidden sm:inline">Uploading...</span>
-              <span className="sm:hidden">...</span>
-            </>
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <>
-              <UploadCloud className="w-4 h-4" />
-              <span className="hidden sm:inline">Upload File</span>
-              <span className="sm:hidden">Upload</span>
-            </>
+            <UploadCloud className="w-4 h-4" />
           )}
+          <span className="hidden sm:inline">Upload</span>
         </button>
       </div>
 
       {/* Error banner */}
       {error && (
-        <div className="mx-4 sm:mx-8 mb-4 flex items-center gap-2 bg-red-600/10 border border-red-600/30 rounded-lg p-3 text-sm text-red-400">
+        <div className="mx-3 mt-3 flex items-center gap-2 bg-red-600/10 border border-red-600/30 rounded-xl p-3 text-sm text-red-400 flex-shrink-0">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span className="flex-1 min-w-0 break-words">{error}</span>
           <button
@@ -400,40 +380,54 @@ export function StoragePage({ onBack }: StoragePageProps) {
       )}
 
       {/* File list */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-4 sm:pb-8">
+      <div className="flex-1 overflow-y-auto p-3 min-h-0">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-slate-500 animate-spin" />
           </div>
         ) : sortedFilteredFiles.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-            <FileIcon className="w-16 h-16 mb-4 opacity-30" />
-            <p className="text-lg">No files in storage</p>
-            <p className="text-sm mt-1">Upload a file to get started</p>
+            <FileIcon className="w-10 h-10 mb-3 text-slate-700" />
+            <p className="text-sm font-medium text-slate-500">
+              {searchQuery ? 'No files match your search' : 'No files in storage'}
+            </p>
+            {!searchQuery && (
+              <p className="text-xs text-slate-600 mt-1">Upload a file to get started</p>
+            )}
           </div>
         ) : (
           <div className="space-y-2">
+            {searchQuery && (
+              <p className="text-xs text-slate-500 px-1 mb-1">
+                {sortedFilteredFiles.length} file{sortedFilteredFiles.length !== 1 ? 's' : ''} match
+              </p>
+            )}
             {sortedFilteredFiles.map((file) => {
               const count = noteCounts[file.id] || 0;
-              if (renamingId === file.id) {
+              const isRenaming = renamingId === file.id;
+
+              if (isRenaming) {
                 return (
                   <div
                     key={file.id}
-                    className="flex items-center gap-2 bg-slate-800 rounded-xl p-3 sm:p-4 border border-emerald-500/40"
+                    className="relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/60 rounded-xl overflow-hidden border border-emerald-500/40"
                   >
-                    <span className="text-xl sm:text-2xl flex-shrink-0">
-                      {getFileIcon(file.file_type)}
-                    </span>
+                    <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-emerald-400" />
+                    <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-emerald-500/15 flex-shrink-0">
+                      <span className="text-xl sm:text-2xl">{getFileIcon(file.file_type)}</span>
+                    </div>
                     <input
+                      ref={renameInputRef}
                       autoFocus
                       value={renameValue}
                       onChange={(e) => setRenameValue(e.target.value)}
                       onKeyDown={(e) => {
+                        e.stopPropagation();
                         if (e.key === 'Enter') submitRename();
-                        if (e.key === 'Escape') setRenamingId(null);
+                        if (e.key === 'Escape') cancelRename();
                       }}
                       onBlur={submitRename}
-                      className="flex-1 min-w-0 bg-slate-900/70 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+                      className="flex-1 min-w-0 bg-slate-700/80 text-white rounded-lg px-2.5 py-1.5 text-[17px] sm:text-sm font-semibold outline-none border border-emerald-500/60 ring-2 ring-emerald-500/20"
                     />
                     <button
                       onMouseDown={(e) => e.preventDefault()}
@@ -445,7 +439,7 @@ export function StoragePage({ onBack }: StoragePageProps) {
                     </button>
                     <button
                       onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => setRenamingId(null)}
+                      onClick={cancelRename}
                       className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700 transition-colors flex-shrink-0"
                       title="Cancel"
                     >
@@ -454,129 +448,87 @@ export function StoragePage({ onBack }: StoragePageProps) {
                   </div>
                 );
               }
+
               return (
                 <div
                   key={file.id}
-                  className="group flex items-center gap-3 sm:gap-4 bg-slate-800/50 hover:bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700 transition-colors"
+                  className="group file-row relative w-full flex items-center gap-3 pl-4 pr-3 py-3 sm:pl-3.5 sm:pr-2.5 sm:py-2.5 bg-slate-700/50 hover:bg-slate-700/70 active:bg-slate-700 rounded-xl transition-colors overflow-hidden"
                 >
+                  <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-emerald-400/70 group-hover:bg-emerald-400 transition-colors" />
 
                   <button
                     type="button"
                     onClick={() => setPreviewFile(file)}
-                    className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 text-left"
+                    className="flex items-center gap-3 flex-1 min-w-0 text-left"
                     title="Preview"
                   >
-                  <span className="text-xl sm:text-2xl flex-shrink-0">
-                    {getFileIcon(file.file_type)}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
-                      {file.filename}
-                    </p>
-                    <div className="flex items-center gap-2 sm:gap-3 text-xs text-slate-500 flex-wrap">
-                      <span>{formatFileSize(file.file_size)}</span>
-                      <span className="hidden sm:inline">•</span>
-                      <span className="hidden sm:inline truncate max-w-[120px]">
-                        {file.file_type}
-                      </span>
-                      <span className="hidden sm:inline">•</span>
-                      <span>{new Date(file.created_at).toLocaleDateString()}</span>
+                    <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-emerald-500/15 flex-shrink-0">
+                      <span className="text-xl sm:text-2xl">{getFileIcon(file.file_type)}</span>
                     </div>
-                    {/* Note count badge */}
-                    <div className="flex items-center gap-1 mt-1.5">
-                      <span
-                        className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full font-medium ${
-                          count > 0
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : 'bg-slate-700/50 text-slate-500 border border-slate-600/30'
-                        }`}
-                        title={
-                          count > 0
-                            ? `Linked to ${count} note${count !== 1 ? 's' : ''}`
-                            : 'Not linked to any note'
-                        }
-                      >
-                        <Paperclip className="w-2.5 h-2.5" />
-                        {count}
-                      </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[17px] sm:text-sm font-semibold text-white truncate">
+                        {file.filename}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-sm sm:text-xs text-slate-500">
+                        <span>{formatFileSize(file.file_size)}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="hidden sm:inline truncate max-w-[120px]">
+                          {file.file_type}
+                        </span>
+                        <span className="hidden sm:inline">•</span>
+                        <span>{new Date(file.created_at).toLocaleDateString()}</span>
+                      </div>
+                      {/* Note count badge */}
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <span
+                          className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full font-medium ${
+                            count > 0
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              : 'bg-slate-700/50 text-slate-500 border border-slate-600/30'
+                          }`}
+                          title={
+                            count > 0
+                              ? `Linked to ${count} note${count !== 1 ? 's' : ''}`
+                              : 'Not linked to any note'
+                          }
+                        >
+                          <Paperclip className="w-2.5 h-2.5" />
+                          {count}
+                        </span>
+                      </div>
                     </div>
-                  </div>
                   </button>
 
-                  {/* Desktop actions */}
-                  <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                    <button
-                      onClick={() => handleDownload(file)}
-                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-                      title="Download"
-                    >
-                      <Download className="w-4 h-4 text-slate-400" />
-                    </button>
-                    <button
-                      onClick={() => startRename(file)}
-                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-                      title="Rename"
-                    >
-                      <Pencil className="w-4 h-4 text-slate-400" />
-                    </button>
-                    <button
-
-                      onClick={() => setConfirmDelete(file.id)}
-                      className="p-2 hover:bg-red-600/20 rounded-lg transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-400" />
-                    </button>
-                  </div>
-
-                  {/* Mobile actions menu */}
-                  <div className="sm:hidden relative flex-shrink-0">
-                    <button
-                      ref={(el) => {
-                        menuRefs.current[file.id] = el;
-                      }}
-                      onClick={() =>
-                        setOpenMenuId(openMenuId === file.id ? null : file.id)
-                      }
-                      className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-                    >
-                      <MoreVertical className="w-4 h-4 text-slate-400" />
-                    </button>
-                    {openMenuId === file.id && (
-                      <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 min-w-[140px] py-1">
-                        <button
-                          onClick={() => {
-                            handleDownload(file);
-                            setOpenMenuId(null);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors text-left"
-                        >
-                          <Download className="w-4 h-4" />
-                          Download
-                        </button>
-                        <button
-                          onClick={() => {
-                            startRename(file);
-                            setOpenMenuId(null);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors text-left"
-                        >
-                          <Pencil className="w-4 h-4" />
-                          Rename
-                        </button>
-                        <button
-
-                          onClick={() => {
-                            setConfirmDelete(file.id);
-                            setOpenMenuId(null);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-600/10 transition-colors text-left"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          Delete
-                        </button>
-                      </div>
-                    )}
+                  <div className="flex items-center flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <UnifiedMenu
+                      ariaLabel="File options"
+                      onOpenChange={(open) => setMenuOpenId(open ? file.id : null)}
+                      triggerClassName={`w-10 h-10 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
+                        menuOpenId === file.id ? '' : 'sm:opacity-0 sm:group-hover:opacity-100'
+                      }`}
+                      iconClassName="w-5 h-5 sm:w-4 sm:h-4"
+                      items={[
+                        {
+                          id: 'download',
+                          label: 'Download',
+                          icon: Download,
+                          onSelect: () => handleDownload(file),
+                        },
+                        {
+                          id: 'rename',
+                          label: 'Rename',
+                          icon: Pencil,
+                          onSelect: () => startRename(file),
+                        },
+                        {
+                          id: 'delete',
+                          label: 'Delete',
+                          icon: Trash2,
+                          danger: true,
+                          onSelect: () => setConfirmDelete(file.id),
+                        },
+                      ]}
+                    />
                   </div>
                 </div>
               );
@@ -593,8 +545,8 @@ export function StoragePage({ onBack }: StoragePageProps) {
 
       {/* Delete confirmation */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl w-full max-w-sm overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm px-4 sm:px-0">
+          <div className="bg-slate-800 border-0 sm:border sm:border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-sm sm:mx-4 overflow-hidden">
             <div className="px-5 sm:px-6 py-5">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-red-600/20 rounded-lg">
@@ -609,13 +561,13 @@ export function StoragePage({ onBack }: StoragePageProps) {
               <div className="flex gap-3">
                 <button
                   onClick={() => setConfirmDelete(null)}
-                  className="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-semibold transition-colors"
                 >
                   Don't Delete
                 </button>
                 <button
                   onClick={() => handleDelete(confirmDelete)}
-                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-semibold transition-colors"
                 >
                   Delete
                 </button>
