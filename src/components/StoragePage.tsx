@@ -16,7 +16,6 @@ import {
   Paperclip,
   Pencil,
   Check,
-  MoreHorizontal,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
