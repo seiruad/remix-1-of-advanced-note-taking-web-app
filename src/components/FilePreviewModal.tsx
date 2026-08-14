@@ -191,7 +191,7 @@ export function FilePreviewModal({ file, onClose, onDownload }: FilePreviewModal
             </div>
 
           ) : kind === 'video' && url ? (
-            <video src={url} controls className="max-w-full max-h-full" />
+            <VideoPlayer src={url} title={file.filename} />
           ) : kind === 'audio' && url ? (
             <AudioPlayer
               src={url}
