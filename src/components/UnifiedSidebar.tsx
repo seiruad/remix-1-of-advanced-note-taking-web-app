@@ -572,12 +572,8 @@ function SidebarNavBar({
   onRenameFolder: (folderId: string, name: string) => void;
   onOpenDeleteFolder: (folder: FolderType) => void;
 }) {
-  const [crumbMenuOpen, setCrumbMenuOpen] = useState(false);
-  const [crumbMenuPos, setCrumbMenuPos] = useState<{ top: number; left: number } | null>(null);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
-
-  const crumbRef = useRef<HTMLButtonElement | null>(null);
 
   const persistMode = (m: Mode) => {
     setMode(m);
@@ -585,23 +581,6 @@ function SidebarNavBar({
     try { localStorage.setItem(MODE_STORAGE_KEY, m); } catch { /* noop */ }
   };
 
-  useEffect(() => {
-    if (!crumbMenuOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setCrumbMenuOpen(false); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [crumbMenuOpen]);
-
-  const openCrumbMenu = () => {
-    const rect = crumbRef.current!.getBoundingClientRect();
-    const MENU_W = 200;
-    const MENU_H = 130;
-    const MARGIN = 8;
-    const left = Math.min(rect.right - MENU_W, window.innerWidth - MENU_W - MARGIN);
-    const top = Math.min(rect.bottom + 6, window.innerHeight - MENU_H - MARGIN);
-    setCrumbMenuPos({ top: Math.max(MARGIN, top), left: Math.max(MARGIN, left) });
-    setCrumbMenuOpen(true);
-  };
 
   const isNoFolder = selectedFolderId === NO_FOLDER_ID;
   const insideFolder = !!selectedFolderId;
