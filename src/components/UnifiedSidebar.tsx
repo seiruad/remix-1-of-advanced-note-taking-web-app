@@ -842,23 +842,25 @@ function FolderRowFlat({
         </button>
       )}
 
-      <UnifiedMenu
-        ariaLabel="Folder options"
-        onOpenChange={setMenuOpen}
-        triggerClassName={`w-9 h-9 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
-          menuOpen ? '' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
-        }`}
-        iconClassName="folder-menu-icon"
-        items={[
-          {
-            id: 'rename',
-            label: 'Rename',
-            icon: Pencil,
-            onSelect: () => { setRenameValue(folder.name); setIsRenaming(true); },
-          },
-          { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
-        ]}
-      />
+      <div className="flex items-center flex-shrink-0 p-1" onClick={(e) => e.stopPropagation()}>
+        <UnifiedMenu
+          ariaLabel="Folder options"
+          onOpenChange={setMenuOpen}
+          triggerClassName={`w-9 h-9 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
+            menuOpen ? '' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
+          }`}
+          iconClassName="folder-menu-icon"
+          items={[
+            {
+              id: 'rename',
+              label: 'Rename',
+              icon: Pencil,
+              onSelect: () => { setRenameValue(folder.name); setIsRenaming(true); },
+            },
+            { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
+          ]}
+        />
+      </div>
     </div>
   );
 }
@@ -1292,7 +1294,7 @@ export function UnifiedSidebar({
                     )}
                     <div className="space-y-2.5">
                       {showUnfiled && (
-                        <div className="group relative w-full flex items-center gap-1 overflow-hidden rounded-xl bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700/60 transition-colors">
+                        <div className="group relative w-full flex items-center gap-1 overflow-hidden rounded-xl hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors">
                           <button
                             onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
                             className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 overflow-hidden"
@@ -1305,7 +1307,7 @@ export function UnifiedSidebar({
                               {unfiledNotes.length}
                             </span>
                           </button>
-                          <span aria-hidden className="flex-shrink-0 w-9 h-9 sm:w-8 sm:h-8" />
+                          <span aria-hidden className="flex-shrink-0 w-11 h-11 sm:w-10 sm:h-10" />
                         </div>
                       )}
 
