@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { UnifiedMenu } from './UnifiedMenu';
+import { UnifiedWarningWindow } from './UnifiedWarningWindow';
 import {
   Folder as FolderIcon,
   ChevronRight,
@@ -1349,69 +1350,39 @@ export function UnifiedSidebar({
 
 
       {/* Delete note confirmation */}
-      {noteToDelete && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-slate-800 border-0 sm:border sm:border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 max-w-sm w-full sm:mx-4">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-red-600/15 flex items-center justify-center mb-4">
-                <AlertTriangle className="w-7 h-7 text-red-400" />
-              </div>
-              <h2 className="text-lg font-semibold text-white mb-2">Delete note?</h2>
-              <p className="text-sm text-slate-400 mb-6">
-                "{noteToDelete.title || 'Untitled'}" will be permanently deleted. This action cannot be undone.
-              </p>
-              <div className="flex gap-3 w-full">
-                <button
-                  onClick={() => setNoteToDelete(null)}
-                  className="flex-1 px-4 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => { onDeleteNote(noteToDelete.id); setNoteToDelete(null); }}
-                  className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <UnifiedWarningWindow
+        open={!!noteToDelete}
+        icon={AlertTriangle}
+        title="Delete note?"
+        description={
+          noteToDelete
+            ? `"${noteToDelete.title || 'Untitled'}" will be permanently deleted. This action cannot be undone.`
+            : null
+        }
+        confirmLabel="Delete"
+        onCancel={() => setNoteToDelete(null)}
+        onConfirm={() => { if (noteToDelete) onDeleteNote(noteToDelete.id); setNoteToDelete(null); }}
+      />
 
       {/* Delete folder confirmation */}
-      {folderToDelete && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-slate-800 border-0 sm:border sm:border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 max-w-sm w-full sm:mx-4">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-red-600/15 flex items-center justify-center mb-4">
-                <Trash2 className="w-7 h-7 text-red-400" />
-              </div>
-              <h2 className="text-lg font-semibold text-white mb-2">Delete folder?</h2>
-              <p className="text-sm text-slate-400 mb-6">
-                "{folderToDelete.name}" will be deleted.{' '}
-                {folderToDeleteNoteCount > 0
+      <UnifiedWarningWindow
+        open={!!folderToDelete}
+        icon={Trash2}
+        title="Delete folder?"
+        description={
+          folderToDelete
+            ? `"${folderToDelete.name}" will be deleted. ${
+                folderToDeleteNoteCount > 0
                   ? `${folderToDeleteNoteCount} note${folderToDeleteNoteCount !== 1 ? 's' : ''} inside will be moved to No folder — nothing will be lost.`
-                  : 'The folder is empty.'}
-              </p>
-              <div className="flex gap-3 w-full">
-                <button
-                  onClick={() => setFolderToDelete(null)}
-                  className="flex-1 px-4 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => { onDeleteFolder(folderToDelete.id); setFolderToDelete(null); }}
-                  className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold transition-colors"
-                >
-                  Delete Folder
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+                  : 'The folder is empty.'
+              }`
+            : null
+        }
+        confirmLabel="Delete Folder"
+        onCancel={() => setFolderToDelete(null)}
+        onConfirm={() => { if (folderToDelete) onDeleteFolder(folderToDelete.id); setFolderToDelete(null); }}
+      />
+
     </div>
   );
 }
