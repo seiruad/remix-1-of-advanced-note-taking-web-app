@@ -23,6 +23,7 @@ import { FileItem } from '../types/database';
 import { buildFileUrl } from './FilePreviewPage';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UnifiedMenu } from './UnifiedMenu';
+import { UnifiedWarningWindow } from './UnifiedWarningWindow';
 
 interface StoragePageProps {
   onBack: () => void;
