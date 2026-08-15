@@ -552,38 +552,25 @@ export function StoragePage({ onBack }: StoragePageProps) {
 
 
       {/* Delete confirmation */}
-      {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm px-4 sm:px-0">
-          <div className="bg-slate-800 border-0 sm:border sm:border-slate-700 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-sm sm:mx-4 overflow-hidden">
-            <div className="px-5 sm:px-6 py-5">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-red-600/20 rounded-lg">
-                  <Trash2 className="w-5 h-5 text-red-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-white">Delete File</h3>
-              </div>
-              <p className="text-sm text-slate-400 mb-5">
-                This will permanently delete the file from storage and remove it from
-                all linked notes. This action cannot be undone.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setConfirmDelete(null)}
-                  className="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-semibold transition-colors"
-                >
-                  Don't Delete
-                </button>
-                <button
-                  onClick={() => handleDelete(confirmDelete)}
-                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-semibold transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <UnifiedWarningWindow
+        open={!!confirmDelete}
+        title="Delete File"
+        description={
+          (() => {
+            const file = files.find((f) => f.id === confirmDelete);
+            const count = file ? noteCounts[file.id] || 0 : 0;
+            return count > 0
+              ? `This will permanently delete the file from storage and remove it from ${count} linked note${count !== 1 ? 's' : ''}. This action cannot be undone.`
+              : 'This will permanently delete the file from storage. This action cannot be undone.';
+          })()
+        }
+        icon={Trash2}
+        tone="danger"
+        confirmLabel="Delete"
+        cancelLabel="Don't Delete"
+        onConfirm={() => confirmDelete && handleDelete(confirmDelete)}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }
