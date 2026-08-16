@@ -12,7 +12,8 @@ import {
   FileText,
   Clock,
   FolderOpen,
-  AlertTriangle,
+  FileX,
+  FolderX,
   Notebook,
   LayoutList,
   FolderTree as FolderTreeIcon,
@@ -1352,14 +1353,13 @@ export function UnifiedSidebar({
       {/* Delete note confirmation */}
       <UnifiedWarningWindow
         open={!!noteToDelete}
-        icon={AlertTriangle}
+        icon={FileX}
         title="Delete note?"
         description={
           noteToDelete
             ? `"${noteToDelete.title || 'Untitled'}" will be permanently deleted. This action cannot be undone.`
             : null
         }
-        confirmLabel="Delete"
         onCancel={() => setNoteToDelete(null)}
         onConfirm={() => { if (noteToDelete) onDeleteNote(noteToDelete.id); setNoteToDelete(null); }}
       />
@@ -1367,7 +1367,7 @@ export function UnifiedSidebar({
       {/* Delete folder confirmation */}
       <UnifiedWarningWindow
         open={!!folderToDelete}
-        icon={Trash2}
+        icon={FolderX}
         title="Delete folder?"
         description={
           folderToDelete
@@ -1378,7 +1378,6 @@ export function UnifiedSidebar({
               }`
             : null
         }
-        confirmLabel="Delete Folder"
         onCancel={() => setFolderToDelete(null)}
         onConfirm={() => { if (folderToDelete) onDeleteFolder(folderToDelete.id); setFolderToDelete(null); }}
       />
