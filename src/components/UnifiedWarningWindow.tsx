@@ -64,11 +64,8 @@ export function UnifiedWarningWindow({
         aria-modal="true"
         aria-label={title}
         onPointerDown={(e) => e.stopPropagation()}
-        className="w-full sm:max-w-sm sm:mx-4 bg-slate-800/95 backdrop-blur-xl border-t border-slate-700/70 sm:border rounded-t-2xl sm:rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.65)] px-5 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:p-6 animate-[dropdownIn_0.18s_cubic-bezier(0.34,1.4,0.64,1)_both]"
+        className="w-full sm:max-w-sm sm:mx-4 bg-slate-800/95 backdrop-blur-xl border-t border-slate-700/70 sm:border rounded-t-2xl sm:rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.65)] px-5 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:p-6 animate-[slideUpSheet_0.22s_ease-out_both]"
       >
-        {/* Grab handle (mobile) */}
-        <div className="sm:hidden mx-auto mb-4 h-1 w-10 rounded-full bg-slate-600/70" />
-
         <div className="flex flex-col items-center text-center">
           <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mb-3 sm:mb-4 ${accent.ring}`}>
             <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7" />
