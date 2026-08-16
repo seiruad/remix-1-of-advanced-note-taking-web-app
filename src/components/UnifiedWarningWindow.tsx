@@ -26,7 +26,7 @@ export function UnifiedWarningWindow({
   title,
   description,
   icon: Icon = AlertTriangle,
-  confirmLabel = 'Confirm',
+  confirmLabel = 'Delete',
   cancelLabel = 'Cancel',
   tone = 'danger',
   onConfirm,
