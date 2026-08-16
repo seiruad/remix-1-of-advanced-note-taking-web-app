@@ -12,7 +12,6 @@ import {
   FileText,
   Clock,
   FolderOpen,
-  FolderX,
   Notebook,
   LayoutList,
   FolderTree as FolderTreeIcon,
@@ -1352,7 +1351,6 @@ export function UnifiedSidebar({
       {/* Delete note confirmation */}
       <UnifiedWarningWindow
         open={!!noteToDelete}
-        icon={FileText}
         title="Delete note?"
         description={
           noteToDelete
@@ -1366,7 +1364,6 @@ export function UnifiedSidebar({
       {/* Delete folder confirmation */}
       <UnifiedWarningWindow
         open={!!folderToDelete}
-        icon={FolderX}
         title="Delete folder?"
         description={
           folderToDelete

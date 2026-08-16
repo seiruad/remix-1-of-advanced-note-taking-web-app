@@ -1,4 +1,4 @@
-import { useEffect, type ComponentType } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AlertTriangle } from 'lucide-react';
 
@@ -7,7 +7,6 @@ export interface UnifiedWarningWindowProps {
   title: string;
   /** Body text / description. Can be a string or rich content. */
   description?: React.ReactNode;
-  icon?: ComponentType<{ className?: string }>;
   confirmLabel?: string;
   cancelLabel?: string;
   /** 'danger' (default) = red confirm, 'primary' = emerald confirm. */
@@ -25,7 +24,6 @@ export function UnifiedWarningWindow({
   open,
   title,
   description,
-  icon: Icon = AlertTriangle,
   confirmLabel = 'Delete',
   cancelLabel = 'Cancel',
   tone = 'danger',
@@ -73,7 +71,7 @@ export function UnifiedWarningWindow({
 
         <div className="flex flex-col items-center text-center">
           <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mb-3 sm:mb-4 ${accent.ring}`}>
-            <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
+            <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
 
           <h2 className="text-[17px] sm:text-lg font-semibold text-white mb-1.5">{title}</h2>
