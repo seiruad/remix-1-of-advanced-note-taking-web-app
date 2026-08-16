@@ -16,6 +16,7 @@ import {
   Paperclip,
   Pencil,
   Check,
+  FileX,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -564,10 +565,8 @@ export function StoragePage({ onBack }: StoragePageProps) {
               : 'This will permanently delete the file from storage. This action cannot be undone.';
           })()
         }
-        icon={Trash2}
+        icon={FileX}
         tone="danger"
-        confirmLabel="Delete"
-        cancelLabel="Don't Delete"
         onConfirm={() => confirmDelete && handleDelete(confirmDelete)}
         onCancel={() => setConfirmDelete(null)}
       />
