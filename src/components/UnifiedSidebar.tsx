@@ -12,7 +12,6 @@ import {
   FileText,
   Clock,
   FolderOpen,
-  FileX,
   FolderX,
   Notebook,
   LayoutList,
