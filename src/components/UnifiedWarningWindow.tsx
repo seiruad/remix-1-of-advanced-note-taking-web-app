@@ -71,7 +71,7 @@ export function UnifiedWarningWindow({
 
         <div className="flex flex-col items-center text-center">
           <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mb-3 sm:mb-4 ${accent.ring}`}>
-            <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
+            <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
 
           <h2 className="text-[17px] sm:text-lg font-semibold text-white mb-1.5">{title}</h2>
