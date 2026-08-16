@@ -1353,7 +1353,7 @@ export function UnifiedSidebar({
       {/* Delete note confirmation */}
       <UnifiedWarningWindow
         open={!!noteToDelete}
-        icon={FileX}
+        icon={FileText}
         title="Delete note?"
         description={
           noteToDelete
