@@ -9,6 +9,7 @@ import {
   Plus,
   Trash2,
   Search,
+  FileText,
   Clock,
   FolderOpen,
   Notebook,
