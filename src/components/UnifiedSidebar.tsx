@@ -12,7 +12,6 @@ import {
   FileText,
   Clock,
   FolderOpen,
-  FileX,
   FolderX,
   Notebook,
   LayoutList,
@@ -1353,7 +1352,7 @@ export function UnifiedSidebar({
       {/* Delete note confirmation */}
       <UnifiedWarningWindow
         open={!!noteToDelete}
-        icon={FileX}
+        icon={FileText}
         title="Delete note?"
         description={
           noteToDelete
