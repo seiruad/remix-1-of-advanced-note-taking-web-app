@@ -136,15 +136,14 @@ function SidebarNavBar({
                 <LayoutList className="w-4 h-4" />
               </button>
 
-              {/* Folders / back */}
+              {/* Back */}
               <button
                 onClick={() => setSelectedFolderId(null)}
-                className="flex-shrink-0 flex items-center justify-center gap-0.5 px-2 h-full rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 active:bg-slate-700/80 active:scale-95 transition-all"
+                className="flex-shrink-0 flex items-center justify-center w-10 h-full rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 active:bg-slate-700/80 active:scale-95 transition-all"
                 aria-label="Back to folders"
                 title="Back to folders"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
-                <FolderTreeIcon className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4" />
               </button>
 
               {/* Folder name badge */}
