@@ -326,6 +326,24 @@ export function UnifiedSidebar({
     try { localStorage.setItem(MODE_STORAGE_KEY, 'all'); } catch { /* noop */ }
   }, []);
 
+  const startFolderRename = (folderId: string, name: string) => {
+    setRenamingFolderId(folderId);
+    setRenameDraft(name);
+  };
+
+  const commitFolderRename = (folderId: string) => {
+    const folder = folders.find((f) => f.id === folderId);
+    const v = renameDraft.trim();
+    if (v && folder && v !== folder.name) onRenameFolder(folderId, v);
+    setRenamingFolderId(null);
+    setRenameDraft('');
+  };
+
+  const cancelFolderRename = () => {
+    setRenamingFolderId(null);
+    setRenameDraft('');
+  };
+
 
   const sortedFolders = useMemo(
     () => [...folders].sort((a, b) => {
