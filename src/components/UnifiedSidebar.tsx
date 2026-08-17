@@ -319,29 +319,6 @@ export function UnifiedSidebar({
     setExpandedMap((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const toggleExpanded = (key: string) => setExpanded(key, !isExpanded(key));
-
-  const handleToggleFolder = (folderId: string) => {
-    const wasExpanded = isExpanded(folderId);
-    setExpanded(folderId, !wasExpanded);
-    if (wasExpanded && currentNoteId) {
-      const folderNotes = notes.filter((n) => n.folder_id === folderId);
-      if (folderNotes.some((n) => n.id === currentNoteId)) {
-        onSelectNote('');
-      }
-    }
-  };
-
-  const handleToggleUnfiled = () => {
-    const wasExpanded = unfiledExpanded;
-    toggleExpanded(UNFILED_KEY);
-    if (wasExpanded && currentNoteId && unfiledNotes.some((n) => n.id === currentNoteId)) {
-      onSelectNote('');
-    }
-  };
-  void handleToggleFolder;
-  void handleToggleUnfiled;
-  void FolderSection;
 
   useEffect(() => {
     if (!currentNoteId) return;
