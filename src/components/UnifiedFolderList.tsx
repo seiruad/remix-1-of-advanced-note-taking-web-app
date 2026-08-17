@@ -44,20 +44,24 @@ function FolderRowFlat({
   };
 
   const count = notes.filter((n) => n.folder_id === folder.id).length;
+  const countLabel = count === 0 ? 'No notes' : `${count} note${count !== 1 ? 's' : ''}`;
+  const isNew = folder.is_new ?? false;
 
-  const folderBtnClasses = folder.is_new
+  const folderBtnClasses = isNew
     ? 'bg-amber-500/[0.06] hover:bg-amber-500/10 active:bg-amber-500/15'
     : 'hover:bg-slate-700/40 active:bg-slate-700/60';
 
+  const iconBgClasses = isNew
+    ? 'bg-amber-500/10'
+    : 'bg-slate-700/30';
+
   return (
-    <div className={`group folder-row relative w-full flex items-center gap-1 overflow-hidden rounded-xl transition-colors ${folderBtnClasses}`}>
+    <div className={`group/card relative flex items-stretch rounded-xl cursor-pointer transition-colors duration-150 overflow-hidden ${folderBtnClasses}`}>
       {isRenaming ? (
         <div className="flex items-center gap-3 flex-1 min-w-0 py-3.5 sm:py-3 pl-4 pr-2">
-          <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
-            folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
-          }`}>
-            {folder.is_new ? (
-              <FolderPlus className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-300" />
+          <div className={`flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex-shrink-0 ${iconBgClasses}`}>
+            {isNew ? (
+              <FolderPlus className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-400" />
             ) : (
               <FolderIcon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400" />
             )}
@@ -82,19 +86,19 @@ function FolderRowFlat({
         </div>
       ) : (
         <button onClick={onSelect} className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2">
-          <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
-            folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
-          }`}>
-            {folder.is_new ? (
-              <FolderPlus className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-300" />
+          <div className={`flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex-shrink-0 ${iconBgClasses}`}>
+            {isNew ? (
+              <FolderPlus className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-400" />
             ) : (
               <FolderIcon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400" />
             )}
           </div>
-          <span className="folder-name flex-1 min-w-0 text-left text-base sm:text-sm font-semibold text-white truncate">{folder.name}</span>
-          <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
-            {count}
-          </span>
+          <div className="flex-1 min-w-0">
+            <span className="folder-name block text-left text-base sm:text-sm font-semibold text-white truncate">{folder.name}</span>
+            <span className={`block text-left text-sm sm:text-xs mt-0.5 ${isNew ? 'text-amber-400/70' : 'text-slate-500'}`}>
+              {countLabel}
+            </span>
+          </div>
         </button>
       )}
 
@@ -103,7 +107,7 @@ function FolderRowFlat({
           ariaLabel="Folder options"
           onOpenChange={setMenuOpen}
           triggerClassName={`w-9 h-9 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
-            menuOpen ? '' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
+            menuOpen ? '' : 'opacity-100 sm:opacity-0 sm:group-hover/card:opacity-100'
           }`}
           iconClassName="w-5 h-5 sm:w-4 sm:h-4"
           items={[
@@ -189,18 +193,20 @@ export function UnifiedFolderList({
       )}
       <div className="space-y-2.5">
         {showUnfiled && (
-          <div className="group relative w-full flex items-center gap-1 overflow-hidden rounded-xl hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors">
+          <div className="group/card relative flex items-stretch rounded-xl cursor-pointer hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors duration-150 overflow-hidden">
             <button
               onClick={() => onSelectFolder(NO_FOLDER_ID)}
-              className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 overflow-hidden"
+              className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2"
             >
-              <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
-                <Inbox className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-300" />
+              <div className="flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8 rounded-lg bg-slate-700/30 flex-shrink-0">
+                <Inbox className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-400" />
               </div>
-              <span className="flex-1 min-w-0 text-left text-base sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
-              <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
-                {unfiledCount}
-              </span>
+              <div className="flex-1 min-w-0">
+                <span className="folder-name block text-left text-base sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
+                <span className="block text-left text-sm sm:text-xs text-slate-500 mt-0.5">
+                  {unfiledCount === 0 ? 'No notes' : `${unfiledCount} note${unfiledCount !== 1 ? 's' : ''}`}
+                </span>
+              </div>
             </button>
             <span aria-hidden className="flex-shrink-0 w-11 h-11 sm:w-10 sm:h-10" />
           </div>
