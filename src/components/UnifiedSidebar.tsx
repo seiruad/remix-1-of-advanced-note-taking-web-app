@@ -69,7 +69,6 @@ function SidebarNavBar({
   notes: _notes,
   unfiledCount,
   onRenameFolder,
-  onOpenDeleteFolder,
   renamingFolderId,
   renameDraft,
   onRenameDraftChange,
@@ -84,7 +83,6 @@ function SidebarNavBar({
   notes: NoteWithDetails[];
   unfiledCount: number;
   onRenameFolder: (folderId: string, name: string) => void;
-  onOpenDeleteFolder: (folder: FolderType) => void;
   renamingFolderId: string | null;
   renameDraft: string;
   onRenameDraftChange: (v: string) => void;
