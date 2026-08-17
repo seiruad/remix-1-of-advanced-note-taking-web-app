@@ -9,24 +9,17 @@ import {
   Plus,
   Trash2,
   Search,
-  FileText,
-  Clock,
-  FolderOpen,
   Notebook,
-  LayoutList,
   FolderTree as FolderTreeIcon,
   X,
   Pencil,
-  
   MoreHorizontal,
-  FolderInput,
-  
   FolderPlus,
-  
   Inbox,
 } from 'lucide-react';
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
 import { StorageUsage } from './StorageUsage';
+import { UnifiedNoteList, NoteCard, formatDate } from './UnifiedNoteList';
 
 
 interface UnifiedSidebarProps {
