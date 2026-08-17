@@ -44,7 +44,6 @@ type Mode = 'all' | 'folders';
 
 const EXPANDED_STORAGE_KEY = 'sidebar-folders-expanded';
 const MODE_STORAGE_KEY = 'sidebar-mode';
-const UNFILED_KEY = '__unfiled__';
 
 function loadExpandedState(): Record<string, boolean> {
   try {
