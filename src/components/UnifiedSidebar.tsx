@@ -498,7 +498,11 @@ export function UnifiedSidebar({
         notes={notes}
         unfiledCount={unfiledNotes.length}
         onRenameFolder={onRenameFolder}
-        onOpenDeleteFolder={(f) => setFolderToDelete(f)}
+        renamingFolderId={renamingFolderId}
+        renameDraft={renameDraft}
+        onRenameDraftChange={setRenameDraft}
+        onRenameCommit={commitFolderRename}
+        onRenameCancel={cancelFolderRename}
       />
 
       {/* ===== NoteList-Viewer ===== */}
