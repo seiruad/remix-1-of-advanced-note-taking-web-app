@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { UnifiedMenu } from './UnifiedMenu';
 import { UnifiedWarningWindow } from './UnifiedWarningWindow';
 import {
-  Folder as FolderIcon,
   ChevronRight,
   ChevronLeft,
   Plus,
@@ -13,7 +12,6 @@ import {
   FolderTree as FolderTreeIcon,
   X,
   Pencil,
-  FolderPlus,
 } from 'lucide-react';
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
 import { StorageUsage } from './StorageUsage';
@@ -363,7 +361,6 @@ export function UnifiedSidebar({
     [notes]
   );
 
-  const unfiledExpanded = isExpanded(UNFILED_KEY);
   const folderToDeleteNoteCount = folderToDelete
     ? notes.filter((n) => n.folder_id === folderToDelete.id).length
     : 0;
