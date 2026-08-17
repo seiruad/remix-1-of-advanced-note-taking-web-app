@@ -1,74 +1,40 @@
-# План: Переделать нижнюю кнопку создания в UnifiedSidebar
+# Вынести список папок в UnifiedFolderList
 
-## Цель
-Заменить текущую «плавающую» кнопку `SidebarFab` (absolute, в углу) на широкую прямоугольную кнопку внизу списка. Кнопка одного стиля, ширины и цвета, но меняет надпись и действие в зависимости от режима.
+Да, стоит. Половина работы уже сделана: список заметок живёт в `UnifiedNoteList`, а список папок всё ещё встроен в `UnifiedSidebar` (сейчас 957 строк, включая мёртвый код).
 
-## Текущее состояние
-- `SidebarFab` рендерится абсолютно в правом нижнем углу (`bottom-4 right-4`) с меню выбора в режиме списка папок.
-- Режимы: `'note' | 'note-in-folder' | 'unfiled' | 'choice'`.
-- В режиме `choice` открывается поп-over с двумя пунктами (New Note / New Folder).
+## Что сейчас в UnifiedSidebar
 
-## Что меняем
+- `FolderRowFlat` — строка папки (иконка, имя, счётчик, inline-переименование, меню Rename/Delete)
+- Инлайновый блок рендера списка папок с фильтрацией по поиску, строкой «No Folder» и заглушкой «No folders match»
+- `FolderSection`, `handleToggleFolder`, `handleToggleUnfiled` — устаревший код от старого дерева папок, помечен `void ...` и нигде не используется
 
-### 1. Расположение и размер
-- Убрать `absolute bottom-4 right-4`.
-- Поместить кнопку внутри нижней части списка (над блоком `StorageUsage`), растянув на всю доступную ширину с боковыми отступами (`w-full mx-3` или эквивалент `px-3`).
-- Высота: `h-12` на мобильных, `h-11` на десктопе (`sm:h-11`).
-- Форма: прямоугольник с закруглением `rounded-xl`.
-- Добавить отступ снизу, чтобы кнопка не прилипала к `StorageUsage` и не перекрывала последние элементы списка.
+## Что делаем
 
-### 2. Единый стиль
-- Фон: `bg-emerald-500/90` (как сейчас).
-- Текст: белый, `font-semibold`, `text-sm`.
-- Ring: `ring-1 ring-emerald-300/40`.
-- Тень: `shadow-[0_8px_24px_-6px_rgba(16,185,129,0.45)]`.
-- Hover/active: `hover:bg-emerald-500 active:bg-emerald-600/90 active:scale-[0.98]`.
-- Иконка: `Plus` внутри небольшого контейнера `w-7 h-7 rounded-lg bg-white/15`.
-- Визуально кнопка должна соответствовать остальному UnifiedSidebar (emerald-акценты, rounded-xl, slate-фон списка).
+1. Создать `src/components/UnifiedFolderList.tsx`:
+   - перенести туда `FolderRowFlat` и весь блок рендера списка папок без изменений разметки и классов (визуал остаётся прежним)
+   - внутри держать сортировку папок, фильтрацию по `searchQuery`, строку «No Folder», пустое состояние и «Search all notes instead →»
+2. В `UnifiedSidebar` заменить инлайновый блок на:
+   ```text
+   mode === 'all' || selectedFolderId  →  <UnifiedNoteList ... />
+   иначе                                →  <UnifiedFolderList ... />
+   ```
+3. Удалить мёртвый код (`FolderSection`, `handleToggleFolder`, `handleToggleUnfiled`, связанные `void`-заглушки и ставшие ненужными импорты/утилиты expanded-состояния, если они больше нигде не используются).
+4. Состояние `mode`, `selectedFolderId`, диалоги удаления, FAB, поиск и Storage остаются в `UnifiedSidebar` — он остаётся «оркестратором».
 
-### 3. Контекстная логика
-Убрать режим `choice` и всплывающее меню. Оставить три состояния:
+## Технические детали
 
-| Режим | Надпись | Действие |
-|-------|---------|----------|
-| `All Notes` | `New Note` | `onCreateNote()` — создать заметку без папки |
-| `Folders` (список папок) | `New Folder` | `onCreateFolder('New Folder', null)` — создать папку |
-| Внутри папки (включая `No Folder`) | `New Note` | `onCreateNote(folderId)` — создать заметку, привязанную к текущей папке; для `No Folder` — `folderId = undefined` |
-
-### 4. Обработчики и типы
-- Обновить тип `FabMode`: `'note' | 'note-in-folder' | 'unfiled' | 'folder'`.
-- Обновить вычисление `fabMode`:
-  - `mode === 'all'` → `'note'`
-  - `mode === 'folders' && !insideFolderView` → `'folder'`
-  - `mode === 'folders' && isNoFolderView` → `'unfiled'`
-  - `mode === 'folders' && currentFolderView` → `'note-in-folder'`
-- Обновить `handleFabClick`:
-  - `'note'`, `'unfiled'`, `'note-in-folder'` → `handleFabCreateNote()`
-  - `'folder'` → `handleFabCreateFolder()`
-- Удалить поп-over меню и состояния `open`/`pos` в `SidebarFab`.
-
-### 5. Mobile First
-- Кнопка занимает почти всю ширину экрана (`mx-3` или `px-3`), легко попадает под большой палец.
-- Высота 48 px на мобильных — удобная тап-зона.
-- Текст и иконка чётко читаются.
-- Не перекрывает контент: список получает дополнительный `pb-20` или кнопка находится вне scrollable области.
-
-## Файлы для изменения
-- `src/components/UnifiedSidebar.tsx`
-  - Компонент `SidebarFab` (строки ~823–925).
-  - Логика `fabMode` и обработчики (строки ~1244–1269).
-  - Место рендера `SidebarFab` (строки ~1541–1548).
-
-## Что НЕ трогаем
-- Логика поиска, навигации, Workspace header, FolderContextStrip.
-- Внешний вид карточек заметок и папок.
-- Блок `StorageUsage`.
+Props `UnifiedFolderList`:
+```ts
+folders: Folder[];          // уже отсортированные или сортируем внутри
+notes: NoteWithDetails[];   // для подсчёта заметок в папке
+searchQuery: string;
+onSelectFolder: (folderId: string) => void;   // включая NO_FOLDER_ID
+onRenameFolder: (folderId: string, name: string) => void;
+onDeleteFolder: (folder: Folder) => void;     // открывает UnifiedWarningWindow в сайдбаре
+onSwitchToAllNotes: () => void;
+```
+Константу `NO_FOLDER_ID` экспортировать из одного места (`UnifiedNoteList` уже её объявляет локально) и переиспользовать, чтобы не расходилась.
 
 ## Проверка
-- `tsgo` — проверка типов.
-- Скриншоты в мобильном viewport (390×844) для трёх состояний: `All Notes`, `Folders` (список), внутри папки.
-- Проверить, что кнопка:
-  - растянута по ширине,
-  - не перекрывает последние элементы,
-  - в режиме `Folders` создаёт папку,
-  - внутри папки создаёт заметку с привязкой.
+
+TypeScript-компиляция + прогон в браузере: список папок, вход в папку, переименование (включая пробел в имени), удаление, поиск по папкам, «No Folder» — на мобильном и десктопном вьюпорте, вид без изменений.
