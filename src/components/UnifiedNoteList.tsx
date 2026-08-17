@@ -17,7 +17,7 @@ import { NoteWithDetails, Folder as FolderType } from '../types/database';
 
 const NO_FOLDER_ID = '__no_folder__';
 
-function formatDate(date: string) {
+export function formatDate(date: string) {
   const now = new Date();
   const then = new Date(date);
   const diff = now.getTime() - then.getTime();
