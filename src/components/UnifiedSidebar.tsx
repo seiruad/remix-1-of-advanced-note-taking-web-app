@@ -5,23 +5,20 @@ import {
   Folder as FolderIcon,
   ChevronRight,
   ChevronLeft,
-  ChevronDown,
   Plus,
   Trash2,
   Search,
-  FolderOpen,
   Notebook,
   LayoutList,
   FolderTree as FolderTreeIcon,
   X,
   Pencil,
-  MoreHorizontal,
   FolderPlus,
-  Inbox,
 } from 'lucide-react';
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
 import { StorageUsage } from './StorageUsage';
-import { UnifiedNoteList, NoteCard } from './UnifiedNoteList';
+import { UnifiedNoteList } from './UnifiedNoteList';
+import { UnifiedFolderList } from './UnifiedFolderList';
 
 
 interface UnifiedSidebarProps {
@@ -61,188 +58,6 @@ function loadExpandedState(): Record<string, boolean> {
   return {};
 }
 
-
-/* ---------- Folder section ---------- */
-
-function FolderSection({
-  folder,
-  notes,
-  allFolders,
-  currentNoteId,
-  expanded,
-  onToggle,
-  onSelectNote,
-  onDeleteNote,
-  onMoveNote,
-  onRequestDelete,
-  onRenameFolder,
-  onCreateNoteInFolder,
-  workspaceName,
-}: {
-  folder: FolderType;
-  notes: NoteWithDetails[];
-  allFolders: FolderType[];
-  currentNoteId: string | null;
-  expanded: boolean;
-  onToggle: () => void;
-  onSelectNote: (id: string) => void;
-  onDeleteNote: (n: NoteWithDetails) => void;
-  onMoveNote: (id: string, fid: string | null) => void;
-  onRequestDelete: (folder: FolderType) => void;
-  onRenameFolder: (folderId: string, name: string) => void;
-  onCreateNoteInFolder: (folderId: string) => void;
-  workspaceName?: string;
-}) {
-  const [showMenu, setShowMenu] = useState(false);
-  const [isRenaming, setIsRenaming] = useState(false);
-  const [renameValue, setRenameValue] = useState(folder.name);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!showMenu) return;
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setShowMenu(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [showMenu]);
-
-  const handleRename = () => {
-    if (renameValue.trim() && renameValue !== folder.name)
-      onRenameFolder(folder.id, renameValue.trim());
-    setIsRenaming(false);
-  };
-
-  const sortedNotes = [...notes].sort((a, b) => {
-    const aNew = a.is_new ?? false;
-    const bNew = b.is_new ?? false;
-    if (aNew !== bNew) return aNew ? -1 : 1;
-    if (aNew && bNew) {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    }
-    return (a.title || '').localeCompare(b.title || '');
-  });
-
-  return (
-    <div className="mb-1">
-      {/* Folder header */}
-      <div
-        className="flex items-center gap-1 rounded-xl hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors cursor-pointer select-none group"
-        onClick={() => { if (!isRenaming) onToggle(); }}
-      >
-        <span className="p-3 sm:p-2.5 text-slate-500 flex-shrink-0">
-          {expanded ? (
-            <ChevronDown className="w-5 h-5 sm:w-4 sm:h-4" />
-          ) : (
-            <ChevronRight className="w-5 h-5 sm:w-4 sm:h-4" />
-          )}
-        </span>
-
-        <div className="flex-1 flex items-center gap-2 py-1 sm:py-0.5 min-w-0">
-          {expanded ? (
-            <FolderOpen className="w-5 h-5 sm:w-4 sm:h-4 text-slate-400 flex-shrink-0" />
-          ) : (
-            <FolderIcon className="w-5 h-5 sm:w-4 sm:h-4 text-slate-400 flex-shrink-0" />
-          )}
-
-          {isRenaming ? (
-            <input
-              type="text"
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              onBlur={handleRename}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleRename();
-                if (e.key === 'Escape') { setRenameValue(folder.name); setIsRenaming(false); }
-              }}
-              className="flex-1 bg-slate-700 text-white text-base sm:text-sm rounded-lg px-2 py-1 sm:py-0.5 outline-none border border-emerald-500 min-w-0"
-              autoFocus
-            />
-          ) : (
-            <span
-              className="text-base sm:text-sm font-semibold text-slate-200 truncate"
-              onDoubleClick={(e) => { e.stopPropagation(); setRenameValue(folder.name); setIsRenaming(true); }}
-            >
-              {folder.name}
-            </span>
-          )}
-
-          {!isRenaming && (
-            <span className="ml-auto mr-1 min-w-[20px] text-center text-sm sm:text-xs font-medium text-slate-500 bg-slate-700/60 rounded-full px-1.5 py-0.5 flex-shrink-0">
-              {notes.length}
-            </span>
-          )}
-        </div>
-
-        {/* Folder actions */}
-        <div className="flex items-center flex-shrink-0 pr-1 gap-0.5">
-          <button
-            onClick={(e) => { e.stopPropagation(); onCreateNoteInFolder(folder.id); }}
-            className="p-2.5 sm:p-2 rounded-lg text-slate-500 hover:text-emerald-400 hover:bg-slate-700/60 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-            title="New note in folder"
-          >
-            <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
-          </button>
-
-          <div ref={menuRef} className="relative">
-            <button
-              onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
-              className="p-2.5 sm:p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-              title="Folder options"
-            >
-              <MoreHorizontal className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
-
-            {showMenu && (
-              <div
-                className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-40 min-w-[150px] py-1.5 overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => { setRenameValue(folder.name); setIsRenaming(true); setShowMenu(false); }}
-                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700/60 transition-colors"
-                >
-                  <Pencil className="w-3.5 h-3.5" /> Rename
-                </button>
-                <div className="border-t border-slate-700/60 my-1" />
-                <button
-                  onClick={() => { onRequestDelete(folder); setShowMenu(false); }}
-                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> Delete
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Notes inside folder */}
-      {expanded && (
-        <div className="mt-0.5 ml-3 pl-3 border-l border-slate-700/50 space-y-0.5">
-          {sortedNotes.length === 0 ? (
-            <p className="text-xs text-slate-600 italic py-2 px-1">Empty folder</p>
-          ) : (
-            sortedNotes.map((note) => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                folders={allFolders}
-                isActive={currentNoteId === note.id}
-                onSelect={() => onSelectNote(note.id)}
-                onDelete={() => onDeleteNote(note)}
-                onMove={(fid) => onMoveNote(note.id, fid)}
-                showFolder={false}
-                workspaceName={workspaceName}
-              />
-            ))
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 /* ---------- Sidebar nav-bar (mode toggle / breadcrumb / search / + New) ---------- */
 
@@ -451,116 +266,6 @@ function SidebarFab({
 }
 
 
-
-/* ---------- Flat folder row (Folders mode) ---------- */
-
-function FolderRowFlat({
-  folder,
-  notes,
-  onSelect,
-  onRename,
-  onDelete,
-}: {
-  folder: FolderType;
-  notes: NoteWithDetails[];
-  onSelect: () => void;
-  onRename: (name: string) => void;
-  onDelete: () => void;
-}) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isRenaming, setIsRenaming] = useState(folder.is_new ?? false);
-  const [renameValue, setRenameValue] = useState(folder.name);
-  const renameInputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    if (folder.is_new && renameInputRef.current) {
-      renameInputRef.current.focus();
-      renameInputRef.current.select();
-    }
-  }, [folder.is_new]);
-
-  const handleRename = () => {
-    if (renameValue.trim() && renameValue !== folder.name) onRename(renameValue.trim());
-    setIsRenaming(false);
-  };
-
-  const count = notes.filter((n) => n.folder_id === folder.id).length;
-
-  const folderBtnClasses = folder.is_new
-    ? 'bg-amber-500/[0.06] hover:bg-amber-500/10 active:bg-amber-500/15'
-    : 'hover:bg-slate-700/40 active:bg-slate-700/60';
-
-  return (
-    <div className={`group folder-row relative w-full flex items-center gap-1 overflow-hidden rounded-xl transition-colors ${folderBtnClasses}`}>
-      {isRenaming ? (
-        <div className="flex items-center gap-3 flex-1 min-w-0 py-3.5 sm:py-3 pl-4 pr-2">
-          <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
-            folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
-          }`}>
-            {folder.is_new ? (
-              <FolderPlus className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-300" />
-            ) : (
-              <FolderIcon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400" />
-            )}
-          </div>
-          <input
-            type="text"
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-            onBlur={handleRename}
-            onKeyDown={(e) => {
-              e.stopPropagation();
-              if (e.key === 'Enter') handleRename();
-              if (e.key === 'Escape') { setRenameValue(folder.name); setIsRenaming(false); }
-            }}
-            onKeyUp={(e) => e.stopPropagation()}
-            onKeyPress={(e) => e.stopPropagation()}
-            ref={renameInputRef}
-            className="folder-rename-input flex-1 min-w-0 bg-slate-700/80 text-white rounded-lg px-2.5 py-1.5 outline-none border border-emerald-500/60 ring-2 ring-emerald-500/20"
-            autoFocus
-          />
-        </div>
-      ) : (
-        <button onClick={onSelect} className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2">
-          <div className={`flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex-shrink-0 ${
-            folder.is_new ? 'bg-amber-500/15' : 'bg-emerald-500/15'
-          }`}>
-            {folder.is_new ? (
-              <FolderPlus className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-300" />
-            ) : (
-              <FolderIcon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400" />
-            )}
-          </div>
-          <span className="folder-name flex-1 min-w-0 text-left text-base sm:text-sm font-semibold text-white truncate">{folder.name}</span>
-          <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
-            {count}
-          </span>
-        </button>
-      )}
-
-      <div className="flex items-center flex-shrink-0 p-1" onClick={(e) => e.stopPropagation()}>
-        <UnifiedMenu
-          ariaLabel="Folder options"
-          onOpenChange={setMenuOpen}
-          triggerClassName={`w-9 h-9 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
-            menuOpen ? '' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
-          }`}
-          iconClassName="folder-menu-icon"
-          items={[
-            {
-              id: 'rename',
-              label: 'Rename',
-              icon: Pencil,
-              onSelect: () => { setRenameValue(folder.name); setIsRenaming(true); },
-            },
-            { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
-          ]}
-        />
-      </div>
-    </div>
-  );
-}
 
 /* ---------- Main sidebar ---------- */
 
