@@ -271,20 +271,11 @@ body {
   font-size: 14px;
   font-weight: 600;
 }
-.folder-menu-icon {
-  width: 18px;
-  height: 18px;
-}
-
-/* Folder row — mobile: larger touch targets, bigger text, bigger menu icon */
+/* Folder row — mobile: larger touch targets, bigger text */
 @media (max-width: 639px) {
   .folder-rename-input {
     font-size: 17px;
     font-weight: 600;
     padding: 8px 12px;
-  }
-  .folder-menu-icon {
-    width: 22px;
-    height: 22px;
   }
 }
