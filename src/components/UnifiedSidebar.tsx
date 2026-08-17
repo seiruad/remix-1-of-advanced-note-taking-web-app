@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
 import { StorageUsage } from './StorageUsage';
-import { UnifiedNoteList, NoteCard, formatDate } from './UnifiedNoteList';
+import { UnifiedNoteList, NoteCard } from './UnifiedNoteList';
 
 
 interface UnifiedSidebarProps {
