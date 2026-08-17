@@ -537,14 +537,38 @@ export function UnifiedSidebar({
         )}
         </div>
 
-        {/* FAB — contextual create */}
+        {/* FAB — contextual create + folder menu */}
         {!hideFab && (
-          <div className="px-3 pt-2 pb-3 bg-slate-800 border-t border-slate-700/50 flex-shrink-0">
-            <SidebarFab
-              fabMode={fabMode}
-              onCreateNote={handleFabCreateNote}
-              onCreateFolder={handleFabCreateFolder}
-            />
+          <div className="px-3 pt-2 pb-3 bg-slate-800 border-t border-slate-700/50 flex-shrink-0 flex gap-2">
+            <div className="flex-1 min-w-0">
+              <SidebarFab
+                fabMode={fabMode}
+                onCreateNote={handleFabCreateNote}
+                onCreateFolder={handleFabCreateFolder}
+              />
+            </div>
+            {currentFolderView && (
+              <UnifiedMenu
+                ariaLabel="Folder options"
+                triggerClassName="flex-shrink-0 flex items-center justify-center w-12 sm:w-11 h-12 sm:h-11 rounded-xl bg-slate-700/60 text-slate-300 hover:bg-slate-700 hover:text-white active:bg-slate-700/80 transition-colors"
+                iconClassName="w-5 h-5"
+                items={[
+                  {
+                    id: 'rename',
+                    label: 'Rename',
+                    icon: Pencil,
+                    onSelect: () => startFolderRename(currentFolderView.id, currentFolderView.name),
+                  },
+                  {
+                    id: 'delete',
+                    label: 'Delete',
+                    icon: Trash2,
+                    danger: true,
+                    onSelect: () => setFolderToDelete(currentFolderView),
+                  },
+                ]}
+              />
+            )}
           </div>
         )}
       </div>
