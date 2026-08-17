@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
 import { StorageUsage } from './StorageUsage';
-import { UnifiedNoteList, NoteCard, formatDate } from './UnifiedNoteList';
+import { UnifiedNoteList, NoteCard } from './UnifiedNoteList';
 
 
 interface UnifiedSidebarProps {
@@ -819,193 +819,90 @@ export function UnifiedSidebar({
       <div className="flex-1 relative min-h-0 flex flex-col">
         <div className="flex-1 overflow-y-auto notes-list-scroll min-h-0">
 
-        {(() => {
-          const q = searchQuery.trim().toLowerCase();
-          const hasQuery = q.length > 0;
+        {mode === 'all' || selectedFolderId ? (
+          <UnifiedNoteList
+            mode={mode}
+            selectedFolderId={selectedFolderId}
+            notes={notes}
+            folders={sortedFolders}
+            currentNoteId={currentNoteId}
+            searchQuery={searchQuery}
+            workspaceName={workspaceName}
+            onSelectNote={onSelectNote}
+            onDeleteNote={(note) => setNoteToDelete(note)}
+            onMoveNote={onMoveNote}
+            onCreateNoteInFolder={handleCreateNoteInFolder}
+            onSwitchToAllNotes={switchToAllNotes}
+          />
+        ) : (
+          <div className="p-3">
+            {(() => {
+              const q = searchQuery.trim().toLowerCase();
+              const hasQuery = q.length > 0;
+              const foldersFiltered = hasQuery
+                ? sortedFolders.filter((f) => f.name.toLowerCase().includes(q))
+                : sortedFolders;
+              const showUnfiled = !hasQuery || 'no folder'.includes(q);
 
-          const NoMatchesFallback = ({ label }: { label: string }) => (
-            <div className="py-12 text-center px-4">
-              <Search className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-              <p className="text-sm text-slate-500">No {label} match "{searchQuery}"</p>
-              <button
-                onClick={switchToAllNotes}
-                className="mt-3 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
-              >
-                Search all notes instead →
-              </button>
-            </div>
-          );
+              const NoMatchesFallback = ({ label }: { label: string }) => (
+                <div className="py-12 text-center px-4">
+                  <Search className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500">No {label} match "{searchQuery}"</p>
+                  <button
+                    onClick={switchToAllNotes}
+                    className="mt-3 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                  >
+                    Search all notes instead →
+                  </button>
+                </div>
+              );
 
-          /* ---------- All Notes mode ---------- */
-          if (mode === 'all') {
-            const list = hasQuery ? allNotesSorted.filter((n) => noteMatches(n, q)) : allNotesSorted;
-            return (
-              <div className="p-3">
-                {allNotesSorted.length === 0 ? (
-                  <div className="py-16 text-center">
-                    <Notebook className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                    <p className="text-sm font-medium text-slate-500">No notes yet</p>
-                    <p className="text-xs text-slate-600 mt-1">Tap "New Note" to get started</p>
-                  </div>
-                ) : list.length === 0 ? (
-                  <div className="py-12 text-center">
-                    <Search className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                    <p className="text-sm text-slate-500">No notes match "{searchQuery}"</p>
-                  </div>
-                ) : (
-                  <>
-                    {hasQuery && (
-                      <p className="text-xs text-slate-500 px-1 mb-2">
-                        {list.length} result{list.length !== 1 ? 's' : ''}
-                      </p>
-                    )}
-                    <div className="space-y-1">
-                      {list.map((note) => (
-                        <NoteCard
-                          key={note.id}
-                          note={note}
-                          folders={sortedFolders}
-                          isActive={currentNoteId === note.id}
-                          onSelect={() => onSelectNote(note.id)}
-                          onDelete={() => setNoteToDelete(note)}
-                          onMove={(fid) => onMoveNote(note.id, fid)}
-                          workspaceName={workspaceName}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            );
-          }
+              if (hasQuery && foldersFiltered.length === 0 && !showUnfiled) {
+                return <NoMatchesFallback label="folders" />;
+              }
 
-          /* ---------- Folders mode ---------- */
-          return (
-            <div className="p-3">
-              {(() => {
-                const NO_FOLDER_ID = '__no_folder__';
-
-                /* Inside a folder — search only inside its notes */
-                if (selectedFolderId) {
-                  const isNoFolder = selectedFolderId === NO_FOLDER_ID;
-                  const folder = isNoFolder ? null : sortedFolders.find((f) => f.id === selectedFolderId);
-                  if (!isNoFolder && !folder) return null;
-                  const baseNotes = (isNoFolder
-                    ? unfiledNotes
-                    : notes.filter((n) => n.folder_id === folder!.id)
-                  ).slice().sort((a, b) => {
-                    const aNew = a.is_new ?? false;
-                    const bNew = b.is_new ?? false;
-                    if (aNew !== bNew) return aNew ? -1 : 1;
-                    if (aNew && bNew) {
-                      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-                    }
-                    return (a.title || '').localeCompare(b.title || '');
-                  });
-                  const folderNotes = hasQuery ? baseNotes.filter((n) => noteMatches(n, q)) : baseNotes;
-
-                  return (
-                    <div>
-                      {folderNotes.length > 0 ? (
-                        <>
-                          {hasQuery && (
-                            <p className="text-xs text-slate-500 px-1 mb-2">
-                              {folderNotes.length} result{folderNotes.length !== 1 ? 's' : ''} in folder
-                            </p>
-                          )}
-                          <div className="space-y-1.5">
-                            {folderNotes.map((note) => (
-                              <NoteCard
-                                key={note.id}
-                                note={note}
-                                folders={sortedFolders}
-                                isActive={currentNoteId === note.id}
-                                onSelect={() => onSelectNote(note.id)}
-                                onDelete={() => setNoteToDelete(note)}
-                                onMove={(fid) => onMoveNote(note.id, fid)}
-                                showFolder={false}
-                                workspaceName={workspaceName}
-                              />
-                            ))}
+              return (
+                <>
+                  {hasQuery && (
+                    <p className="text-xs text-slate-500 px-1 mb-2">
+                      {foldersFiltered.length + (showUnfiled ? 1 : 0)} folder{foldersFiltered.length + (showUnfiled ? 1 : 0) !== 1 ? 's' : ''} match
+                    </p>
+                  )}
+                  <div className="space-y-2.5">
+                    {showUnfiled && (
+                      <div className="group relative w-full flex items-center gap-1 overflow-hidden rounded-xl hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors">
+                        <button
+                          onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
+                          className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 overflow-hidden"
+                        >
+                          <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
+                            <Inbox className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-300" />
                           </div>
-                        </>
-                      ) : hasQuery ? (
-                        <NoMatchesFallback label="notes in this folder" />
-                      ) : (
-                        <div className="py-12 text-center">
-                          <FileText className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                          <p className="text-sm font-medium text-slate-500">
-                            {isNoFolder ? 'No unfiled notes' : 'No notes in this folder'}
-                          </p>
-                          {!isNoFolder && (
-                            <button
-                              onClick={() => handleCreateNoteInFolder(folder!.id)}
-                              className="mt-3 text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
-                            >
-                              Create a note here
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-
-                /* Folders list — search only folder names. "No Folder" is always pinned on top. */
-                const foldersFiltered = hasQuery
-                  ? sortedFolders.filter((f) => f.name.toLowerCase().includes(q))
-                  : sortedFolders;
-                const showUnfiled = !hasQuery || 'no folder'.includes(q);
-
-
-                if (hasQuery && foldersFiltered.length === 0 && !showUnfiled) {
-                  return <NoMatchesFallback label="folders" />;
-                }
-
-                return (
-                  <>
-                    {hasQuery && (
-                      <p className="text-xs text-slate-500 px-1 mb-2">
-                        {foldersFiltered.length + (showUnfiled ? 1 : 0)} folder{foldersFiltered.length + (showUnfiled ? 1 : 0) !== 1 ? 's' : ''} match
-                      </p>
+                          <span className="flex-1 min-w-0 text-left text-base sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
+                          <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
+                            {unfiledNotes.length}
+                          </span>
+                        </button>
+                        <span aria-hidden className="flex-shrink-0 w-11 h-11 sm:w-10 sm:h-10" />
+                      </div>
                     )}
-                    <div className="space-y-2.5">
-                      {showUnfiled && (
-                        <div className="group relative w-full flex items-center gap-1 overflow-hidden rounded-xl hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors">
-                          <button
-                            onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
-                            className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 overflow-hidden"
-                          >
-                            <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
-                              <Inbox className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-300" />
-                            </div>
-                            <span className="flex-1 min-w-0 text-left text-base sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
-                            <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
-                              {unfiledNotes.length}
-                            </span>
-                          </button>
-                          <span aria-hidden className="flex-shrink-0 w-11 h-11 sm:w-10 sm:h-10" />
-                        </div>
-                      )}
 
-
-                      {foldersFiltered.map((folder) => (
-                        <FolderRowFlat
-                          key={folder.id}
-                          folder={folder}
-                          notes={notes}
-                          onSelect={() => setSelectedFolderId(folder.id)}
-                          onRename={(name) => onRenameFolder(folder.id, name)}
-                          onDelete={() => setFolderToDelete(folder)}
-                        />
-                      ))}
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-          );
-        })()}
+                    {foldersFiltered.map((folder) => (
+                      <FolderRowFlat
+                        key={folder.id}
+                        folder={folder}
+                        notes={notes}
+                        onSelect={() => setSelectedFolderId(folder.id)}
+                        onRename={(name) => onRenameFolder(folder.id, name)}
+                        onDelete={() => setFolderToDelete(folder)}
+                      />
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
         </div>
 
         {/* FAB — contextual create */}
