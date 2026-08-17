@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
 
-const NO_FOLDER_ID = '__no_folder__';
+export const NO_FOLDER_ID = '__no_folder__';
 
 export function formatDate(date: string) {
   const now = new Date();
