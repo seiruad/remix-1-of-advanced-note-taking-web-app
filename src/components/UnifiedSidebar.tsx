@@ -285,6 +285,8 @@ export function UnifiedSidebar({
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [noteToDelete, setNoteToDelete] = useState<NoteWithDetails | null>(null);
   const [folderToDelete, setFolderToDelete] = useState<FolderType | null>(null);
+  const [renamingFolderId, setRenamingFolderId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState('');
   const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>(loadExpandedState);
 
   useEffect(() => {
