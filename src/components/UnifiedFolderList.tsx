@@ -98,14 +98,14 @@ function FolderRowFlat({
         </button>
       )}
 
-      <div className="flex items-center flex-shrink-0 p-1" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center pr-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
         <UnifiedMenu
           ariaLabel="Folder options"
           onOpenChange={setMenuOpen}
           triggerClassName={`w-9 h-9 sm:w-8 sm:h-8 text-slate-500 hover:text-slate-300 hover:bg-slate-700/60 ${
             menuOpen ? '' : 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
           }`}
-          iconClassName="folder-menu-icon"
+          iconClassName="w-5 h-5 sm:w-4 sm:h-4"
           items={[
             {
               id: 'rename',
