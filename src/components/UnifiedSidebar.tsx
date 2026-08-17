@@ -668,19 +668,6 @@ export function UnifiedSidebar({
     [folders]
   );
 
-  const allNotesSorted = useMemo(
-    () => [...notes].sort((a, b) => {
-      const aNew = a.is_new ?? false;
-      const bNew = b.is_new ?? false;
-      if (aNew !== bNew) return aNew ? -1 : 1;
-      if (aNew && bNew) {
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      }
-      return (a.title || '').localeCompare(b.title || '');
-    }),
-    [notes]
-  );
-
   const unfiledNotes = useMemo(
     () => notes.filter((n) => !n.folder_id).sort((a, b) => {
       const aNew = a.is_new ?? false;
