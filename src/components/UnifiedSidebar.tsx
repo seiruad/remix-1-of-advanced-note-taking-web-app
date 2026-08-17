@@ -835,73 +835,15 @@ export function UnifiedSidebar({
             onSwitchToAllNotes={switchToAllNotes}
           />
         ) : (
-          <div className="p-3">
-            {(() => {
-              const q = searchQuery.trim().toLowerCase();
-              const hasQuery = q.length > 0;
-              const foldersFiltered = hasQuery
-                ? sortedFolders.filter((f) => f.name.toLowerCase().includes(q))
-                : sortedFolders;
-              const showUnfiled = !hasQuery || 'no folder'.includes(q);
-
-              const NoMatchesFallback = ({ label }: { label: string }) => (
-                <div className="py-12 text-center px-4">
-                  <Search className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                  <p className="text-sm text-slate-500">No {label} match "{searchQuery}"</p>
-                  <button
-                    onClick={switchToAllNotes}
-                    className="mt-3 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
-                  >
-                    Search all notes instead →
-                  </button>
-                </div>
-              );
-
-              if (hasQuery && foldersFiltered.length === 0 && !showUnfiled) {
-                return <NoMatchesFallback label="folders" />;
-              }
-
-              return (
-                <>
-                  {hasQuery && (
-                    <p className="text-xs text-slate-500 px-1 mb-2">
-                      {foldersFiltered.length + (showUnfiled ? 1 : 0)} folder{foldersFiltered.length + (showUnfiled ? 1 : 0) !== 1 ? 's' : ''} match
-                    </p>
-                  )}
-                  <div className="space-y-2.5">
-                    {showUnfiled && (
-                      <div className="group relative w-full flex items-center gap-1 overflow-hidden rounded-xl hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors">
-                        <button
-                          onClick={() => setSelectedFolderId(NO_FOLDER_ID)}
-                          className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-xl py-3.5 sm:py-3 pl-4 pr-2 overflow-hidden"
-                        >
-                          <div className="flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-slate-600/30 flex-shrink-0">
-                            <Inbox className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-300" />
-                          </div>
-                          <span className="flex-1 min-w-0 text-left text-base sm:text-sm font-semibold italic text-slate-300 truncate">No Folder</span>
-                          <span className="folder-count-badge flex-shrink-0 inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-slate-900/50 text-[11px] font-semibold text-slate-400 tabular-nums">
-                            {unfiledNotes.length}
-                          </span>
-                        </button>
-                        <span aria-hidden className="flex-shrink-0 w-11 h-11 sm:w-10 sm:h-10" />
-                      </div>
-                    )}
-
-                    {foldersFiltered.map((folder) => (
-                      <FolderRowFlat
-                        key={folder.id}
-                        folder={folder}
-                        notes={notes}
-                        onSelect={() => setSelectedFolderId(folder.id)}
-                        onRename={(name) => onRenameFolder(folder.id, name)}
-                        onDelete={() => setFolderToDelete(folder)}
-                      />
-                    ))}
-                  </div>
-                </>
-              );
-            })()}
-          </div>
+          <UnifiedFolderList
+            folders={sortedFolders}
+            notes={notes}
+            searchQuery={searchQuery}
+            onSelectFolder={(fid) => setSelectedFolderId(fid)}
+            onRenameFolder={onRenameFolder}
+            onDeleteFolder={(f) => setFolderToDelete(f)}
+            onSwitchToAllNotes={switchToAllNotes}
+          />
         )}
         </div>
 
