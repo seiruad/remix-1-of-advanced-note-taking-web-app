@@ -651,13 +651,6 @@ export function UnifiedSidebar({
     setExpanded(folderId, true);
   };
 
-  const noteMatches = useCallback(
-    (n: NoteWithDetails, q: string) =>
-      n.title.toLowerCase().includes(q) ||
-      JSON.stringify(n.content).toLowerCase().includes(q),
-    [],
-  );
-
   const switchToAllNotes = useCallback(() => {
     setSelectedFolderId(null);
     setMode('all');
