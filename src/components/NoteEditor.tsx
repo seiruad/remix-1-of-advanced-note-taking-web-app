@@ -436,13 +436,14 @@ export function NoteEditor({
                       <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-600" />
                     </>
                   )}
-                  <FolderIconToUse className={`w-3.5 h-3.5 flex-shrink-0 ${folder ? 'text-slate-300' : 'text-slate-500'}`} />
+                  <FolderIconToUse className="w-3.5 h-3.5 flex-shrink-0 text-slate-500" />
                   <span className={`truncate max-w-[45%] text-[13px] ${folder ? 'text-slate-300' : 'text-slate-500 italic'}`}>
                     {folder ? folder.name : 'No Folder'}
                   </span>
                 </div>
               );
             })()}
+
 
 
           </div>
