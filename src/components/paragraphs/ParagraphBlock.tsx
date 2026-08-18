@@ -119,7 +119,7 @@ export function ParagraphBlock({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className={`flex items-start gap-1.5 px-2 sm:px-3 ${textHidden ? 'py-1' : 'py-2'}`}>
+      <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
         <div
           className="flex-1 min-w-0"
           onFocus={() => onFocusEditor(null)}
