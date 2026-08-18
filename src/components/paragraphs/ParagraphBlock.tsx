@@ -70,6 +70,7 @@ export function ParagraphBlock({
   onDetach,
   onOpenFile,
 }: ParagraphBlockProps) {
+  const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [textRevealed, setTextRevealed] = useState(false);
