@@ -126,11 +126,11 @@ function SidebarNavBar({
     <div className="border-b border-slate-700/50 bg-slate-800">
       <div className="h-11 px-3 flex items-center">
         <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-lg bg-slate-900/60">
-          {/* Slot 1 — All Notes (icon-only inside a folder) */}
+          {/* Slot 1 — All Notes / back to all notes */}
           <button
             onClick={() => persistMode('all')}
-            className={`flex-shrink-0 min-w-0 overflow-hidden flex items-center justify-center gap-1.5 h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 will-change-transform transition-colors duration-150 ${
-              insideFolder ? 'w-10' : 'flex-1'
+            className={`relative min-w-0 overflow-hidden h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-[flex,colors] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              insideFolder ? 'flex-[0_0_2.5rem]' : 'flex-[1_0_0]'
             } ${
               !insideFolder && mode === 'all'
                 ? 'bg-slate-700 text-emerald-400'
@@ -139,21 +139,28 @@ function SidebarNavBar({
             aria-label="All Notes"
             title="All Notes"
           >
-            {insideFolder ? (
+            <span
+              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                insideFolder ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              }`}
+            >
+              <LayoutList className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="truncate">All Notes</span>
+            </span>
+            <span
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
               <ChevronsLeft className="w-4 h-4 flex-shrink-0" />
-            ) : (
-              <>
-                <LayoutList className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="truncate">All Notes</span>
-              </>
-            )}
+            </span>
           </button>
 
-          {/* Slot 2 — Folders / back (icon-only inside a folder) */}
+          {/* Slot 2 — Folders / back to folders */}
           <button
             onClick={() => (insideFolder ? setSelectedFolderId(null) : persistMode('folders'))}
-            className={`flex-shrink-0 min-w-0 overflow-hidden flex items-center justify-center gap-1.5 h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 will-change-transform transition-colors duration-150 ${
-              insideFolder ? 'w-10' : 'flex-1'
+            className={`relative min-w-0 overflow-hidden h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-[flex,colors] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              insideFolder ? 'flex-[0_0_2.5rem]' : 'flex-[1_0_0]'
             } ${
               !insideFolder && mode === 'folders'
                 ? 'bg-slate-700 text-emerald-400'
@@ -162,20 +169,27 @@ function SidebarNavBar({
             aria-label={insideFolder ? 'Back to folders' : 'Folders'}
             title={insideFolder ? 'Back to folders' : 'Folders'}
           >
-            {insideFolder ? (
+            <span
+              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                insideFolder ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              }`}
+            >
+              <FolderTreeIcon className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="truncate">Folders</span>
+            </span>
+            <span
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
               <ChevronLeft className="w-4 h-4 flex-shrink-0" />
-            ) : (
-              <>
-                <FolderTreeIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="truncate">Folders</span>
-              </>
-            )}
+            </span>
           </button>
 
-          {/* Slot 3 — current folder badge (always rendered, fades/slides in and out) */}
+          {/* Slot 3 — current folder badge */}
           <div
-            className={`flex-1 min-w-0 h-full overflow-hidden transition-[opacity,max-width] duration-150 ease-out will-change-transform ${
-              insideFolder ? 'opacity-100 max-w-full' : 'opacity-0 max-w-0 pointer-events-none'
+            className={`min-w-0 h-full overflow-hidden transition-[flex,opacity] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              insideFolder ? 'flex-[1_0_0] opacity-100' : 'flex-[0_0_0] opacity-0 pointer-events-none'
             }`}
           >
             {isRenaming ? (
