@@ -133,7 +133,7 @@ export function UnifiedMenu({
               left: pos?.left ?? -9999,
               visibility: pos ? 'visible' : 'hidden',
             }}
-            className="w-[220px] sm:w-[200px] bg-slate-800/95 backdrop-blur-xl border border-slate-700/70 rounded-xl overflow-hidden shadow-[0_16px_44px_rgba(0,0,0,0.6)] py-1 animate-[dropdownIn_0.16s_cubic-bezier(0.34,1.4,0.64,1)_both]"
+            className="w-[200px] sm:w-[180px] bg-slate-800/95 backdrop-blur-xl border border-slate-700/70 rounded-xl overflow-hidden shadow-[0_16px_44px_rgba(0,0,0,0.6)] py-1 animate-[dropdownIn_0.16s_cubic-bezier(0.34,1.4,0.64,1)_both]"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
@@ -141,7 +141,7 @@ export function UnifiedMenu({
               const Icon = item.icon;
               return (
                 <div key={item.id}>
-                  {i > 0 && <div className="mx-3 my-1 h-px bg-slate-700/70" />}
+                  {i > 0 && <div className="mx-2.5 my-1 h-px bg-slate-700/70" />}
                   <button
                     type="button"
                     role="menuitem"
@@ -150,18 +150,18 @@ export function UnifiedMenu({
                       close();
                       item.onSelect();
                     }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-[15px] sm:text-sm font-medium transition-colors ${
+                    className={`w-full flex items-center gap-2.5 px-2.5 py-2 text-left text-sm sm:text-[13px] font-medium transition-colors ${
                       item.danger
                         ? 'text-red-400 hover:bg-red-500/10 active:bg-red-500/15'
                         : 'text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
                     }`}
                   >
                     <span
-                      className={`flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 ${
+                      className={`flex items-center justify-center w-7 h-7 rounded-lg flex-shrink-0 ${
                         item.danger ? 'bg-red-500/15 text-red-400' : 'bg-slate-700/80 text-slate-200'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-3.5 h-3.5" />
                     </span>
                     {item.label}
                   </button>
