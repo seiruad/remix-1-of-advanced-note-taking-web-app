@@ -10,7 +10,12 @@ interface AttachFileDialogProps {
   noteId: string;
   onFileLinked: (file: FileItem) => void;
   existingFileIds: string[];
+  /** When set, newly linked files are attached to this paragraph. */
+  paragraphId?: string | null;
+  /** Files already attached to that paragraph (shown as linked). */
+  paragraphFileIds?: string[];
 }
+
 
 function formatFileSize(bytes: number) {
   if (bytes === 0) return '0 B';
@@ -34,7 +39,10 @@ export function AttachFileDialog({
   noteId,
   onFileLinked,
   existingFileIds,
+  paragraphId = null,
+  paragraphFileIds,
 }: AttachFileDialogProps) {
+
   const { user } = useAuth();
   const [mode, setMode] = useState<'choose' | 'upload' | 'select'>('choose');
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -107,6 +115,7 @@ export function AttachFileDialog({
           note_id: noteId,
           file_id: fileRecord.id,
           user_id: user.id,
+          paragraph_id: paragraphId,
         });
 
       if (linkError) throw linkError;
@@ -125,15 +134,26 @@ export function AttachFileDialog({
   const handleSelectExisting = async (file: FileItem) => {
     setError(null);
     try {
-      const { error: linkError } = await supabase
-        .from('note_files')
-        .insert({
-          note_id: noteId,
-          file_id: file.id,
-          user_id: user!.id,
-        });
+      if (existingFileIds.includes(file.id)) {
+        // Already linked to the note — just move it into this paragraph.
+        const { error: moveError } = await supabase
+          .from('note_files')
+          .update({ paragraph_id: paragraphId })
+          .eq('note_id', noteId)
+          .eq('file_id', file.id);
+        if (moveError) throw moveError;
+      } else {
+        const { error: linkError } = await supabase
+          .from('note_files')
+          .insert({
+            note_id: noteId,
+            file_id: file.id,
+            user_id: user!.id,
+            paragraph_id: paragraphId,
+          });
 
-      if (linkError) throw linkError;
+        if (linkError) throw linkError;
+      }
 
       onFileLinked(file);
       onClose();
@@ -142,6 +162,7 @@ export function AttachFileDialog({
       setError(message);
     }
   };
+
 
   const filteredFiles = files.filter((f) =>
     f.filename.toLowerCase().includes(searchQuery.toLowerCase())
@@ -279,7 +300,10 @@ export function AttachFileDialog({
                   </div>
                 ) : (
                   filteredFiles.map((file) => {
-                    const isLinked = existingFileIds.includes(file.id);
+                    const isLinked = paragraphFileIds
+                      ? paragraphFileIds.includes(file.id)
+                      : existingFileIds.includes(file.id);
+
                     return (
                       <button
                         key={file.id}
