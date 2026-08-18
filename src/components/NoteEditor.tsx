@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { RichTextEditor } from './RichTextEditor';
+import { ParagraphList } from './paragraphs/ParagraphList';
 import { AttachFileDialog } from './AttachFileDialog';
 import { buildFileUrl } from './FilePreviewPage';
 import { useNavigate, useLocation } from 'react-router-dom';
