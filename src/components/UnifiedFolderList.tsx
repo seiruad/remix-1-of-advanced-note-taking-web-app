@@ -39,7 +39,7 @@ function FolderRowFlat({
   }, [folder.is_new]);
 
   const handleRename = () => {
-    if (renameValue.trim() && renameValue !== folder.name) onRename(renameValue.trim());
+    if (renameValue.trim()) onRename(renameValue.trim());
     setIsRenaming(false);
   };
 
