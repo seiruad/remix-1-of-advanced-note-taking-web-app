@@ -630,12 +630,17 @@ export function NoteEditor({
 
       {/* ===== SCROLLABLE BODY ===== */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-32 sm:pb-28">
-        <RichTextEditor
-          content={note.content}
-          onChange={handleContentChange}
-          editable={canEdit}
-          onEditorReady={setEditorInstance}
+        <ParagraphList
+          noteId={note.id}
+          userId={user?.id ?? null}
+          canEdit={canEdit}
+          initialContent={note.content}
+          files={files}
+          onOpenFile={(file) => setPreviewFile(file)}
+          onActiveEditorChange={setEditorInstance}
+          onFileLinked={onFileLinked}
         />
+
 
         {error && (
           <div className="mt-4 flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-sm text-red-400">
