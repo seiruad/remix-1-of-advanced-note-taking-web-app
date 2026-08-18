@@ -6,7 +6,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Note, FileItem, Folder, Workspace } from '../types/database';
 import { supabase } from '../lib/supabase';
 import {
-  FolderOpen,
   Paperclip,
   Download,
   Trash2,
