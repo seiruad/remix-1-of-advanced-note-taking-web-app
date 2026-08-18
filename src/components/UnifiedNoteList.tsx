@@ -223,24 +223,24 @@ export function NoteCard({
       <div
         className={`group/card relative flex items-stretch rounded-xl cursor-pointer transition-colors duration-150 overflow-hidden ${
           isActive && isNew
-            ? 'bg-amber-500/15'
+            ? 'bg-amber-500/[0.10] hover:bg-amber-500/[0.12] active:bg-amber-500/[0.14]'
             : isNew
-              ? 'bg-amber-500/[0.06] hover:bg-amber-500/10'
+              ? 'bg-amber-500/[0.04] hover:bg-amber-500/[0.07] active:bg-amber-500/[0.10]'
               : isActive
-                ? 'bg-emerald-500/12'
+                ? 'bg-emerald-500/[0.07] hover:bg-emerald-500/[0.09] active:bg-emerald-500/[0.11]'
                 : 'hover:bg-slate-700/40 active:bg-slate-700/60'
         }`}
         onClick={onSelect}
       >
-        {/* Left accent bar: active=emerald, new+active=bright amber, new=amber */}
+        {/* Left accent bar: active=muted emerald, new+active=amber, new=muted amber */}
         {(isActive || isNew) && (
           <span
             className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full ${
               isActive && isNew
                 ? 'bg-amber-400'
                 : isActive
-                  ? 'bg-emerald-400'
-                  : 'bg-amber-400/70'
+                  ? 'bg-emerald-400/80'
+                  : 'bg-amber-400/60'
             }`}
           />
         )}
@@ -248,12 +248,18 @@ export function NoteCard({
         <div className="flex-1 py-3.5 sm:py-3 pl-4 pr-2 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className={`text-base sm:text-sm font-semibold leading-snug truncate ${
-              isNew ? 'text-amber-100 italic' : isActive ? 'text-emerald-50' : 'text-slate-100'
+              isNew && isActive
+                ? 'text-amber-100 italic'
+                : isNew
+                  ? 'text-amber-200/90 italic'
+                  : isActive
+                    ? 'text-emerald-100/90'
+                    : 'text-slate-100'
             }`}>
               {note.title || 'Untitled'}
             </h3>
             {isNew && (
-              <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-amber-300 bg-amber-500/15 rounded-full px-1.5 py-0.5">
+              <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-amber-300/80 bg-amber-500/10 rounded-full px-1.5 py-0.5">
                 New
               </span>
             )}
