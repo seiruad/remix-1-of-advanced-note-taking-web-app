@@ -13,6 +13,8 @@ interface RichTextEditorProps {
   minHeightClassName?: string;
   /** Empty string disables the placeholder entirely. */
   placeholder?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export function RichTextEditor({
@@ -22,13 +24,19 @@ export function RichTextEditor({
   onEditorReady,
   minHeightClassName = 'min-h-[300px]',
   placeholder = 'Start writing your note...',
+  onFocus,
+  onBlur,
 }: RichTextEditorProps) {
   const onChangeRef = useRef(onChange);
   const onReadyRef = useRef(onEditorReady);
+  const onFocusRef = useRef(onFocus);
+  const onBlurRef = useRef(onBlur);
   useEffect(() => {
     onChangeRef.current = onChange;
     onReadyRef.current = onEditorReady;
-  }, [onChange, onEditorReady]);
+    onFocusRef.current = onFocus;
+    onBlurRef.current = onBlur;
+  }, [onChange, onEditorReady, onFocus, onBlur]);
 
   const isEditingRef = useRef(false);
   const placeholderRef = useRef(placeholder);
@@ -56,6 +64,12 @@ export function RichTextEditor({
     onUpdate: ({ editor }) => {
       isEditingRef.current = true;
       onChangeRef.current(editor.getJSON());
+    },
+    onFocus: () => {
+      onFocusRef.current?.();
+    },
+    onBlur: () => {
+      onBlurRef.current?.();
     },
   });
 
