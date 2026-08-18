@@ -126,7 +126,7 @@ function SidebarNavBar({
     <div className="border-b border-slate-700/50 bg-slate-800">
       <div className="h-11 px-3 flex items-center">
         <div
-          className={`flex-1 min-w-0 h-9 grid gap-1 p-1 rounded-lg bg-slate-900/60 transition-[grid-template-columns] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          className={`flex-1 min-w-0 h-9 grid gap-1 p-1 rounded-lg bg-slate-900/60 transition-[grid-template-columns] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
             insideFolder ? 'grid-cols-[0fr_0fr_1fr]' : 'grid-cols-[1fr_1fr_0fr]'
           }`}
         >
@@ -142,16 +142,20 @@ function SidebarNavBar({
             title="All Notes"
           >
             <span
-              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-                insideFolder ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                insideFolder
+                  ? 'opacity-0 pointer-events-none duration-150'
+                  : 'opacity-100 duration-150 delay-100'
               }`}
             >
               <LayoutList className="w-3.5 h-3.5 flex-shrink-0" />
               <span className="truncate">All Notes</span>
             </span>
             <span
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-                insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              className={`absolute inset-0 flex items-center justify-center transition-opacity ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                insideFolder
+                  ? 'opacity-100 duration-150 delay-100'
+                  : 'opacity-0 pointer-events-none duration-150'
               }`}
             >
               <ChevronsLeft className="w-4 h-4 flex-shrink-0" />
@@ -170,16 +174,20 @@ function SidebarNavBar({
             title={insideFolder ? 'Back to folders' : 'Folders'}
           >
             <span
-              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-                insideFolder ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                insideFolder
+                  ? 'opacity-0 pointer-events-none duration-150'
+                  : 'opacity-100 duration-150 delay-100'
               }`}
             >
               <FolderTreeIcon className="w-3.5 h-3.5 flex-shrink-0" />
               <span className="truncate">Folders</span>
             </span>
             <span
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-                insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              className={`absolute inset-0 flex items-center justify-center transition-opacity ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                insideFolder
+                  ? 'opacity-100 duration-150 delay-100'
+                  : 'opacity-0 pointer-events-none duration-150'
               }`}
             >
               <ChevronLeft className="w-4 h-4 flex-shrink-0" />
@@ -188,8 +196,8 @@ function SidebarNavBar({
 
           {/* Slot 3 — current folder badge */}
           <div
-            className={`min-w-0 h-full overflow-hidden transition-[opacity,transform] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            className={`min-w-0 h-full overflow-hidden transition-opacity ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              insideFolder ? 'opacity-100 duration-200 delay-75' : 'opacity-0 pointer-events-none duration-150'
             }`}
           >
             {isRenaming ? (
