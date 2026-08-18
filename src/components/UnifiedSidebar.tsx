@@ -126,87 +126,87 @@ function SidebarNavBar({
     <div className="border-b border-slate-700/50 bg-slate-800">
       <div className="h-11 px-3 flex items-center">
         <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-lg bg-slate-900/60">
-          {insideFolder && crumbInfo ? (
-            <>
-              {/* All Notes — double chevron */}
-              <button
-                onClick={() => persistMode('all')}
-                className="flex-shrink-0 flex items-center justify-center w-9 h-full rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
-                aria-label="All Notes"
-                title="All Notes"
-              >
-                <ChevronsLeft className="w-4 h-4" />
-              </button>
+          {/* Slot 1 — All Notes (collapses to icon inside a folder) */}
+          <button
+            onClick={() => persistMode('all')}
+            style={{ flexGrow: insideFolder ? 0 : 1, flexBasis: insideFolder ? '2.25rem' : 0 }}
+            className={`flex-shrink-0 min-w-0 overflow-hidden flex items-center justify-center gap-1.5 h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-[flex-basis,flex-grow,background-color,color] duration-200 ease-out ${
+              !insideFolder && mode === 'all'
+                ? 'bg-slate-700 text-emerald-400'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
+            }`}
+            aria-label="All Notes"
+            title="All Notes"
+          >
+            {insideFolder ? (
+              <ChevronsLeft className="w-4 h-4 flex-shrink-0" />
+            ) : (
+              <>
+                <LayoutList className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="truncate">All Notes</span>
+              </>
+            )}
+          </button>
 
-              {/* Back */}
-              <button
-                onClick={() => setSelectedFolderId(null)}
-                className="flex-shrink-0 flex items-center justify-center w-10 h-full rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
-                aria-label="Back to folders"
-                title="Back to folders"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
+          {/* Slot 2 — Folders / back (collapses to icon inside a folder) */}
+          <button
+            onClick={() => (insideFolder ? setSelectedFolderId(null) : persistMode('folders'))}
+            style={{ flexGrow: insideFolder ? 0 : 1, flexBasis: insideFolder ? '2.5rem' : 0 }}
+            className={`flex-shrink-0 min-w-0 overflow-hidden flex items-center justify-center gap-1.5 h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-[flex-basis,flex-grow,background-color,color] duration-200 ease-out ${
+              !insideFolder && mode === 'folders'
+                ? 'bg-slate-700 text-emerald-400'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
+            }`}
+            aria-label={insideFolder ? 'Back to folders' : 'Folders'}
+            title={insideFolder ? 'Back to folders' : 'Folders'}
+          >
+            {insideFolder ? (
+              <ChevronLeft className="w-4 h-4 flex-shrink-0" />
+            ) : (
+              <>
+                <FolderTreeIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="truncate">Folders</span>
+              </>
+            )}
+          </button>
 
-
-              {/* Folder name badge */}
-              {isRenaming ? (
-                <input
-                  type="text"
-                  value={renameDraft}
-                  onChange={(e) => onRenameDraftChange(e.target.value)}
-                  onBlur={() => {
-                    if (currentFolder) {
-                      const v = renameDraft.trim();
-                      if (v && v !== currentFolder.name) onRenameFolder(currentFolder.id, v);
-                      onRenameCommit(currentFolder.id);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-                    if (e.key === 'Escape') onRenameCancel();
-                  }}
-                  className="flex-1 min-w-0 h-full bg-slate-700/80 text-white rounded-lg px-2 text-[13px] font-semibold outline-none border border-emerald-500/60"
-                  autoFocus
-                />
-              ) : (
-                <div className="flex-1 min-w-0 h-full flex items-center gap-2 rounded-lg bg-slate-700/40 px-2.5">
-                  <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
-                  <span className={`truncate text-[13px] font-medium ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
-                    {crumbInfo.name}
+          {/* Slot 3 — current folder badge */}
+          {insideFolder && crumbInfo && (
+            isRenaming ? (
+              <input
+                type="text"
+                value={renameDraft}
+                onChange={(e) => onRenameDraftChange(e.target.value)}
+                onBlur={() => {
+                  if (currentFolder) {
+                    const v = renameDraft.trim();
+                    if (v && v !== currentFolder.name) onRenameFolder(currentFolder.id, v);
+                    onRenameCommit(currentFolder.id);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                  if (e.key === 'Escape') onRenameCancel();
+                }}
+                className="flex-1 min-w-0 h-full bg-slate-700/80 text-white rounded-lg px-2 text-[13px] font-semibold outline-none border border-emerald-500/60"
+                autoFocus
+              />
+            ) : (
+              <div className="flex-1 min-w-0 h-full flex items-center gap-2 rounded-lg bg-slate-700/40 px-2.5 animate-fade-in">
+                <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
+                <span className={`truncate text-[13px] font-medium ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
+                  {crumbInfo.name}
+                </span>
+                {crumbInfo.isNew && (
+                  <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
+                    New
                   </span>
-                  {crumbInfo.isNew && (
-                    <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
-                      New
-                    </span>
-                  )}
-                  <span className="flex-shrink-0 text-[11px] font-medium text-slate-500 tabular-nums ml-auto">
-                    {crumbInfo.count}
-                  </span>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => persistMode('all')}
-                className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-colors ${
-                  mode === 'all' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
-                }`}
-              >
-                <LayoutList className="w-3.5 h-3.5" />
-                All Notes
-              </button>
-              <button
-                onClick={() => persistMode('folders')}
-                className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-colors ${
-                  mode === 'folders' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
-                }`}
-              >
-                <FolderTreeIcon className="w-3.5 h-3.5" />
-                Folders
-              </button>
-            </>
+                )}
+                <span className="flex-shrink-0 text-[11px] font-medium text-slate-500 tabular-nums ml-auto">
+                  {crumbInfo.count}
+                </span>
+              </div>
+            )
           )}
         </div>
       </div>
