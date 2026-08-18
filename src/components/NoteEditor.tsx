@@ -19,8 +19,6 @@ import {
   MoreHorizontal,
   Pencil,
   Check,
-
-  
   Bold,
   Italic,
   Strikethrough,
@@ -33,7 +31,9 @@ import {
   RemoveFormatting,
   ArrowLeft,
   Folder as FolderIcon,
-  Building2,
+  FolderPlus,
+  Inbox,
+  Notebook,
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -376,8 +376,10 @@ export function NoteEditor({
           <p className="text-xs text-slate-500 mt-1.5">Or create a new note to get started</p>
         </div>
       </div>
-    );
-  }
+  );
+}
+
+  const isNewNote = note.is_new ?? false;
 
   return (
     <div
@@ -413,26 +415,36 @@ export function NoteEditor({
             </button>
           )}
 
-          <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-emerald-400" />
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isNewNote ? 'bg-amber-500/10' : 'bg-slate-700/30'}`}>
+            <FileText className={`w-5 h-5 ${isNewNote ? 'text-amber-400' : 'text-slate-400'}`} />
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">Note</p>
+            <p className={`text-[10px] uppercase tracking-wider font-medium leading-tight ${isNewNote ? 'text-amber-400/80' : 'text-slate-500'}`}>
+              {isNewNote ? 'New Note' : 'Note'}
+            </p>
             {(() => {
               const workspace = workspaces.find((w) => w.id === note.workspace_id);
               const folder = folders.find((f) => f.id === note.folder_id);
+              const isNewFolder = folder?.is_new ?? false;
+              const FolderIconToUse = folder ? (isNewFolder ? FolderPlus : FolderIcon) : Inbox;
               return (
                 <div className="flex items-center gap-1.5 min-w-0">
                   {workspace && (
                     <>
-                      <Building2 className="w-3.5 h-3.5 flex-shrink-0 text-slate-500" />
-                      <span className="truncate max-w-[140px] text-[13px] text-slate-300">{workspace.name}</span>
+                      <Notebook className="w-3.5 h-3.5 flex-shrink-0 text-slate-500" />
+                      <span className="truncate max-w-[45%] text-[13px] text-slate-300">{workspace.name}</span>
                       <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-600" />
                     </>
                   )}
-                  <FolderIcon className={`w-3.5 h-3.5 flex-shrink-0 ${folder ? 'text-slate-500' : 'text-slate-600'}`} />
-                  <span className={`truncate max-w-[140px] text-[13px] ${folder ? 'text-slate-300' : 'text-slate-500'}`}>
+                  <FolderIconToUse className={`w-3.5 h-3.5 flex-shrink-0 ${
+                    folder
+                      ? isNewFolder
+                        ? 'text-amber-400'
+                        : 'text-emerald-400'
+                      : 'text-slate-500'
+                  }`} />
+                  <span className={`truncate max-w-[45%] text-[13px] ${folder ? 'text-slate-300' : 'text-slate-500 italic'}`}>
                     {folder ? folder.name : 'No Folder'}
                   </span>
                 </div>
