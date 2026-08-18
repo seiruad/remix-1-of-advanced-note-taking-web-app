@@ -110,13 +110,41 @@ export function ParagraphBlock({
     >
       <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
         <div className="flex-1 min-w-0" onFocus={() => onFocusEditor(null)}>
-          <RichTextEditor
-            content={paragraph.content}
-            onChange={onChange}
-            editable={canEdit}
-            onEditorReady={onFocusEditor}
-            minHeightClassName="min-h-[1.75rem]"
-          />
+          <div className={`relative ${textHidden ? 'h-0 overflow-hidden' : ''}`}>
+            <RichTextEditor
+              content={paragraph.content}
+              onChange={onChange}
+              editable={canEdit}
+              onEditorReady={onFocusEditor}
+              minHeightClassName="min-h-[1.75rem]"
+              placeholder={showEmptyHint || textHidden ? '' : 'Start writing your note...'}
+            />
+
+            {showEmptyHint && (
+              <div className="pointer-events-none absolute inset-0 flex items-center text-[13px] text-slate-500">
+                <span>Write text or&nbsp;</span>
+                <button
+                  type="button"
+                  onClick={onAttach}
+                  className="pointer-events-auto underline underline-offset-2 hover:text-slate-300 transition-colors"
+                >
+                  attach a file
+                </button>
+              </div>
+            )}
+          </div>
+
+          {textHidden && (
+            <button
+              type="button"
+              onClick={revealText}
+              aria-label="Add text to paragraph"
+              className="w-full text-left text-[12px] text-slate-600 hover:text-slate-400 transition-colors"
+            >
+              &nbsp;
+            </button>
+          )}
+
 
           {files.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">
