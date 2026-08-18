@@ -10,6 +10,7 @@ interface RichTextEditorProps {
   onChange: (content: Record<string, unknown>) => void;
   editable?: boolean;
   onEditorReady?: (editor: ReturnType<typeof useEditor>) => void;
+  minHeightClassName?: string;
 }
 
 export function RichTextEditor({
@@ -17,6 +18,7 @@ export function RichTextEditor({
   onChange,
   editable = true,
   onEditorReady,
+  minHeightClassName = 'min-h-[300px]',
 }: RichTextEditorProps) {
   const onChangeRef = useRef(onChange);
   const onReadyRef = useRef(onEditorReady);
@@ -84,7 +86,7 @@ export function RichTextEditor({
   return (
     <EditorContent
       editor={editor}
-      className="prose prose-invert max-w-none min-h-[300px] focus:outline-none"
+      className={`prose prose-invert max-w-none ${minHeightClassName} focus:outline-none`}
     />
   );
 }
