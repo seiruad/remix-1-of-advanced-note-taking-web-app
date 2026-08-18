@@ -11,6 +11,28 @@ import {
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
 import { NO_FOLDER_ID } from './UnifiedNoteList';
 
+const RENAMED_FOLDERS_KEY = 'folder-rename-shown';
+
+function loadRenamedFolderIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(RENAMED_FOLDERS_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch {
+    // corrupt state
+  }
+  return new Set();
+}
+
+function markFolderRenamed(folderId: string) {
+  try {
+    const ids = loadRenamedFolderIds();
+    ids.add(folderId);
+    localStorage.setItem(RENAMED_FOLDERS_KEY, JSON.stringify([...ids]));
+  } catch {
+    // storage unavailable
+  }
+}
+
 /* ---------- Flat folder row ---------- */
 
 function FolderRowFlat({
