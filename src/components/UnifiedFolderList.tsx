@@ -11,6 +11,28 @@ import {
 import { NoteWithDetails, Folder as FolderType } from '../types/database';
 import { NO_FOLDER_ID } from './UnifiedNoteList';
 
+const RENAMED_FOLDERS_KEY = 'folder-rename-shown';
+
+function loadRenamedFolderIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(RENAMED_FOLDERS_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch {
+    // corrupt state
+  }
+  return new Set();
+}
+
+function markFolderRenamed(folderId: string) {
+  try {
+    const ids = loadRenamedFolderIds();
+    ids.add(folderId);
+    localStorage.setItem(RENAMED_FOLDERS_KEY, JSON.stringify([...ids]));
+  } catch {
+    // storage unavailable
+  }
+}
+
 /* ---------- Flat folder row ---------- */
 
 function FolderRowFlat({
@@ -27,19 +49,23 @@ function FolderRowFlat({
   onDelete: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isRenaming, setIsRenaming] = useState(folder.is_new ?? false);
+  const [isRenaming, setIsRenaming] = useState(
+    (folder.is_new ?? false) && !loadRenamedFolderIds().has(folder.id)
+  );
   const [renameValue, setRenameValue] = useState(folder.name);
   const renameInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (folder.is_new && renameInputRef.current) {
+    if (isRenaming && renameInputRef.current) {
       renameInputRef.current.focus();
       renameInputRef.current.select();
     }
-  }, [folder.is_new]);
+  }, [isRenaming]);
 
   const handleRename = () => {
-    if (renameValue.trim()) onRename(renameValue.trim());
+    const v = renameValue.trim();
+    if (v && v !== folder.name) onRename(v);
+    markFolderRenamed(folder.id);
     setIsRenaming(false);
   };
 

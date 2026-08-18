@@ -212,7 +212,7 @@ function SidebarNavBar({
                 onBlur={() => {
                   if (currentFolder) {
                     const v = renameDraft.trim();
-                    if (v) onRenameFolder(currentFolder.id, v);
+                    if (v && v !== currentFolder.name) onRenameFolder(currentFolder.id, v);
                     onRenameCommit(currentFolder.id);
                   }
                 }}
