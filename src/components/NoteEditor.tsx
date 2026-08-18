@@ -427,7 +427,12 @@ export function NoteEditor({
               const workspace = workspaces.find((w) => w.id === note.workspace_id);
               const folder = folders.find((f) => f.id === note.folder_id);
               const isNewFolder = folder?.is_new ?? false;
-              const FolderIconToUse = folder ? (isNewFolder ? FolderPlus : FolderIcon) : Inbox;
+              const FolderIconToUse = folder ? FolderOpen : Inbox;
+              const folderColor = folder
+                ? isNewFolder
+                  ? 'text-amber-400'
+                  : 'text-slate-300'
+                : 'text-slate-500';
               return (
                 <div className="flex items-center gap-1.5 min-w-0">
                   {workspace && (
@@ -437,19 +442,14 @@ export function NoteEditor({
                       <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-600" />
                     </>
                   )}
-                  <FolderIconToUse className={`w-3.5 h-3.5 flex-shrink-0 ${
-                    folder
-                      ? isNewFolder
-                        ? 'text-amber-400'
-                        : 'text-emerald-400'
-                      : 'text-slate-500'
-                  }`} />
-                  <span className={`truncate max-w-[45%] text-[13px] ${folder ? 'text-slate-300' : 'text-slate-500 italic'}`}>
+                  <FolderIconToUse className={`w-3.5 h-3.5 flex-shrink-0 ${folderColor}`} />
+                  <span className={`truncate max-w-[45%] text-[13px] ${folder ? (isNewFolder ? 'text-amber-400' : 'text-slate-300') : 'text-slate-500 italic'}`}>
                     {folder ? folder.name : 'No Folder'}
                   </span>
                 </div>
               );
             })()}
+
           </div>
         </div>
 
