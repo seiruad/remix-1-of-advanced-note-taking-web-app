@@ -224,19 +224,21 @@ function SidebarNavBar({
                 autoFocus
               />
             ) : crumbInfo ? (
-              <div className="w-full h-full flex items-center gap-2 rounded-lg bg-slate-700/40 px-2.5">
-                <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
-                <span className={`truncate text-[13px] font-medium ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
-                  {crumbInfo.name}
-                </span>
-                {crumbInfo.isNew && (
-                  <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
-                    New
+              <div className="w-full h-full flex items-center justify-between gap-2 rounded-lg bg-slate-700/40 px-2.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
+                  <span className={`truncate text-[13px] font-medium ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
+                    {crumbInfo.name}
                   </span>
-                )}
-                <span className="flex-shrink-0 text-[11px] font-medium text-slate-500 tabular-nums">
-                  {crumbInfo.count}
-                </span>
+                  {crumbInfo.isNew && (
+                    <span className="flex-shrink-0 text-[9px] font-bold tracking-wider px-1 py-0.5 rounded bg-amber-500/15 text-amber-300 uppercase">
+                      New
+                    </span>
+                  )}
+                  <span className="flex-shrink-0 text-[11px] font-medium text-slate-500 tabular-nums">
+                    {crumbInfo.count}
+                  </span>
+                </div>
                 {!isNoFolder && currentFolder && (
                   <UnifiedMenu
                     ariaLabel="Folder options"
