@@ -115,6 +115,7 @@ export function AttachFileDialog({
           note_id: noteId,
           file_id: fileRecord.id,
           user_id: user.id,
+          paragraph_id: paragraphId,
         });
 
       if (linkError) throw linkError;
@@ -133,15 +134,26 @@ export function AttachFileDialog({
   const handleSelectExisting = async (file: FileItem) => {
     setError(null);
     try {
-      const { error: linkError } = await supabase
-        .from('note_files')
-        .insert({
-          note_id: noteId,
-          file_id: file.id,
-          user_id: user!.id,
-        });
+      if (existingFileIds.includes(file.id)) {
+        // Already linked to the note — just move it into this paragraph.
+        const { error: moveError } = await supabase
+          .from('note_files')
+          .update({ paragraph_id: paragraphId })
+          .eq('note_id', noteId)
+          .eq('file_id', file.id);
+        if (moveError) throw moveError;
+      } else {
+        const { error: linkError } = await supabase
+          .from('note_files')
+          .insert({
+            note_id: noteId,
+            file_id: file.id,
+            user_id: user!.id,
+            paragraph_id: paragraphId,
+          });
 
-      if (linkError) throw linkError;
+        if (linkError) throw linkError;
+      }
 
       onFileLinked(file);
       onClose();
@@ -150,6 +162,7 @@ export function AttachFileDialog({
       setError(message);
     }
   };
+
 
   const filteredFiles = files.filter((f) =>
     f.filename.toLowerCase().includes(searchQuery.toLowerCase())
