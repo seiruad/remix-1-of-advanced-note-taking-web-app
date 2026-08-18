@@ -190,7 +190,7 @@ function SidebarNavBar({
             <>
               <button
                 onClick={() => persistMode('all')}
-                className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-colors ${
                   mode === 'all' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
                 }`}
               >
@@ -199,7 +199,7 @@ function SidebarNavBar({
               </button>
               <button
                 onClick={() => persistMode('folders')}
-                className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-colors ${
                   mode === 'folders' ? 'bg-slate-700 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200 active:bg-slate-700/40'
                 }`}
               >
