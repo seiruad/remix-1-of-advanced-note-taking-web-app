@@ -636,7 +636,12 @@ export function NoteEditor({
           canEdit={canEdit}
           initialContent={note.content}
           files={files}
-          onOpenFile={(file) => setPreviewFile(file)}
+          onOpenFile={(file) =>
+            navigate(buildFileUrl(file.id, { kind: 'note', noteId: note.id }), {
+              state: { background: location },
+            })
+          }
+
           onActiveEditorChange={setEditorInstance}
           onFileLinked={onFileLinked}
         />
