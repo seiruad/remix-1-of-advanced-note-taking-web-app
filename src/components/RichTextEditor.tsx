@@ -29,10 +29,14 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const onChangeRef = useRef(onChange);
   const onReadyRef = useRef(onEditorReady);
+  const onFocusRef = useRef(onFocus);
+  const onBlurRef = useRef(onBlur);
   useEffect(() => {
     onChangeRef.current = onChange;
     onReadyRef.current = onEditorReady;
-  }, [onChange, onEditorReady]);
+    onFocusRef.current = onFocus;
+    onBlurRef.current = onBlur;
+  }, [onChange, onEditorReady, onFocus, onBlur]);
 
   const isEditingRef = useRef(false);
   const placeholderRef = useRef(placeholder);
