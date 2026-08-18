@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import type { Editor } from '@tiptap/react';
 import {
   ArrowUpToLine,
   ArrowDownToLine,
@@ -72,6 +73,7 @@ export function ParagraphBlock({
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [textRevealed, setTextRevealed] = useState(false);
+  const editorRef = useRef<Editor | null>(null);
 
   const empty = isDocEmpty(paragraph.content);
   const hasFiles = files.length > 0;
@@ -80,7 +82,16 @@ export function ParagraphBlock({
   // Fully empty paragraph: offer both actions in one hint line.
   const showEmptyHint = canEdit && empty && !hasFiles;
 
-  const revealText = () => setTextRevealed(true);
+  const revealText = () => {
+    setTextRevealed(true);
+    // focus once the collapsed row has expanded
+    setTimeout(() => editorRef.current?.commands.focus('end'), 0);
+  };
+
+  // Leaving an empty text field puts the paragraph back to how it was.
+  const handleBlur = () => {
+    if (isDocEmpty(paragraph.content)) setTextRevealed(false);
+  };
 
   const items: UnifiedMenuItem[] = [
     ...(textHidden
@@ -109,15 +120,22 @@ export function ParagraphBlock({
       onMouseLeave={() => setHovered(false)}
     >
       <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
-        <div className="flex-1 min-w-0" onFocus={() => onFocusEditor(null)}>
+        <div
+          className="flex-1 min-w-0"
+          onFocus={() => onFocusEditor(null)}
+          onBlur={handleBlur}
+        >
           <div className={`relative ${textHidden ? 'h-0 overflow-hidden' : ''}`}>
             <RichTextEditor
               content={paragraph.content}
               onChange={onChange}
               editable={canEdit}
-              onEditorReady={onFocusEditor}
+              onEditorReady={(editor) => {
+                editorRef.current = (editor as Editor) ?? null;
+                onFocusEditor(editor);
+              }}
               minHeightClassName="min-h-[1.75rem]"
-              placeholder={showEmptyHint || textHidden ? '' : 'Start writing your note...'}
+              placeholder=""
             />
 
             {showEmptyHint && (
