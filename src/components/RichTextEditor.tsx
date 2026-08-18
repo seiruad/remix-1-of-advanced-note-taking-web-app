@@ -13,6 +13,8 @@ interface RichTextEditorProps {
   minHeightClassName?: string;
   /** Empty string disables the placeholder entirely. */
   placeholder?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export function RichTextEditor({
