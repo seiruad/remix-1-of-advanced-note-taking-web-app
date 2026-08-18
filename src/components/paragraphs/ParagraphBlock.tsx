@@ -199,7 +199,7 @@ export function ParagraphBlock({
             ariaLabel="Paragraph options"
             onOpenChange={setMenuOpen}
             triggerClassName={`w-8 h-8 mt-0.5 text-slate-500 hover:text-slate-200 transition-opacity ${
-              focused || menuOpen ? 'opacity-100' : 'opacity-0 sm:opacity-0 max-sm:opacity-100'
+              hovered || focused || menuOpen ? 'opacity-100' : 'opacity-0 sm:opacity-0 max-sm:opacity-100'
             }`}
             iconClassName="w-4 h-4"
             openTriggerClassName="text-slate-100"
