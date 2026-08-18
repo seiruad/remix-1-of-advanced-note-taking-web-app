@@ -95,6 +95,7 @@ export type Database = {
           file_id: string
           id: string
           note_id: string
+          paragraph_id: string | null
           user_id: string
         }
         Insert: {
@@ -102,6 +103,7 @@ export type Database = {
           file_id: string
           id?: string
           note_id: string
+          paragraph_id?: string | null
           user_id: string
         }
         Update: {
@@ -109,6 +111,7 @@ export type Database = {
           file_id?: string
           id?: string
           note_id?: string
+          paragraph_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -121,6 +124,51 @@ export type Database = {
           },
           {
             foreignKeyName: "note_files_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "note_files_paragraph_id_fkey"
+            columns: ["paragraph_id"]
+            isOneToOne: false
+            referencedRelation: "note_paragraphs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      note_paragraphs: {
+        Row: {
+          content: Json | null
+          created_at: string
+          id: string
+          note_id: string
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          id?: string
+          note_id: string
+          position?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          id?: string
+          note_id?: string
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_paragraphs_note_id_fkey"
             columns: ["note_id"]
             isOneToOne: false
             referencedRelation: "notes"
