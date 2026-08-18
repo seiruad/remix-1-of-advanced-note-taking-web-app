@@ -119,13 +119,13 @@ export function ParagraphBlock({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className={`flex items-start gap-1.5 px-2 sm:px-3 ${textHidden ? 'py-1' : 'py-2'}`}>
+      <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
         <div
           className="flex-1 min-w-0"
           onFocus={() => onFocusEditor(null)}
           onBlur={handleBlur}
         >
-          <div className={`relative ${textHidden ? 'h-0 overflow-hidden' : ''}`}>
+          <div className={`relative ${textHidden ? 'h-0 max-h-0 overflow-hidden' : ''}`}>
             <RichTextEditor
               content={paragraph.content}
               onChange={onChange}
@@ -154,7 +154,7 @@ export function ParagraphBlock({
 
 
           {files.length > 0 && (
-            <div className={`flex flex-wrap gap-1.5 ${textHidden ? 'mt-0' : 'mt-2'}`}>
+            <div className="flex flex-wrap gap-1.5 mt-2">
               {files.map((file) => {
                 const Icon = iconFor(file.file_type);
                 return (
