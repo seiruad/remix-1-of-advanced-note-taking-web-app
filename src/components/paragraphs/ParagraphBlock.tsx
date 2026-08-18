@@ -101,6 +101,7 @@ export function ParagraphBlock({
             onChange={onChange}
             editable={canEdit}
             onEditorReady={onFocusEditor}
+            minHeightClassName="min-h-[1.75rem]"
           />
 
           {files.length > 0 && (
