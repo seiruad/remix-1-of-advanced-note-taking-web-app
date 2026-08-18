@@ -225,7 +225,7 @@ export function NoteCard({
           isActive && isNew
             ? 'bg-amber-500/10 hover:bg-amber-500/[0.12] active:bg-amber-500/[0.14]'
             : isNew
-              ? 'bg-amber-500/[0.06]'
+              ? 'hover:bg-amber-500/[0.08] active:bg-amber-500/[0.12]'
               : isActive
                 ? 'bg-emerald-500/[0.07] hover:bg-emerald-500/[0.09] active:bg-emerald-500/[0.11]'
                 : 'hover:bg-slate-700/40 active:bg-slate-700/60'
