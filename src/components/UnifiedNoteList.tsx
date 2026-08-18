@@ -225,22 +225,18 @@ export function NoteCard({
           isActive && isNew
             ? 'bg-amber-500/[0.10] hover:bg-amber-500/[0.12] active:bg-amber-500/[0.14]'
             : isNew
-              ? 'bg-amber-500/[0.04] hover:bg-amber-500/[0.07] active:bg-amber-500/[0.10]'
+              ? 'bg-amber-500/[0.04]'
               : isActive
                 ? 'bg-emerald-500/[0.07] hover:bg-emerald-500/[0.09] active:bg-emerald-500/[0.11]'
                 : 'hover:bg-slate-700/40 active:bg-slate-700/60'
         }`}
         onClick={onSelect}
       >
-        {/* Left accent bar: active=muted emerald, new+active=amber, new=muted amber */}
-        {(isActive || isNew) && (
+        {/* Left accent bar: only when active (emerald for normal, amber for new) */}
+        {isActive && (
           <span
             className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full ${
-              isActive && isNew
-                ? 'bg-amber-400'
-                : isActive
-                  ? 'bg-emerald-400/80'
-                  : 'bg-amber-400/60'
+              isNew ? 'bg-amber-400' : 'bg-emerald-400/80'
             }`}
           />
         )}
@@ -248,13 +244,7 @@ export function NoteCard({
         <div className="flex-1 py-3.5 sm:py-3 pl-4 pr-2 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className={`text-base sm:text-sm font-semibold leading-snug truncate ${
-              isNew && isActive
-                ? 'text-amber-100 italic'
-                : isNew
-                  ? 'text-amber-200/90 italic'
-                  : isActive
-                    ? 'text-emerald-100/90'
-                    : 'text-slate-100'
+              isNew ? 'text-slate-100' : isActive ? 'text-emerald-100/90' : 'text-slate-100'
             }`}>
               {note.title || 'Untitled'}
             </h3>
@@ -267,18 +257,18 @@ export function NoteCard({
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-2 sm:mt-1.5">
             {showFolder && (
-              <span className="flex items-center gap-1 text-sm sm:text-xs text-slate-500">
+              <span className={`flex items-center gap-1 text-sm sm:text-xs ${isNew ? 'text-amber-300/80' : 'text-slate-500'}`}>
                 <FolderOpen className="w-4 h-4 sm:w-3 sm:h-3 flex-shrink-0" />
                 <span className="truncate max-w-[100px]">{folderName || 'No folder'}</span>
               </span>
             )}
 
-            <span className="flex items-center gap-1 text-sm sm:text-xs text-slate-500">
+            <span className={`flex items-center gap-1 text-sm sm:text-xs ${isNew ? 'text-amber-300/80' : 'text-slate-500'}`}>
               <Clock className="w-4 h-4 sm:w-3 sm:h-3 flex-shrink-0" />
               {formatDate(note.updated_at)}
             </span>
             {note.files && note.files.length > 0 && (
-              <span className="flex items-center gap-1 text-sm sm:text-xs text-slate-500">
+              <span className={`flex items-center gap-1 text-sm sm:text-xs ${isNew ? 'text-amber-300/80' : 'text-slate-500'}`}>
                 <FileText className="w-4 h-4 sm:w-3 sm:h-3 flex-shrink-0" />
                 {note.files.length}
               </span>
