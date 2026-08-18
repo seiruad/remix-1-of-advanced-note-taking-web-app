@@ -30,10 +30,10 @@ import {
   Redo,
   RemoveFormatting,
   ArrowLeft,
-  Folder as FolderIcon,
-  FolderPlus,
+  FolderOpen,
   Inbox,
   Notebook,
+
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
