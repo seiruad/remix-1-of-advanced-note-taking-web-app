@@ -143,14 +143,15 @@ export function ParagraphBlock({
             />
 
             {showEmptyHint && (
-              <div className="pointer-events-none absolute inset-0 flex items-center text-[13px] text-slate-500">
-                <span>Write text or&nbsp;</span>
+              <div className="pointer-events-none absolute inset-0 flex items-center gap-2 px-2 sm:px-3 text-sm sm:text-[13px] text-slate-500">
+                <span>Write text or</span>
                 <button
                   type="button"
                   onClick={onAttach}
-                  className="pointer-events-auto underline underline-offset-2 hover:text-slate-300 transition-colors"
+                  aria-label="Attach file to paragraph"
+                  className="pointer-events-auto flex items-center justify-center min-w-11 min-h-11 sm:min-w-9 sm:min-h-9 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
-                  attach a file
+                  <Paperclip className="w-5 h-5 sm:w-4 sm:h-4" />
                 </button>
               </div>
             )}
