@@ -14,11 +14,12 @@ export function isDocEmpty(doc: Doc): boolean {
   if (!doc) return true;
   const content = (doc as { content?: unknown[] }).content;
   if (!Array.isArray(content) || content.length === 0) return true;
-  const text = JSON.stringify(content).match(/"text":"(.*?)"/g);
-  if (text && text.some((t) => t.replace(/"text":"|"$/g, '').trim().length > 0)) return true;
-  // images / horizontal rules etc. count as content
-  return !JSON.stringify(content).includes('"type":"image"');
+  const serialized = JSON.stringify(content);
+  const hasText = /"text":"[^"]*\S[^"]*"/.test(serialized);
+  const hasMedia = serialized.includes('"type":"image"');
+  return !hasText && !hasMedia;
 }
+
 
 function mergeDocs(a: Doc, b: Doc): Doc {
   const aContent = (a as { content?: unknown[] } | null)?.content ?? [];
