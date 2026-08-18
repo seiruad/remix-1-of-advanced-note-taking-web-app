@@ -72,6 +72,7 @@ export function ParagraphBlock({
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [textRevealed, setTextRevealed] = useState(false);
+  const editorRef = useRef<Editor | null>(null);
 
   const empty = isDocEmpty(paragraph.content);
   const hasFiles = files.length > 0;
