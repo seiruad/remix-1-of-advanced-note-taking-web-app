@@ -113,11 +113,13 @@ export function ParagraphBlock({
 
   return (
     <div
-      className={`group relative rounded-xl border transition-colors ${
-        focused || menuOpen
-          ? 'border-slate-700/60 bg-slate-800/50'
-          : 'border-transparent bg-transparent'
+      className={`group relative rounded-xl border transition-colors bg-transparent ${
+        hovered || focused || menuOpen
+          ? 'border-slate-700/60'
+          : 'border-transparent'
       }`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
         <div
