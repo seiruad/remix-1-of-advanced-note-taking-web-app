@@ -46,7 +46,7 @@ export function RichTextEditor({
         },
       }),
       Placeholder.configure({
-        placeholder: 'Start writing your note...',
+        placeholder: () => placeholderRef.current,
       }),
     ],
     content: content || '',
