@@ -80,8 +80,8 @@ export function ParagraphBlock({
   const hasFiles = files.length > 0;
   // Empty + files: hide the text row until the user asks for it.
   const textHidden = canEdit && empty && hasFiles && !textRevealed;
-  // Fully empty paragraph: offer both actions in one hint line.
-  const showEmptyHint = canEdit && empty && !hasFiles;
+  // Fully empty paragraph without focus: offer both actions in one hint line.
+  const showEmptyHint = canEdit && empty && !hasFiles && !focused;
 
   const revealText = () => {
     setTextRevealed(true);
@@ -204,7 +204,7 @@ export function ParagraphBlock({
           )}
         </div>
 
-        {canEdit && (
+        {canEdit && !showEmptyHint && (
           <UnifiedMenu
             items={items}
             ariaLabel="Paragraph options"
