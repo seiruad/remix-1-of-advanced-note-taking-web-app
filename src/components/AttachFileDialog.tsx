@@ -39,7 +39,10 @@ export function AttachFileDialog({
   noteId,
   onFileLinked,
   existingFileIds,
+  paragraphId = null,
+  paragraphFileIds,
 }: AttachFileDialogProps) {
+
   const { user } = useAuth();
   const [mode, setMode] = useState<'choose' | 'upload' | 'select'>('choose');
   const [files, setFiles] = useState<FileItem[]>([]);
