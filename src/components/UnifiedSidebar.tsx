@@ -234,9 +234,31 @@ function SidebarNavBar({
                     New
                   </span>
                 )}
-                <span className="flex-shrink-0 text-[11px] font-medium text-slate-500 tabular-nums ml-auto">
+                <span className="flex-shrink-0 text-[11px] font-medium text-slate-500 tabular-nums">
                   {crumbInfo.count}
                 </span>
+                {!isNoFolder && currentFolder && (
+                  <UnifiedMenu
+                    ariaLabel="Folder options"
+                    triggerClassName="flex-shrink-0 flex items-center justify-center w-8 h-full rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/70 active:bg-slate-700/80 transition-colors"
+                    iconClassName="w-4 h-4"
+                    items={[
+                      {
+                        id: 'rename',
+                        label: 'Rename',
+                        icon: Pencil,
+                        onSelect: () => onStartFolderRename(currentFolder.id, currentFolder.name),
+                      },
+                      {
+                        id: 'delete',
+                        label: 'Delete',
+                        icon: Trash2,
+                        danger: true,
+                        onSelect: () => onRequestFolderDelete(currentFolder),
+                      },
+                    ]}
+                  />
+                )}
               </div>
             ) : null}
           </div>
