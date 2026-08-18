@@ -71,8 +71,21 @@ export function ParagraphBlock({
 }: ParagraphBlockProps) {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [textRevealed, setTextRevealed] = useState(false);
+
+  const empty = isDocEmpty(paragraph.content);
+  const hasFiles = files.length > 0;
+  // Empty + files: hide the text row until the user asks for it.
+  const textHidden = canEdit && empty && hasFiles && !textRevealed;
+  // Fully empty paragraph: offer both actions in one hint line.
+  const showEmptyHint = canEdit && empty && !hasFiles;
+
+  const revealText = () => setTextRevealed(true);
 
   const items: UnifiedMenuItem[] = [
+    ...(textHidden
+      ? [{ id: 'add-text', label: 'Add Text', icon: Type, onSelect: revealText }]
+      : []),
     { id: 'attach', label: 'Attach File', icon: Paperclip, onSelect: onAttach },
     { id: 'above', label: 'Add Above', icon: ArrowUpToLine, onSelect: onAddAbove },
     { id: 'below', label: 'Add Below', icon: ArrowDownToLine, onSelect: onAddBelow },
