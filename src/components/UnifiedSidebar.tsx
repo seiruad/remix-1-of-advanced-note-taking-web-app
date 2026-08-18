@@ -188,7 +188,7 @@ function SidebarNavBar({
 
           {/* Slot 3 — current folder badge */}
           <div
-            className={`min-w-0 h-full overflow-hidden transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            className={`min-w-0 h-full overflow-hidden transition-[opacity,transform] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
               insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           >
