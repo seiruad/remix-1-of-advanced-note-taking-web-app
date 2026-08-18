@@ -76,6 +76,8 @@ function SidebarNavBar({
   onRenameDraftChange,
   onRenameCommit,
   onRenameCancel,
+  onStartFolderRename,
+  onRequestFolderDelete,
 }: {
   mode: Mode;
   setMode: (m: Mode) => void;
@@ -90,6 +92,8 @@ function SidebarNavBar({
   onRenameDraftChange: (v: string) => void;
   onRenameCommit: (folderId: string) => void;
   onRenameCancel: () => void;
+  onStartFolderRename: (folderId: string, name: string) => void;
+  onRequestFolderDelete: (folder: FolderType) => void;
 }) {
   const persistMode = (m: Mode) => {
     setMode(m);
