@@ -154,7 +154,7 @@ export function ParagraphBlock({
 
 
           {files.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <div className={`flex flex-wrap gap-1.5 ${textHidden ? 'mt-0' : 'mt-2'}`}>
               {files.map((file) => {
                 const Icon = iconFor(file.file_type);
                 return (
