@@ -70,6 +70,7 @@ export function ParagraphBlock({
   onDetach,
   onOpenFile,
 }: ParagraphBlockProps) {
+  const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [textRevealed, setTextRevealed] = useState(false);
@@ -112,11 +113,13 @@ export function ParagraphBlock({
 
   return (
     <div
-      className={`group relative rounded-xl border transition-colors ${
-        focused || menuOpen
-          ? 'border-slate-700/60 bg-slate-800/50'
-          : 'border-transparent bg-transparent'
+      className={`group relative rounded-xl border transition-colors bg-transparent ${
+        hovered || focused || menuOpen
+          ? 'border-slate-700/60'
+          : 'border-transparent'
       }`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
         <div
@@ -196,7 +199,7 @@ export function ParagraphBlock({
             ariaLabel="Paragraph options"
             onOpenChange={setMenuOpen}
             triggerClassName={`w-8 h-8 mt-0.5 text-slate-500 hover:text-slate-200 transition-opacity ${
-              focused || menuOpen ? 'opacity-100' : 'opacity-0 sm:opacity-0 max-sm:opacity-100'
+              hovered || focused || menuOpen ? 'opacity-100' : 'opacity-0 sm:opacity-0 max-sm:opacity-100'
             }`}
             iconClassName="w-4 h-4"
             openTriggerClassName="text-slate-100"
