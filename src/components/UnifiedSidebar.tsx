@@ -125,13 +125,15 @@ function SidebarNavBar({
   return (
     <div className="border-b border-slate-700/50 bg-slate-800">
       <div className="h-11 px-3 flex items-center">
-        <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-lg bg-slate-900/60">
+        <div
+          className={`flex-1 min-w-0 h-9 grid gap-1 p-1 rounded-lg bg-slate-900/60 transition-[grid-template-columns] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            insideFolder ? 'grid-cols-[0fr_0fr_1fr]' : 'grid-cols-[1fr_1fr_0fr]'
+          }`}
+        >
           {/* Slot 1 — All Notes / back to all notes */}
           <button
             onClick={() => persistMode('all')}
-            className={`relative min-w-0 overflow-hidden h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-[flex,colors] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              insideFolder ? 'flex-[0_0_2.5rem]' : 'flex-[1_0_0]'
-            } ${
+            className={`relative min-w-10 overflow-hidden h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
               !insideFolder && mode === 'all'
                 ? 'bg-slate-700 text-emerald-400'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
@@ -140,7 +142,7 @@ function SidebarNavBar({
             title="All Notes"
           >
             <span
-              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                 insideFolder ? 'opacity-0 pointer-events-none' : 'opacity-100'
               }`}
             >
@@ -148,7 +150,7 @@ function SidebarNavBar({
               <span className="truncate">All Notes</span>
             </span>
             <span
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                 insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
@@ -159,9 +161,7 @@ function SidebarNavBar({
           {/* Slot 2 — Folders / back to folders */}
           <button
             onClick={() => (insideFolder ? setSelectedFolderId(null) : persistMode('folders'))}
-            className={`relative min-w-0 overflow-hidden h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-[flex,colors] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              insideFolder ? 'flex-[0_0_2.5rem]' : 'flex-[1_0_0]'
-            } ${
+            className={`relative min-w-10 overflow-hidden h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
               !insideFolder && mode === 'folders'
                 ? 'bg-slate-700 text-emerald-400'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
@@ -170,7 +170,7 @@ function SidebarNavBar({
             title={insideFolder ? 'Back to folders' : 'Folders'}
           >
             <span
-              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                 insideFolder ? 'opacity-0 pointer-events-none' : 'opacity-100'
               }`}
             >
@@ -178,7 +178,7 @@ function SidebarNavBar({
               <span className="truncate">Folders</span>
             </span>
             <span
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                 insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
@@ -188,8 +188,8 @@ function SidebarNavBar({
 
           {/* Slot 3 — current folder badge */}
           <div
-            className={`min-w-0 h-full overflow-hidden transition-[flex,opacity] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              insideFolder ? 'flex-[1_0_0] opacity-100' : 'flex-[0_0_0] opacity-0 pointer-events-none'
+            className={`min-w-0 h-full overflow-hidden transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           >
             {isRenaming ? (
