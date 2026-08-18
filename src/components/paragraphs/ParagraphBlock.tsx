@@ -5,6 +5,7 @@ import {
   Merge,
   Paperclip,
   Trash2,
+  Type,
   Unlink,
   FileText,
   Image as ImageIcon,
@@ -15,7 +16,7 @@ import {
 import { RichTextEditor } from '../RichTextEditor';
 import { UnifiedMenu, type UnifiedMenuItem } from '../UnifiedMenu';
 import type { FileItem } from '../../types/database';
-import type { NoteParagraph } from './useNoteParagraphs';
+import { isDocEmpty, type NoteParagraph } from './useNoteParagraphs';
 
 function iconFor(type: string) {
   if (type.startsWith('image/')) return ImageIcon;
