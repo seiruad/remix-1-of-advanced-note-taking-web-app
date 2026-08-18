@@ -300,7 +300,10 @@ export function AttachFileDialog({
                   </div>
                 ) : (
                   filteredFiles.map((file) => {
-                    const isLinked = existingFileIds.includes(file.id);
+                    const isLinked = paragraphFileIds
+                      ? paragraphFileIds.includes(file.id)
+                      : existingFileIds.includes(file.id);
+
                     return (
                       <button
                         key={file.id}
