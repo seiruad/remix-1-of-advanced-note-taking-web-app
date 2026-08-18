@@ -126,11 +126,12 @@ function SidebarNavBar({
     <div className="border-b border-slate-700/50 bg-slate-800">
       <div className="h-11 px-3 flex items-center">
         <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-lg bg-slate-900/60">
-          {/* Slot 1 — All Notes (collapses to icon inside a folder) */}
+          {/* Slot 1 — All Notes (icon-only inside a folder) */}
           <button
             onClick={() => persistMode('all')}
-            style={{ flexGrow: insideFolder ? 0 : 1, flexBasis: insideFolder ? '2.25rem' : 0 }}
-            className={`flex-shrink-0 min-w-0 overflow-hidden flex items-center justify-center gap-1.5 h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-[flex-basis,flex-grow,background-color,color] duration-200 ease-out ${
+            className={`flex-shrink-0 min-w-0 overflow-hidden flex items-center justify-center gap-1.5 h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 will-change-transform transition-colors duration-150 ${
+              insideFolder ? 'w-10' : 'flex-1'
+            } ${
               !insideFolder && mode === 'all'
                 ? 'bg-slate-700 text-emerald-400'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
@@ -148,11 +149,12 @@ function SidebarNavBar({
             )}
           </button>
 
-          {/* Slot 2 — Folders / back (collapses to icon inside a folder) */}
+          {/* Slot 2 — Folders / back (icon-only inside a folder) */}
           <button
             onClick={() => (insideFolder ? setSelectedFolderId(null) : persistMode('folders'))}
-            style={{ flexGrow: insideFolder ? 0 : 1, flexBasis: insideFolder ? '2.5rem' : 0 }}
-            className={`flex-shrink-0 min-w-0 overflow-hidden flex items-center justify-center gap-1.5 h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-[flex-basis,flex-grow,background-color,color] duration-200 ease-out ${
+            className={`flex-shrink-0 min-w-0 overflow-hidden flex items-center justify-center gap-1.5 h-full rounded-lg text-[13px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 will-change-transform transition-colors duration-150 ${
+              insideFolder ? 'w-10' : 'flex-1'
+            } ${
               !insideFolder && mode === 'folders'
                 ? 'bg-slate-700 text-emerald-400'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
@@ -170,9 +172,13 @@ function SidebarNavBar({
             )}
           </button>
 
-          {/* Slot 3 — current folder badge */}
-          {insideFolder && crumbInfo && (
-            isRenaming ? (
+          {/* Slot 3 — current folder badge (always rendered, fades/slides in and out) */}
+          <div
+            className={`flex-1 min-w-0 h-full overflow-hidden transition-[opacity,max-width] duration-150 ease-out will-change-transform ${
+              insideFolder ? 'opacity-100 max-w-full' : 'opacity-0 max-w-0 pointer-events-none'
+            }`}
+          >
+            {isRenaming ? (
               <input
                 type="text"
                 value={renameDraft}
@@ -188,11 +194,11 @@ function SidebarNavBar({
                   if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
                   if (e.key === 'Escape') onRenameCancel();
                 }}
-                className="flex-1 min-w-0 h-full bg-slate-700/80 text-white rounded-lg px-2 text-[13px] font-semibold outline-none border border-emerald-500/60"
+                className="w-full h-full bg-slate-700/80 text-white rounded-lg px-2 text-[13px] font-semibold outline-none border border-emerald-500/60"
                 autoFocus
               />
-            ) : (
-              <div className="flex-1 min-w-0 h-full flex items-center gap-2 rounded-lg bg-slate-700/40 px-2.5 animate-fade-in">
+            ) : crumbInfo ? (
+              <div className="w-full h-full flex items-center gap-2 rounded-lg bg-slate-700/40 px-2.5">
                 <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${crumbInfo.dot}`} />
                 <span className={`truncate text-[13px] font-medium ${crumbInfo.italic ? 'text-slate-300 italic' : 'text-slate-100'}`}>
                   {crumbInfo.name}
@@ -206,8 +212,8 @@ function SidebarNavBar({
                   {crumbInfo.count}
                 </span>
               </div>
-            )
-          )}
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
