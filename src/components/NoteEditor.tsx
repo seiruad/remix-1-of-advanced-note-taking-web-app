@@ -19,8 +19,6 @@ import {
   MoreHorizontal,
   Pencil,
   Check,
-
-  
   Bold,
   Italic,
   Strikethrough,
@@ -33,7 +31,9 @@ import {
   RemoveFormatting,
   ArrowLeft,
   Folder as FolderIcon,
-  Building2,
+  FolderPlus,
+  Inbox,
+  Notebook,
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
