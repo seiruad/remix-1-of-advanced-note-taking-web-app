@@ -24,6 +24,8 @@ export function RichTextEditor({
   onEditorReady,
   minHeightClassName = 'min-h-[300px]',
   placeholder = 'Start writing your note...',
+  onFocus,
+  onBlur,
 }: RichTextEditorProps) {
   const onChangeRef = useRef(onChange);
   const onReadyRef = useRef(onEditorReady);
