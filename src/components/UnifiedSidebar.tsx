@@ -242,7 +242,8 @@ function SidebarNavBar({
                 {!isNoFolder && currentFolder && (
                   <UnifiedMenu
                     ariaLabel="Folder options"
-                    triggerClassName="flex-shrink-0 flex items-center justify-center w-8 h-full rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/70 active:bg-slate-700/80 transition-colors"
+                    triggerClassName="flex-shrink-0 flex items-center justify-center w-8 h-full rounded-lg text-slate-400 hover:text-slate-100 transition-colors"
+                    openTriggerClassName="text-slate-100"
                     iconClassName="w-4 h-4"
                     items={[
                       {
