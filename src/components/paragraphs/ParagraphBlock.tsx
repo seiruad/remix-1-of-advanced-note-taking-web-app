@@ -80,7 +80,16 @@ export function ParagraphBlock({
   // Fully empty paragraph: offer both actions in one hint line.
   const showEmptyHint = canEdit && empty && !hasFiles;
 
-  const revealText = () => setTextRevealed(true);
+  const revealText = () => {
+    setTextRevealed(true);
+    // focus once the collapsed row has expanded
+    setTimeout(() => editorRef.current?.commands.focus('end'), 0);
+  };
+
+  // Leaving an empty text field puts the paragraph back to how it was.
+  const handleBlur = () => {
+    if (isDocEmpty(paragraph.content)) setTextRevealed(false);
+  };
 
   const items: UnifiedMenuItem[] = [
     ...(textHidden
