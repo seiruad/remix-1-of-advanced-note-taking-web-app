@@ -113,7 +113,7 @@ export function ParagraphBlock({
     <div
       className={`group relative rounded-xl border transition-colors ${
         hovered || menuOpen
-          ? 'border-slate-700/60 bg-slate-900/40'
+          ? 'border-slate-700/60 bg-slate-800/50'
           : 'border-transparent bg-transparent'
       }`}
       onMouseEnter={() => setHovered(true)}

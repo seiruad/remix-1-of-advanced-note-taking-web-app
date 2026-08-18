@@ -379,7 +379,7 @@ export function NoteEditor({
 
   return (
     <div
-      className="flex flex-col h-full bg-slate-900/50 overflow-hidden relative"
+      className="flex flex-col h-full bg-slate-900/60 overflow-hidden relative"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
