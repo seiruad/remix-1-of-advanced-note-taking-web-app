@@ -31,6 +31,8 @@ export function RichTextEditor({
   }, [onChange, onEditorReady]);
 
   const isEditingRef = useRef(false);
+  const placeholderRef = useRef(placeholder);
+  placeholderRef.current = placeholder;
 
   const editor = useEditor({
     extensions: [
