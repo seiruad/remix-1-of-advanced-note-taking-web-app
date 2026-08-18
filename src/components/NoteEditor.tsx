@@ -376,8 +376,10 @@ export function NoteEditor({
           <p className="text-xs text-slate-500 mt-1.5">Or create a new note to get started</p>
         </div>
       </div>
-    );
-  }
+  );
+}
+
+  const isNewNote = note.is_new ?? false;
 
   return (
     <div
