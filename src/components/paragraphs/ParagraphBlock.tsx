@@ -138,7 +138,7 @@ export function ParagraphBlock({
               }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              minHeightClassName="min-h-[1.75rem]"
+              minHeightClassName={showEmptyHint ? 'min-h-11 sm:min-h-9' : 'min-h-[1.75rem]'}
               placeholder=""
             />
 
