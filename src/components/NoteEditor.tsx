@@ -367,10 +367,10 @@ export function NoteEditor({
 
   if (!note) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-slate-800">
+      <div className="flex-1 flex items-center justify-center bg-slate-900/60">
         <div className="text-center">
-          <div className="flex items-center justify-center w-14 h-14 mx-auto mb-3 rounded-2xl bg-emerald-500/10">
-            <FileText className="w-7 h-7 text-emerald-400/80" />
+          <div className="flex items-center justify-center w-14 h-14 mx-auto mb-3 rounded-2xl bg-slate-700/30">
+            <FileText className="w-7 h-7 text-slate-400" />
           </div>
           <p className="text-sm font-semibold text-slate-300">Select a note to view</p>
           <p className="text-xs text-slate-500 mt-1.5">Or create a new note to get started</p>
