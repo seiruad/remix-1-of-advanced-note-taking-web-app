@@ -91,7 +91,7 @@ export function RichTextEditor({
   return (
     <EditorContent
       editor={editor}
-      className={`prose prose-invert max-w-none ${minHeightClassName} focus:outline-none`}
+      className={`prose prose-invert max-w-none prose-p:my-0 prose-headings:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:my-0 ${minHeightClassName} focus:outline-none`}
     />
   );
 }
