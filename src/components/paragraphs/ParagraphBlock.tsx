@@ -143,7 +143,7 @@ export function ParagraphBlock({
             />
 
             {showEmptyHint && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-3 px-4 sm:px-5 text-sm sm:text-[13px] text-slate-500">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-start gap-3 px-6 sm:px-8 text-sm sm:text-[13px] text-slate-500">
                 <button
                   type="button"
                   onClick={revealText}
