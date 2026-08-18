@@ -5,6 +5,7 @@ import {
   Merge,
   Paperclip,
   Trash2,
+  Type,
   Unlink,
   FileText,
   Image as ImageIcon,
@@ -15,7 +16,7 @@ import {
 import { RichTextEditor } from '../RichTextEditor';
 import { UnifiedMenu, type UnifiedMenuItem } from '../UnifiedMenu';
 import type { FileItem } from '../../types/database';
-import type { NoteParagraph } from './useNoteParagraphs';
+import { isDocEmpty, type NoteParagraph } from './useNoteParagraphs';
 
 function iconFor(type: string) {
   if (type.startsWith('image/')) return ImageIcon;
@@ -70,8 +71,21 @@ export function ParagraphBlock({
 }: ParagraphBlockProps) {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [textRevealed, setTextRevealed] = useState(false);
+
+  const empty = isDocEmpty(paragraph.content);
+  const hasFiles = files.length > 0;
+  // Empty + files: hide the text row until the user asks for it.
+  const textHidden = canEdit && empty && hasFiles && !textRevealed;
+  // Fully empty paragraph: offer both actions in one hint line.
+  const showEmptyHint = canEdit && empty && !hasFiles;
+
+  const revealText = () => setTextRevealed(true);
 
   const items: UnifiedMenuItem[] = [
+    ...(textHidden
+      ? [{ id: 'add-text', label: 'Add Text', icon: Type, onSelect: revealText }]
+      : []),
     { id: 'attach', label: 'Attach File', icon: Paperclip, onSelect: onAttach },
     { id: 'above', label: 'Add Above', icon: ArrowUpToLine, onSelect: onAddAbove },
     { id: 'below', label: 'Add Below', icon: ArrowDownToLine, onSelect: onAddBelow },
@@ -96,13 +110,41 @@ export function ParagraphBlock({
     >
       <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
         <div className="flex-1 min-w-0" onFocus={() => onFocusEditor(null)}>
-          <RichTextEditor
-            content={paragraph.content}
-            onChange={onChange}
-            editable={canEdit}
-            onEditorReady={onFocusEditor}
-            minHeightClassName="min-h-[1.75rem]"
-          />
+          <div className={`relative ${textHidden ? 'h-0 overflow-hidden' : ''}`}>
+            <RichTextEditor
+              content={paragraph.content}
+              onChange={onChange}
+              editable={canEdit}
+              onEditorReady={onFocusEditor}
+              minHeightClassName="min-h-[1.75rem]"
+              placeholder={showEmptyHint || textHidden ? '' : 'Start writing your note...'}
+            />
+
+            {showEmptyHint && (
+              <div className="pointer-events-none absolute inset-0 flex items-center text-[13px] text-slate-500">
+                <span>Write text or&nbsp;</span>
+                <button
+                  type="button"
+                  onClick={onAttach}
+                  className="pointer-events-auto underline underline-offset-2 hover:text-slate-300 transition-colors"
+                >
+                  attach a file
+                </button>
+              </div>
+            )}
+          </div>
+
+          {textHidden && (
+            <button
+              type="button"
+              onClick={revealText}
+              aria-label="Add text to paragraph"
+              className="w-full text-left text-[12px] text-slate-600 hover:text-slate-400 transition-colors"
+            >
+              &nbsp;
+            </button>
+          )}
+
 
           {files.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">

@@ -11,6 +11,8 @@ interface RichTextEditorProps {
   editable?: boolean;
   onEditorReady?: (editor: ReturnType<typeof useEditor>) => void;
   minHeightClassName?: string;
+  /** Empty string disables the placeholder entirely. */
+  placeholder?: string;
 }
 
 export function RichTextEditor({
@@ -19,6 +21,7 @@ export function RichTextEditor({
   editable = true,
   onEditorReady,
   minHeightClassName = 'min-h-[300px]',
+  placeholder = 'Start writing your note...',
 }: RichTextEditorProps) {
   const onChangeRef = useRef(onChange);
   const onReadyRef = useRef(onEditorReady);
@@ -28,6 +31,8 @@ export function RichTextEditor({
   }, [onChange, onEditorReady]);
 
   const isEditingRef = useRef(false);
+  const placeholderRef = useRef(placeholder);
+  placeholderRef.current = placeholder;
 
   const editor = useEditor({
     extensions: [
@@ -43,7 +48,7 @@ export function RichTextEditor({
         },
       }),
       Placeholder.configure({
-        placeholder: 'Start writing your note...',
+        placeholder: () => placeholderRef.current,
       }),
     ],
     content: content || '',
