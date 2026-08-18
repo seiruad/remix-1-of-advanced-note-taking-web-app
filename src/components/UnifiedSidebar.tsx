@@ -126,7 +126,7 @@ function SidebarNavBar({
     <div className="border-b border-slate-700/50 bg-slate-800">
       <div className="h-11 px-3 flex items-center">
         <div
-          className={`flex-1 min-w-0 h-9 grid gap-1 p-1 rounded-lg bg-slate-900/60 transition-[grid-template-columns] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          className={`flex-1 min-w-0 h-9 grid gap-1 p-1 rounded-lg bg-slate-900/60 transition-[grid-template-columns] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
             insideFolder ? 'grid-cols-[0fr_0fr_1fr]' : 'grid-cols-[1fr_1fr_0fr]'
           }`}
         >
