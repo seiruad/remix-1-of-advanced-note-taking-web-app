@@ -197,12 +197,8 @@ export function NoteEditor({
     };
   }, []);
 
-  const handleContentChange = useCallback((content: Record<string, unknown>) => {
-    if (contentTimerRef.current) clearTimeout(contentTimerRef.current);
-    contentTimerRef.current = setTimeout(() => {
-      onUpdateNoteRef.current({ content });
-    }, 600);
-  }, []);
+
+
 
 
   const uploadAndLink = async (file: File) => {
