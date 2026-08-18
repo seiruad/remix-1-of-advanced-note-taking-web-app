@@ -170,7 +170,7 @@ function SidebarNavBar({
             title={insideFolder ? 'Back to folders' : 'Folders'}
           >
             <span
-              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              className={`absolute inset-0 flex items-center justify-center gap-1.5 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                 insideFolder ? 'opacity-0 pointer-events-none' : 'opacity-100'
               }`}
             >
@@ -178,7 +178,7 @@ function SidebarNavBar({
               <span className="truncate">Folders</span>
             </span>
             <span
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                 insideFolder ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
