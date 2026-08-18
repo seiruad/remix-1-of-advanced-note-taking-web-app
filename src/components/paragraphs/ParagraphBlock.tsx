@@ -120,15 +120,22 @@ export function ParagraphBlock({
       onMouseLeave={() => setHovered(false)}
     >
       <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
-        <div className="flex-1 min-w-0" onFocus={() => onFocusEditor(null)}>
+        <div
+          className="flex-1 min-w-0"
+          onFocus={() => onFocusEditor(null)}
+          onBlur={handleBlur}
+        >
           <div className={`relative ${textHidden ? 'h-0 overflow-hidden' : ''}`}>
             <RichTextEditor
               content={paragraph.content}
               onChange={onChange}
               editable={canEdit}
-              onEditorReady={onFocusEditor}
+              onEditorReady={(editor) => {
+                editorRef.current = (editor as Editor) ?? null;
+                onFocusEditor(editor);
+              }}
               minHeightClassName="min-h-[1.75rem]"
-              placeholder={showEmptyHint || textHidden ? '' : 'Start writing your note...'}
+              placeholder=""
             />
 
             {showEmptyHint && (
