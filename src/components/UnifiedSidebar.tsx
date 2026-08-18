@@ -126,25 +126,26 @@ function SidebarNavBar({
         <div className="flex-1 min-w-0 h-9 flex gap-1 p-1 rounded-lg bg-slate-900/60">
           {insideFolder && crumbInfo ? (
             <>
-              {/* All Notes — icon only */}
+              {/* All Notes — double chevron */}
               <button
                 onClick={() => persistMode('all')}
-                className="flex-shrink-0 flex items-center justify-center w-9 h-full rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 active:bg-slate-700/80 active:scale-95 transition-all"
+                className="flex-shrink-0 flex items-center justify-center w-9 h-full rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
                 aria-label="All Notes"
                 title="All Notes"
               >
-                <LayoutList className="w-4 h-4" />
+                <ChevronsLeft className="w-4 h-4" />
               </button>
 
               {/* Back */}
               <button
                 onClick={() => setSelectedFolderId(null)}
-                className="flex-shrink-0 flex items-center justify-center w-10 h-full rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 active:bg-slate-700/80 active:scale-95 transition-all"
+                className="flex-shrink-0 flex items-center justify-center w-10 h-full rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 active:bg-slate-700/80 transition-colors"
                 aria-label="Back to folders"
                 title="Back to folders"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
+
 
               {/* Folder name badge */}
               {isRenaming ? (
