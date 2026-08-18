@@ -138,30 +138,30 @@ export function ParagraphBlock({
               }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              minHeightClassName="min-h-9"
+              minHeightClassName="min-h-[1.75rem]"
               placeholder=""
             />
 
             {showEmptyHint && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-start gap-2.5 text-sm sm:text-[13px] text-slate-500">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-start gap-2 text-xs text-slate-500">
                 <button
                   type="button"
                   onClick={revealText}
                   aria-label="Add text to paragraph"
-                  className="pointer-events-auto inline-flex items-center gap-1.5 min-h-9 pr-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                  className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
-                  <Type className="w-5 h-5 sm:w-4 sm:h-4" />
-                  <span className="text-[13px] sm:text-xs font-medium">Text</span>
+                  <Type className="w-4 h-4" />
+                  <span className="text-xs font-medium">Text</span>
                 </button>
                 <span className="text-slate-500">or</span>
                 <button
                   type="button"
                   onClick={onAttach}
                   aria-label="Attach file to paragraph"
-                  className="pointer-events-auto inline-flex items-center gap-1.5 min-h-9 pr-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                  className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
-                  <Paperclip className="w-5 h-5 sm:w-4 sm:h-4" />
-                  <span className="text-[13px] sm:text-xs font-medium">Attach</span>
+                  <Paperclip className="w-4 h-4" />
+                  <span className="text-xs font-medium">Attach</span>
                 </button>
               </div>
             )}
@@ -209,7 +209,7 @@ export function ParagraphBlock({
             items={items}
             ariaLabel="Paragraph options"
             onOpenChange={setMenuOpen}
-            triggerClassName={`w-8 h-8 mt-0.5 text-slate-500 hover:text-slate-200 transition-opacity ${
+            triggerClassName={`w-7 h-7 text-slate-500 hover:text-slate-200 transition-opacity ${
               hovered || focused || menuOpen ? 'opacity-100' : 'opacity-0 sm:opacity-0 max-sm:opacity-100'
             }`}
             iconClassName="w-4 h-4"
