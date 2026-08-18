@@ -10,7 +10,12 @@ interface AttachFileDialogProps {
   noteId: string;
   onFileLinked: (file: FileItem) => void;
   existingFileIds: string[];
+  /** When set, newly linked files are attached to this paragraph. */
+  paragraphId?: string | null;
+  /** Files already attached to that paragraph (shown as linked). */
+  paragraphFileIds?: string[];
 }
+
 
 function formatFileSize(bytes: number) {
   if (bytes === 0) return '0 B';
