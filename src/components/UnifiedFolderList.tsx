@@ -74,7 +74,7 @@ function FolderRowFlat({
   const isNew = folder.is_new ?? false;
 
   const folderBtnClasses = isNew
-    ? 'bg-amber-500/[0.06] hover:bg-amber-500/10 active:bg-amber-500/15'
+    ? 'hover:bg-amber-500/[0.08] active:bg-amber-500/[0.12]'
     : 'hover:bg-slate-700/40 active:bg-slate-700/60';
 
   const iconBgClasses = isNew
