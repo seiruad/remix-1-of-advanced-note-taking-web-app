@@ -113,12 +113,10 @@ export function ParagraphBlock({
   return (
     <div
       className={`group relative rounded-xl border transition-colors ${
-        hovered || menuOpen
+        focused || menuOpen
           ? 'border-slate-700/60 bg-slate-800/50'
           : 'border-transparent bg-transparent'
       }`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
         <div
@@ -135,6 +133,8 @@ export function ParagraphBlock({
                 editorRef.current = (editor as Editor) ?? null;
                 onFocusEditor(editor);
               }}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
               minHeightClassName="min-h-[1.75rem]"
               placeholder=""
             />
