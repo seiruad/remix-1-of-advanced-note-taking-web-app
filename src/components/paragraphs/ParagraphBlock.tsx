@@ -119,7 +119,7 @@ export function ParagraphBlock({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
+      <div className={`flex items-start gap-1.5 px-2 sm:px-3 ${textHidden ? 'py-1' : 'py-2'}`}>
         <div
           className="flex-1 min-w-0"
           onFocus={() => onFocusEditor(null)}
@@ -152,20 +152,9 @@ export function ParagraphBlock({
             )}
           </div>
 
-          {textHidden && (
-            <button
-              type="button"
-              onClick={revealText}
-              aria-label="Add text to paragraph"
-              className="w-full text-left text-[12px] text-slate-600 hover:text-slate-400 transition-colors"
-            >
-              &nbsp;
-            </button>
-          )}
-
 
           {files.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <div className={`flex flex-wrap gap-1.5 ${textHidden ? 'mt-0' : 'mt-2'}`}>
               {files.map((file) => {
                 const Icon = iconFor(file.file_type);
                 return (
