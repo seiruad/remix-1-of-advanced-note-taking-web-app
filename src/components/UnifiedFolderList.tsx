@@ -49,19 +49,23 @@ function FolderRowFlat({
   onDelete: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isRenaming, setIsRenaming] = useState(folder.is_new ?? false);
+  const [isRenaming, setIsRenaming] = useState(
+    (folder.is_new ?? false) && !loadRenamedFolderIds().has(folder.id)
+  );
   const [renameValue, setRenameValue] = useState(folder.name);
   const renameInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (folder.is_new && renameInputRef.current) {
+    if (isRenaming && renameInputRef.current) {
       renameInputRef.current.focus();
       renameInputRef.current.select();
     }
-  }, [folder.is_new]);
+  }, [isRenaming]);
 
   const handleRename = () => {
-    if (renameValue.trim()) onRename(renameValue.trim());
+    const v = renameValue.trim();
+    if (v && v !== folder.name) onRename(v);
+    markFolderRenamed(folder.id);
     setIsRenaming(false);
   };
 
