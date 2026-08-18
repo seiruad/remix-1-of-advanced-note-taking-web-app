@@ -559,6 +559,8 @@ export function UnifiedSidebar({
         onRenameDraftChange={setRenameDraft}
         onRenameCommit={commitFolderRename}
         onRenameCancel={cancelFolderRename}
+        onStartFolderRename={startFolderRename}
+        onRequestFolderDelete={setFolderToDelete}
       />
 
       {/* ===== NoteList-Viewer ===== */}
