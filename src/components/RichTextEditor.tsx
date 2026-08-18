@@ -65,6 +65,12 @@ export function RichTextEditor({
       isEditingRef.current = true;
       onChangeRef.current(editor.getJSON());
     },
+    onFocus: () => {
+      onFocusRef.current?.();
+    },
+    onBlur: () => {
+      onBlurRef.current?.();
+    },
   });
 
   useEffect(() => {
