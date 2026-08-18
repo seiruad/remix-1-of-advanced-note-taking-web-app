@@ -138,9 +138,7 @@ export function ParagraphBlock({
               }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              minHeightClassName={
-                canEdit && empty && !hasFiles ? 'min-h-11 sm:min-h-9' : 'min-h-[1.75rem]'
-              }
+              minHeightClassName="min-h-9"
               placeholder=""
             />
 
@@ -150,7 +148,7 @@ export function ParagraphBlock({
                   type="button"
                   onClick={revealText}
                   aria-label="Add text to paragraph"
-                  className="pointer-events-auto inline-flex items-center gap-1.5 min-h-11 sm:min-h-9 pr-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                  className="pointer-events-auto inline-flex items-center gap-1.5 min-h-9 pr-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
                   <Type className="w-5 h-5 sm:w-4 sm:h-4" />
                   <span className="text-[13px] sm:text-xs font-medium">Text</span>
@@ -160,7 +158,7 @@ export function ParagraphBlock({
                   type="button"
                   onClick={onAttach}
                   aria-label="Attach file to paragraph"
-                  className="pointer-events-auto inline-flex items-center gap-1.5 min-h-11 sm:min-h-9 pr-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                  className="pointer-events-auto inline-flex items-center gap-1.5 min-h-9 pr-2 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
                   <Paperclip className="w-5 h-5 sm:w-4 sm:h-4" />
                   <span className="text-[13px] sm:text-xs font-medium">Attach</span>
