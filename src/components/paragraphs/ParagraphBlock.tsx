@@ -95,28 +95,30 @@ export function ParagraphBlock({
     if (isDocEmpty(paragraph.content)) setTextRevealed(false);
   };
 
-  const items: UnifiedMenuItem[] = [
-    ...(textHidden
-      ? [{ id: 'add-text', label: 'Add Text', icon: Type, onSelect: revealText }]
-      : []),
-    { id: 'attach', label: 'Attach File', icon: Paperclip, onSelect: onAttach },
-    { id: 'above', label: 'Add Above', icon: ArrowUpToLine, onSelect: onAddAbove },
-    { id: 'below', label: 'Add Below', icon: ArrowDownToLine, onSelect: onAddBelow },
-    ...(index > 0
-      ? [{ id: 'merge-up', label: 'Merge Up', icon: Merge, onSelect: onMergeUp }]
-      : []),
-    ...(index < total - 1
-      ? [{ id: 'merge-down', label: 'Merge Down', icon: Merge, onSelect: onMergeDown }]
-      : []),
-    { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
-  ];
+  const items: UnifiedMenuItem[] = showEmptyHint
+    ? [{ id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete }]
+    : [
+        ...(textHidden
+          ? [{ id: 'add-text', label: 'Add Text', icon: Type, onSelect: revealText }]
+          : []),
+        { id: 'attach', label: 'Attach File', icon: Paperclip, onSelect: onAttach },
+        { id: 'above', label: 'Add Above', icon: ArrowUpToLine, onSelect: onAddAbove },
+        { id: 'below', label: 'Add Below', icon: ArrowDownToLine, onSelect: onAddBelow },
+        ...(index > 0
+          ? [{ id: 'merge-up', label: 'Merge Up', icon: Merge, onSelect: onMergeUp }]
+          : []),
+        ...(index < total - 1
+          ? [{ id: 'merge-down', label: 'Merge Down', icon: Merge, onSelect: onMergeDown }]
+          : []),
+        { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
+      ];
+
+  const showBorder = showEmptyHint ? focused || menuOpen : hovered || focused || menuOpen;
 
   return (
     <div
       className={`group relative rounded-xl border transition-colors bg-transparent ${
-        hovered || focused || menuOpen
-          ? 'border-slate-700/60'
-          : 'border-transparent'
+        showBorder ? 'border-slate-700/60' : 'border-transparent'
       }`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -128,30 +130,32 @@ export function ParagraphBlock({
           onBlur={handleBlur}
         >
           <div className={`relative ${textHidden ? 'h-0 max-h-0 overflow-hidden' : ''}`}>
-            <RichTextEditor
-              content={paragraph.content}
-              onChange={onChange}
-              editable={canEdit}
-              onEditorReady={(editor) => {
-                editorRef.current = (editor as Editor) ?? null;
-                onFocusEditor(editor);
-              }}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              minHeightClassName="min-h-[1.75rem]"
-              placeholder=""
-            />
+            <div className={showEmptyHint ? 'pointer-events-none opacity-0' : ''}>
+              <RichTextEditor
+                content={paragraph.content}
+                onChange={onChange}
+                editable={canEdit}
+                onEditorReady={(editor) => {
+                  editorRef.current = (editor as Editor) ?? null;
+                  onFocusEditor(editor);
+                }}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                minHeightClassName="min-h-[1.75rem]"
+                placeholder=""
+              />
+            </div>
 
             {showEmptyHint && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-start gap-2 text-xs text-slate-500">
                 <button
                   type="button"
                   onClick={revealText}
-                  aria-label="Add text to paragraph"
+                  aria-label="Write text in paragraph"
                   className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
                   <Type className="w-4 h-4" />
-                  <span className="text-xs font-medium">Text</span>
+                  <span className="text-xs font-medium">Write text</span>
                 </button>
                 <span className="text-slate-500">or</span>
                 <button
@@ -161,11 +165,15 @@ export function ParagraphBlock({
                   className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
                   <Paperclip className="w-4 h-4" />
-                  <span className="text-xs font-medium">Attach</span>
+                  <span className="text-xs font-medium">Attach file</span>
                 </button>
+                <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-slate-400/70 bg-slate-700/40 rounded-full px-1.5 py-0.5">
+                  Empty
+                </span>
               </div>
             )}
           </div>
+
 
 
           {files.length > 0 && (
@@ -204,7 +212,7 @@ export function ParagraphBlock({
           )}
         </div>
 
-        {canEdit && !showEmptyHint && (
+        {canEdit && (
           <UnifiedMenu
             items={items}
             ariaLabel="Paragraph options"
