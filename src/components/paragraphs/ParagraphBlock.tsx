@@ -113,7 +113,7 @@ export function ParagraphBlock({
         { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
       ];
 
-  const showBorder = showEmptyHint ? focused || menuOpen : hovered || focused || menuOpen;
+  const showBorder = !showEmptyHint && (hovered || focused || menuOpen);
 
   return (
     <div
@@ -167,7 +167,7 @@ export function ParagraphBlock({
                   <Paperclip className="w-4 h-4" />
                   <span className="text-xs font-medium">Attach file</span>
                 </button>
-                <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-slate-400/70 bg-slate-700/40 rounded-full px-1.5 py-0.5">
+                <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-amber-400/80 bg-amber-500/15 rounded-full px-1.5 py-0.5">
                   Empty
                 </span>
               </div>
