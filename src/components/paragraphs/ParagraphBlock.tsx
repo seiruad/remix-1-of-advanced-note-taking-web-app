@@ -113,7 +113,7 @@ export function ParagraphBlock({
         { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
       ];
 
-  const showBorder = showEmptyHint ? focused || menuOpen : hovered || focused || menuOpen;
+  const showBorder = !showEmptyHint && (hovered || focused || menuOpen);
 
   return (
     <div
