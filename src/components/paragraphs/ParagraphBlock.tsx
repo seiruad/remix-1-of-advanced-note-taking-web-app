@@ -212,7 +212,7 @@ export function ParagraphBlock({
           )}
         </div>
 
-        {canEdit && !showEmptyHint && (
+        {canEdit && (
           <UnifiedMenu
             items={items}
             ariaLabel="Paragraph options"
