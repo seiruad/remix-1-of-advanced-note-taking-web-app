@@ -152,7 +152,7 @@ export function ParagraphBlock({
                   type="button"
                   onClick={revealText}
                   aria-label="Write text in paragraph"
-                  className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                  className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-slate-700/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
                   <Type className="w-4 h-4" />
                   <span className="text-xs font-medium">Write text</span>
@@ -162,7 +162,7 @@ export function ParagraphBlock({
                   type="button"
                   onClick={onAttach}
                   aria-label="Attach file to paragraph"
-                  className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-700/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                  className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-slate-700/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
                   <Paperclip className="w-4 h-4" />
                   <span className="text-xs font-medium">Attach file</span>
