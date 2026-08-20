@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 import {
-  ArrowUpToLine,
-  ArrowDownToLine,
+  Plus,
   Merge,
   Paperclip,
   Trash2,
@@ -39,15 +38,16 @@ interface ParagraphBlockProps {
   paragraph: NoteParagraph;
   index: number;
   total: number;
+  isLast: boolean;
   files: FileItem[];
   canEdit: boolean;
   onChange: (content: Record<string, unknown>) => void;
   onFocusEditor: (editor: unknown) => void;
-  onAddAbove: () => void;
-  onAddBelow: () => void;
+  onAddNew: () => void;
   onMergeUp: () => void;
   onMergeDown: () => void;
   onDelete: () => void;
+  onAutoDelete: () => void;
   onAttach: () => void;
   onDetach: (fileId: string) => void;
   onOpenFile: (file: FileItem) => void;
@@ -57,15 +57,16 @@ export function ParagraphBlock({
   paragraph,
   index,
   total,
+  isLast,
   files,
   canEdit,
   onChange,
   onFocusEditor,
-  onAddAbove,
-  onAddBelow,
+  onAddNew,
   onMergeUp,
   onMergeDown,
   onDelete,
+  onAutoDelete,
   onAttach,
   onDetach,
   onOpenFile,
@@ -80,30 +81,38 @@ export function ParagraphBlock({
   const hasFiles = files.length > 0;
   // Empty + files: hide the text row until the user asks for it.
   const textHidden = canEdit && empty && hasFiles && !textRevealed;
-  // Fully empty paragraph without focus: offer both actions in one hint line.
-  const showEmptyHint = canEdit && empty && !hasFiles && !focused;
+  // The hint lives only in the very last paragraph, while it is empty and unfocused.
+  const showEmptyHint = canEdit && isLast && empty && !hasFiles && !focused;
 
   const revealText = () => {
     setTextRevealed(true);
+    onAddNew();
     // focus once the collapsed row has expanded
     setTimeout(() => editorRef.current?.commands.focus('end'), 0);
   };
 
-  // Leaving an empty text field puts the paragraph back to how it was.
-  const handleBlur = () => {
-    setFocused(false);
-    if (isDocEmpty(paragraph.content)) setTextRevealed(false);
+  const handleAttachFromHint = () => {
+    onAddNew();
+    onAttach();
   };
 
-  const items: UnifiedMenuItem[] = showEmptyHint
-    ? [{ id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete }]
-    : [
+  // Leaving an empty paragraph without files removes it silently.
+  const handleBlur = () => {
+    setFocused(false);
+    if (isDocEmpty(paragraph.content)) {
+      setTextRevealed(false);
+      if (!hasFiles && !isLast) {
+        setTimeout(() => onAutoDelete(), 0);
+      }
+    }
+  };
+
+  const items: UnifiedMenuItem[] = [
         ...(textHidden
           ? [{ id: 'add-text', label: 'Add Text', icon: Type, onSelect: revealText }]
           : []),
         { id: 'attach', label: 'Attach File', icon: Paperclip, onSelect: onAttach },
-        { id: 'above', label: 'Add Above', icon: ArrowUpToLine, onSelect: onAddAbove },
-        { id: 'below', label: 'Add Below', icon: ArrowDownToLine, onSelect: onAddBelow },
+        { id: 'add-new', label: 'Add new', icon: Plus, onSelect: () => {} },
         ...(index > 0
           ? [{ id: 'merge-up', label: 'Merge Up', icon: Merge, onSelect: onMergeUp }]
           : []),
@@ -160,16 +169,13 @@ export function ParagraphBlock({
                 <span className="text-slate-500">or</span>
                 <button
                   type="button"
-                  onClick={onAttach}
+                  onClick={handleAttachFromHint}
                   aria-label="Attach file to paragraph"
                   className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
                   <Paperclip className="w-4 h-4" />
                   <span className="text-xs font-medium">Attach file</span>
                 </button>
-                <span className="flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-amber-400/80 bg-amber-500/15 rounded-full px-1.5 py-0.5">
-                  Empty
-                </span>
               </div>
             )}
           </div>
@@ -212,7 +218,7 @@ export function ParagraphBlock({
           )}
         </div>
 
-        {canEdit && (
+        {canEdit && !showEmptyHint && (
           <UnifiedMenu
             items={items}
             ariaLabel="Paragraph options"

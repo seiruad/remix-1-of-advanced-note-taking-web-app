@@ -79,17 +79,18 @@ export function ParagraphList({
           paragraph={paragraph}
           index={index}
           total={paragraphs.length}
+          isLast={index === paragraphs.length - 1}
           files={filesByParagraph[paragraph.id] ?? []}
           canEdit={canEdit}
           onChange={(content) => setContent(paragraph.id, content)}
           onFocusEditor={(editor) => {
             if (editor) onActiveEditorChange(editor as Editor);
           }}
-          onAddAbove={() => insertAt(index)}
-          onAddBelow={() => insertAt(index + 1)}
+          onAddNew={() => insertAt(paragraphs.length)}
           onMergeUp={() => mergeInto(paragraph.id, paragraphs[index - 1].id, 'below')}
           onMergeDown={() => mergeInto(paragraph.id, paragraphs[index + 1].id, 'above')}
           onDelete={() => setDeleteTarget(paragraph.id)}
+          onAutoDelete={() => removeParagraph(paragraph.id)}
           onAttach={() => setAttachTarget(paragraph.id)}
           onDetach={(fileId) => attachFileToParagraph(fileId, null)}
           onOpenFile={onOpenFile}
