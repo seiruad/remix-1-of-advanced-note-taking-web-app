@@ -82,30 +82,38 @@ export function ParagraphBlock({
   const hasFiles = files.length > 0;
   // Empty + files: hide the text row until the user asks for it.
   const textHidden = canEdit && empty && hasFiles && !textRevealed;
-  // Fully empty paragraph without focus: offer both actions in one hint line.
-  const showEmptyHint = canEdit && empty && !hasFiles && !focused;
+  // The hint lives only in the very last paragraph, while it is empty and unfocused.
+  const showEmptyHint = canEdit && isLast && empty && !hasFiles && !focused;
 
   const revealText = () => {
     setTextRevealed(true);
+    onAddNew();
     // focus once the collapsed row has expanded
     setTimeout(() => editorRef.current?.commands.focus('end'), 0);
   };
 
-  // Leaving an empty text field puts the paragraph back to how it was.
-  const handleBlur = () => {
-    setFocused(false);
-    if (isDocEmpty(paragraph.content)) setTextRevealed(false);
+  const handleAttachFromHint = () => {
+    onAddNew();
+    onAttach();
   };
 
-  const items: UnifiedMenuItem[] = showEmptyHint
-    ? [{ id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete }]
-    : [
+  // Leaving an empty paragraph without files removes it silently.
+  const handleBlur = () => {
+    setFocused(false);
+    if (isDocEmpty(paragraph.content)) {
+      setTextRevealed(false);
+      if (!hasFiles && !isLast) {
+        setTimeout(() => onAutoDelete(), 0);
+      }
+    }
+  };
+
+  const items: UnifiedMenuItem[] = [
         ...(textHidden
           ? [{ id: 'add-text', label: 'Add Text', icon: Type, onSelect: revealText }]
           : []),
         { id: 'attach', label: 'Attach File', icon: Paperclip, onSelect: onAttach },
-        { id: 'above', label: 'Add Above', icon: ArrowUpToLine, onSelect: onAddAbove },
-        { id: 'below', label: 'Add Below', icon: ArrowDownToLine, onSelect: onAddBelow },
+        { id: 'add-new', label: 'Add new', icon: Plus, onSelect: () => {} },
         ...(index > 0
           ? [{ id: 'merge-up', label: 'Merge Up', icon: Merge, onSelect: onMergeUp }]
           : []),
