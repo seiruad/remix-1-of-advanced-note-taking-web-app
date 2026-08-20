@@ -39,15 +39,16 @@ interface ParagraphBlockProps {
   paragraph: NoteParagraph;
   index: number;
   total: number;
+  isLast: boolean;
   files: FileItem[];
   canEdit: boolean;
   onChange: (content: Record<string, unknown>) => void;
   onFocusEditor: (editor: unknown) => void;
-  onAddAbove: () => void;
-  onAddBelow: () => void;
+  onAddNew: () => void;
   onMergeUp: () => void;
   onMergeDown: () => void;
   onDelete: () => void;
+  onAutoDelete: () => void;
   onAttach: () => void;
   onDetach: (fileId: string) => void;
   onOpenFile: (file: FileItem) => void;
@@ -57,15 +58,16 @@ export function ParagraphBlock({
   paragraph,
   index,
   total,
+  isLast,
   files,
   canEdit,
   onChange,
   onFocusEditor,
-  onAddAbove,
-  onAddBelow,
+  onAddNew,
   onMergeUp,
   onMergeDown,
   onDelete,
+  onAutoDelete,
   onAttach,
   onDetach,
   onOpenFile,
