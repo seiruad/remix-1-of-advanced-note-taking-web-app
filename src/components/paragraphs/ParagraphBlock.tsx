@@ -169,7 +169,7 @@ export function ParagraphBlock({
                 <span className="text-slate-500">or</span>
                 <button
                   type="button"
-                  onClick={onAttach}
+                  onClick={handleAttachFromHint}
                   aria-label="Attach file to paragraph"
                   className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
