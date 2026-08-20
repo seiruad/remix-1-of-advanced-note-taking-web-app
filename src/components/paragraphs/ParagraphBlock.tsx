@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 import {
-  ArrowUpToLine,
-  ArrowDownToLine,
+  Plus,
   Merge,
   Paperclip,
   Trash2,
