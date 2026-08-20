@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 import {
   Plus,
@@ -17,6 +17,7 @@ import { RichTextEditor } from '../RichTextEditor';
 import { UnifiedMenu, type UnifiedMenuItem } from '../UnifiedMenu';
 import type { FileItem } from '../../types/database';
 import { isDocEmpty, type NoteParagraph } from './useNoteParagraphs';
+
 
 function iconFor(type: string) {
   if (type.startsWith('image/')) return ImageIcon;
@@ -38,12 +39,11 @@ interface ParagraphBlockProps {
   paragraph: NoteParagraph;
   index: number;
   total: number;
-  isLast: boolean;
   files: FileItem[];
   canEdit: boolean;
+  autoFocus?: boolean;
   onChange: (content: Record<string, unknown>) => void;
   onFocusEditor: (editor: unknown) => void;
-  onAddNew: () => void;
   onMergeUp: () => void;
   onMergeDown: () => void;
   onDelete: () => void;
@@ -57,12 +57,11 @@ export function ParagraphBlock({
   paragraph,
   index,
   total,
-  isLast,
   files,
   canEdit,
+  autoFocus,
   onChange,
   onFocusEditor,
-  onAddNew,
   onMergeUp,
   onMergeDown,
   onDelete,
@@ -81,19 +80,18 @@ export function ParagraphBlock({
   const hasFiles = files.length > 0;
   // Empty + files: hide the text row until the user asks for it.
   const textHidden = canEdit && empty && hasFiles && !textRevealed;
-  // The hint lives only in the very last paragraph, while it is empty and unfocused.
-  const showEmptyHint = canEdit && isLast && empty && !hasFiles && !focused;
+
+  const focusedOnce = useRef(false);
+  useEffect(() => {
+    if (!autoFocus || focusedOnce.current) return;
+    focusedOnce.current = true;
+    const t = setTimeout(() => editorRef.current?.commands.focus('end'), 0);
+    return () => clearTimeout(t);
+  }, [autoFocus]);
 
   const revealText = () => {
     setTextRevealed(true);
-    onAddNew();
-    // focus once the collapsed row has expanded
     setTimeout(() => editorRef.current?.commands.focus('end'), 0);
-  };
-
-  const handleAttachFromHint = () => {
-    onAddNew();
-    onAttach();
   };
 
   // Leaving an empty paragraph without files removes it silently.
@@ -101,7 +99,7 @@ export function ParagraphBlock({
     setFocused(false);
     if (isDocEmpty(paragraph.content)) {
       setTextRevealed(false);
-      if (!hasFiles && !isLast) {
+      if (!hasFiles) {
         setTimeout(() => onAutoDelete(), 0);
       }
     }
@@ -122,7 +120,7 @@ export function ParagraphBlock({
         { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
       ];
 
-  const showBorder = !showEmptyHint && (hovered || focused || menuOpen);
+  const showBorder = hovered || focused || menuOpen;
 
   return (
     <div
@@ -139,48 +137,20 @@ export function ParagraphBlock({
           onBlur={handleBlur}
         >
           <div className={`relative ${textHidden ? 'h-0 max-h-0 overflow-hidden' : ''}`}>
-            <div className={showEmptyHint ? 'pointer-events-none opacity-0' : ''}>
-              <RichTextEditor
-                content={paragraph.content}
-                onChange={onChange}
-                editable={canEdit}
-                onEditorReady={(editor) => {
-                  editorRef.current = (editor as Editor) ?? null;
-                  onFocusEditor(editor);
-                }}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                minHeightClassName="min-h-[1.75rem]"
-                placeholder=""
-              />
-            </div>
-
-            {showEmptyHint && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-start gap-2 text-xs text-slate-500">
-                <button
-                  type="button"
-                  onClick={revealText}
-                  aria-label="Write text in paragraph"
-                  className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
-                >
-                  <Type className="w-4 h-4" />
-                  <span className="text-xs font-medium">Write text</span>
-                </button>
-                <span className="text-slate-500">or</span>
-                <button
-                  type="button"
-                  onClick={handleAttachFromHint}
-                  aria-label="Attach file to paragraph"
-                  className="pointer-events-auto inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
-                >
-                  <Paperclip className="w-4 h-4" />
-                  <span className="text-xs font-medium">Attach file</span>
-                </button>
-              </div>
-            )}
+            <RichTextEditor
+              content={paragraph.content}
+              onChange={onChange}
+              editable={canEdit}
+              onEditorReady={(editor) => {
+                editorRef.current = (editor as Editor) ?? null;
+                onFocusEditor(editor);
+              }}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              minHeightClassName="min-h-[1.75rem]"
+              placeholder=""
+            />
           </div>
-
-
 
           {files.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">
@@ -218,7 +188,7 @@ export function ParagraphBlock({
           )}
         </div>
 
-        {canEdit && !showEmptyHint && (
+        {canEdit && (
           <UnifiedMenu
             items={items}
             ariaLabel="Paragraph options"
@@ -234,3 +204,4 @@ export function ParagraphBlock({
     </div>
   );
 }
+
