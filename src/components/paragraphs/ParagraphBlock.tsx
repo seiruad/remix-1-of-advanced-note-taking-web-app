@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 import {
   Plus,
@@ -17,6 +17,7 @@ import { RichTextEditor } from '../RichTextEditor';
 import { UnifiedMenu, type UnifiedMenuItem } from '../UnifiedMenu';
 import type { FileItem } from '../../types/database';
 import { isDocEmpty, type NoteParagraph } from './useNoteParagraphs';
+
 
 function iconFor(type: string) {
   if (type.startsWith('image/')) return ImageIcon;
