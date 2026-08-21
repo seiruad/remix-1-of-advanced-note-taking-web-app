@@ -118,7 +118,7 @@ export function ParagraphList({
 
       {showHintRow && (
         <div className="rounded-xl border border-transparent bg-transparent">
-          <div className="flex items-center gap-2 px-2 sm:px-3 py-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 px-2 sm:px-3 py-2 min-h-11 text-xs text-slate-500">
             <button
               type="button"
               onClick={() => createTrailing()}
@@ -144,7 +144,7 @@ export function ParagraphList({
 
       {pending && (
         <div className="rounded-xl border border-transparent bg-transparent" aria-hidden>
-          <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
+          <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2 min-h-11">
             <div className="flex-1 min-w-0 min-h-[1.75rem]" />
             <div className="w-7 h-7" />
           </div>
