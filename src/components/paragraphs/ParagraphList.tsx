@@ -121,6 +121,7 @@ export function ParagraphList({
           <div className="flex items-center gap-2 px-2 sm:px-3 py-2 min-h-11 text-xs text-slate-500">
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => createTrailing()}
               aria-label="Write text in new paragraph"
               className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"

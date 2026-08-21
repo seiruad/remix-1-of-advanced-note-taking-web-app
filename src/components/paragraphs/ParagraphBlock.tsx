@@ -107,7 +107,7 @@ export function ParagraphBlock({
 
   const revealText = () => {
     setTextRevealed(true);
-    setTimeout(() => editorRef.current?.commands.focus('end'), 0);
+    focusEditor();
   };
 
   // Leaving an empty paragraph without files removes it silently.
