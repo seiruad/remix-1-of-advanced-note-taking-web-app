@@ -85,8 +85,19 @@ export function ParagraphBlock({
   useEffect(() => {
     if (!autoFocus || focusedOnce.current) return;
     focusedOnce.current = true;
-    const t = setTimeout(() => editorRef.current?.commands.focus('end'), 0);
-    return () => clearTimeout(t);
+    let cancelled = false;
+    const tryFocus = () => {
+      if (cancelled) return;
+      if (editorRef.current) {
+        editorRef.current.commands.focus('end');
+        return;
+      }
+      requestAnimationFrame(tryFocus);
+    };
+    requestAnimationFrame(tryFocus);
+    return () => {
+      cancelled = true;
+    };
   }, [autoFocus]);
 
   const revealText = () => {
@@ -130,7 +141,7 @@ export function ParagraphBlock({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
+      <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2 min-h-11">
         <div
           className="flex-1 min-w-0"
           onFocus={() => onFocusEditor(null)}
