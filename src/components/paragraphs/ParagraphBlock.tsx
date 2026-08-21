@@ -81,28 +81,33 @@ export function ParagraphBlock({
   // Empty + files: hide the text row until the user asks for it.
   const textHidden = canEdit && empty && hasFiles && !textRevealed;
 
+  const focusEditor = () => {
+    let attempts = 0;
+    const tryFocus = () => {
+      attempts += 1;
+      const editor = editorRef.current;
+      if (editor && !editor.isDestroyed) {
+        editor.chain().focus('end').run();
+        const dom = editor.view?.dom as HTMLElement | undefined;
+        dom?.focus({ preventScroll: true });
+        if (editor.isFocused) return;
+      }
+      if (attempts < 20) requestAnimationFrame(tryFocus);
+    };
+    requestAnimationFrame(tryFocus);
+  };
+
   const focusedOnce = useRef(false);
   useEffect(() => {
     if (!autoFocus || focusedOnce.current) return;
     focusedOnce.current = true;
-    let cancelled = false;
-    const tryFocus = () => {
-      if (cancelled) return;
-      if (editorRef.current) {
-        editorRef.current.commands.focus('end');
-        return;
-      }
-      requestAnimationFrame(tryFocus);
-    };
-    requestAnimationFrame(tryFocus);
-    return () => {
-      cancelled = true;
-    };
+    focusEditor();
   }, [autoFocus]);
+
 
   const revealText = () => {
     setTextRevealed(true);
-    setTimeout(() => editorRef.current?.commands.focus('end'), 0);
+    focusEditor();
   };
 
   // Leaving an empty paragraph without files removes it silently.
