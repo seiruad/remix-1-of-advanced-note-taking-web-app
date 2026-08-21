@@ -56,18 +56,23 @@ export function ParagraphList({
     return map;
   }, [files, fileParagraph]);
 
+  const [pending, setPending] = useState(false);
+
   const last = paragraphs[paragraphs.length - 1];
   const lastIsEmpty =
     !last || (isDocEmpty(last.content) && (filesByParagraph[last.id] ?? []).length === 0);
   // The hint row is pure UI: it exists only while there is no trailing empty paragraph.
-  const showHintRow = canEdit && !lastIsEmpty;
+  const showHintRow = canEdit && !lastIsEmpty && !pending;
 
   const createTrailing = async (then?: (id: string) => void) => {
+    setPending(true);
     const id = await insertAt(paragraphs.length);
+    setPending(false);
     if (!id) return;
     setAutoFocusId(id);
     then?.(id);
   };
+
 
   if (loading) {
     return (
