@@ -142,6 +142,17 @@ export function ParagraphList({
         </div>
       )}
 
+      {pending && (
+        <div className="rounded-xl border border-transparent bg-transparent" aria-hidden>
+          <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2">
+            <div className="flex-1 min-w-0 min-h-[1.75rem]" />
+            <div className="w-7 h-7" />
+          </div>
+        </div>
+      )}
+
+
+
       {canEdit && (
         <button
           type="button"
