@@ -152,7 +152,11 @@ export function ParagraphBlock({
           onFocus={() => onFocusEditor(null)}
           onBlur={handleBlur}
         >
-          <div className={`relative ${textHidden ? 'h-0 max-h-0 overflow-hidden' : ''}`}>
+          <div
+            className={`relative [&_.ProseMirror_p]:my-0 [&_.ProseMirror]:leading-7 ${
+              textHidden ? 'h-0 max-h-0 overflow-hidden' : ''
+            }`}
+          >
             <RichTextEditor
               content={paragraph.content}
               onChange={onChange}
