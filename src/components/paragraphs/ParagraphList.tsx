@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Loader2, Plus, X, Type, Paperclip } from 'lucide-react';
+import { Loader2, X, Type, Paperclip } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { AttachFileDialog } from '../AttachFileDialog';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
