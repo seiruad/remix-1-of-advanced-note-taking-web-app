@@ -392,7 +392,7 @@ function NotesApp() {
   );
 
   const handleFileLinked = (file: FileItem) => {
-    setNoteFiles((prev) => [...prev, file]);
+    setNoteFiles((prev) => (prev.some((f) => f.id === file.id) ? prev : [...prev, file]));
     setAllFiles((prev) => {
       if (prev.some((f) => f.id === file.id)) return prev;
       return [file, ...prev];
