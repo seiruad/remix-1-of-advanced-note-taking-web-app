@@ -249,6 +249,13 @@ export function useNoteParagraphs(params: {
   const attachFileToParagraph = useCallback(
     async (fileId: string, paragraphId: string | null) => {
       if (!noteId) return;
+      // Optimistic: the chip appears/disappears instantly, DB catches up after.
+      let previous: string | null | undefined;
+      setFileParagraph((prev) => {
+        previous = prev[fileId];
+        if (prev[fileId] === paragraphId) return prev;
+        return { ...prev, [fileId]: paragraphId };
+      });
       const { error: updateError } = await supabase
         .from('note_files')
         .update({ paragraph_id: paragraphId })
@@ -256,9 +263,8 @@ export function useNoteParagraphs(params: {
         .eq('file_id', fileId);
       if (updateError) {
         setError(updateError.message);
-        return;
+        setFileParagraph((prev) => ({ ...prev, [fileId]: previous ?? null }));
       }
-      setFileParagraph((prev) => ({ ...prev, [fileId]: paragraphId }));
     },
     [noteId],
   );
