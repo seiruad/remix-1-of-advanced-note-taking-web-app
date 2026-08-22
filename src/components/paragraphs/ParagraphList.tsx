@@ -123,54 +123,38 @@ export function ParagraphList({
         />
       ))}
 
-      {showHintRow && (
-        <div className="rounded-xl border border-transparent bg-transparent">
+      {(showHintRow || pending) && (
+        <div className="rounded-xl border border-dashed border-slate-700/70">
           <div className="flex items-center gap-2 px-2 sm:px-3 py-2 min-h-11 text-xs text-slate-500">
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => createTrailing()}
-              aria-label="Write text in new paragraph"
-              className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
-            >
-              <Type className="w-4 h-4" />
-              <span className="text-xs font-medium">Write text</span>
-            </button>
-            <span className="text-slate-500">or</span>
-            <button
-              type="button"
-              onClick={() => createTrailing((id) => setAttachTarget(id))}
-              aria-label="Attach file to new paragraph"
-              className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
-            >
-              <Paperclip className="w-4 h-4" />
-              <span className="text-xs font-medium">Attach file</span>
-            </button>
+            {showHintRow && (
+              <>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => createTrailing()}
+                  aria-label="Write text in new paragraph"
+                  className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                >
+                  <Type className="w-4 h-4" />
+                  <span className="text-xs font-medium">Write text</span>
+                </button>
+                <span className="text-slate-500">or</span>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => createTrailing((id) => setAttachTarget(id))}
+                  aria-label="Attach file to new paragraph"
+                  className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                >
+                  <Paperclip className="w-4 h-4" />
+                  <span className="text-xs font-medium">Attach file</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
 
-      {pending && (
-        <div className="rounded-xl border border-transparent bg-transparent" aria-hidden>
-          <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2 min-h-11">
-            <div className="flex-1 min-w-0 min-h-[1.75rem]" />
-            <div className="w-7 h-7" />
-          </div>
-        </div>
-      )}
-
-
-
-      {canEdit && (
-        <button
-          type="button"
-          onClick={() => createTrailing()}
-          className="w-full flex items-center justify-center gap-2 h-11 rounded-xl border border-dashed border-slate-700/70 text-[13px] font-semibold text-slate-400 hover:text-slate-100 hover:border-emerald-500/40 hover:bg-slate-700/20 active:bg-slate-700/30 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          New Paragraph
-        </button>
-      )}
 
 
       <UnifiedWarningWindow
