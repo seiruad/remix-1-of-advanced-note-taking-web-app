@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { UploadCloud, File as FileIcon, Search, Loader2, X, Link2, HardDrive, Paperclip, ChevronRight, ChevronLeft } from 'lucide-react';
+import { UploadCloud, File as FileIcon, Search, Loader2, X, Link2, HardDrive, Paperclip, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
