@@ -124,7 +124,7 @@ export function ParagraphList({
       ))}
 
       {(showHintRow || pending) && (
-        <div className="rounded-xl border border-dashed border-slate-700/70">
+        <div className="rounded-xl border border-dashed border-transparent">
           <div className="flex items-center gap-2 px-2 sm:px-3 py-2 min-h-11 text-xs text-slate-500">
             {showHintRow && (
               <>
