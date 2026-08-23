@@ -8,7 +8,7 @@ interface AttachFileDialogProps {
   open: boolean;
   onClose: () => void;
   noteId: string;
-  onFileLinked: (file: FileItem) => void;
+  onFileLinked: (file: FileItem) => void | Promise<void>;
   existingFileIds: string[];
   /** When set, newly linked files are attached to this paragraph. */
   paragraphId?: string | null;
