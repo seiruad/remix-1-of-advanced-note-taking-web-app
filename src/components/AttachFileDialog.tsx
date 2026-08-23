@@ -131,37 +131,47 @@ export function AttachFileDialog({
     }
   };
 
-  const handleSelectExisting = async (file: FileItem) => {
+  const linkOne = async (file: FileItem) => {
+    if (existingFileIds.includes(file.id)) {
+      // Already linked to the note — just move it into this paragraph.
+      const { error: moveError } = await supabase
+        .from('note_files')
+        .update({ paragraph_id: paragraphId })
+        .eq('note_id', noteId)
+        .eq('file_id', file.id);
+      if (moveError) throw moveError;
+    } else {
+      const { error: linkError } = await supabase
+        .from('note_files')
+        .insert({
+          note_id: noteId,
+          file_id: file.id,
+          user_id: user!.id,
+          paragraph_id: paragraphId,
+        });
+
+      if (linkError) throw linkError;
+    }
+    await onFileLinked(file);
+  };
+
+  const handleAttachSelected = async () => {
     setError(null);
+    setLinking(true);
     try {
-      if (existingFileIds.includes(file.id)) {
-        // Already linked to the note — just move it into this paragraph.
-        const { error: moveError } = await supabase
-          .from('note_files')
-          .update({ paragraph_id: paragraphId })
-          .eq('note_id', noteId)
-          .eq('file_id', file.id);
-        if (moveError) throw moveError;
-      } else {
-        const { error: linkError } = await supabase
-          .from('note_files')
-          .insert({
-            note_id: noteId,
-            file_id: file.id,
-            user_id: user!.id,
-            paragraph_id: paragraphId,
-          });
-
-        if (linkError) throw linkError;
+      for (const id of selectedIds) {
+        const file = files.find((f) => f.id === id);
+        if (file) await linkOne(file);
       }
-
-      onFileLinked(file);
       onClose();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to link file';
       setError(message);
+    } finally {
+      setLinking(false);
     }
   };
+
 
 
   const filteredFiles = files.filter((f) =>
