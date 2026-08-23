@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Loader2, X, Type, Paperclip } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { AttachFileDialog } from '../AttachFileDialog';
@@ -6,6 +6,10 @@ import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
 import { ParagraphBlock } from './ParagraphBlock';
 import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
+
+const NEW_PARAGRAPH = '__new__';
+
+
 
 
 interface ParagraphListProps {
