@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { UploadCloud, File as FileIcon, Search, Loader2, X, Link2, HardDrive, Paperclip, ChevronRight, ChevronLeft } from 'lucide-react';
+import { UploadCloud, File as FileIcon, Search, Loader2, X, Link2, HardDrive, Paperclip, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
@@ -8,7 +8,7 @@ interface AttachFileDialogProps {
   open: boolean;
   onClose: () => void;
   noteId: string;
-  onFileLinked: (file: FileItem) => void;
+  onFileLinked: (file: FileItem) => void | Promise<void>;
   existingFileIds: string[];
   /** When set, newly linked files are attached to this paragraph. */
   paragraphId?: string | null;
@@ -50,6 +50,8 @@ export function AttachFileDialog({
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [linking, setLinking] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -57,8 +59,10 @@ export function AttachFileDialog({
       setMode('choose');
       setError(null);
       setSearchQuery('');
+      setSelectedIds([]);
     }
   }, [open]);
+
 
   useEffect(() => {
     if (mode === 'select') {
@@ -131,37 +135,47 @@ export function AttachFileDialog({
     }
   };
 
-  const handleSelectExisting = async (file: FileItem) => {
+  const linkOne = async (file: FileItem) => {
+    if (existingFileIds.includes(file.id)) {
+      // Already linked to the note — just move it into this paragraph.
+      const { error: moveError } = await supabase
+        .from('note_files')
+        .update({ paragraph_id: paragraphId })
+        .eq('note_id', noteId)
+        .eq('file_id', file.id);
+      if (moveError) throw moveError;
+    } else {
+      const { error: linkError } = await supabase
+        .from('note_files')
+        .insert({
+          note_id: noteId,
+          file_id: file.id,
+          user_id: user!.id,
+          paragraph_id: paragraphId,
+        });
+
+      if (linkError) throw linkError;
+    }
+    await onFileLinked(file);
+  };
+
+  const handleAttachSelected = async () => {
     setError(null);
+    setLinking(true);
     try {
-      if (existingFileIds.includes(file.id)) {
-        // Already linked to the note — just move it into this paragraph.
-        const { error: moveError } = await supabase
-          .from('note_files')
-          .update({ paragraph_id: paragraphId })
-          .eq('note_id', noteId)
-          .eq('file_id', file.id);
-        if (moveError) throw moveError;
-      } else {
-        const { error: linkError } = await supabase
-          .from('note_files')
-          .insert({
-            note_id: noteId,
-            file_id: file.id,
-            user_id: user!.id,
-            paragraph_id: paragraphId,
-          });
-
-        if (linkError) throw linkError;
+      for (const id of selectedIds) {
+        const file = files.find((f) => f.id === id);
+        if (file) await linkOne(file);
       }
-
-      onFileLinked(file);
       onClose();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to link file';
       setError(message);
+    } finally {
+      setLinking(false);
     }
   };
+
 
 
   const filteredFiles = files.filter((f) =>
@@ -303,23 +317,31 @@ export function AttachFileDialog({
                     const isLinked = paragraphFileIds
                       ? paragraphFileIds.includes(file.id)
                       : existingFileIds.includes(file.id);
+                    const isSelected = selectedIds.includes(file.id);
 
                     return (
                       <button
                         key={file.id}
-                        onClick={() => !isLinked && handleSelectExisting(file)}
-                        disabled={isLinked}
+                        onClick={() =>
+                          !isLinked &&
+                          setSelectedIds((prev) =>
+                            prev.includes(file.id) ? prev.filter((id) => id !== file.id) : [...prev, file.id]
+                          )
+                        }
+                        disabled={isLinked || linking}
                         className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors text-left ${
                           isLinked
                             ? 'bg-emerald-500/10 cursor-not-allowed'
-                            : 'hover:bg-slate-700/40 active:bg-slate-700/60'
+                            : isSelected
+                              ? 'bg-emerald-500/15'
+                              : 'hover:bg-slate-700/40 active:bg-slate-700/60'
                         }`}
                       >
                         <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
                           {getFileIcon(file.file_type)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-semibold truncate leading-snug ${isLinked ? 'text-emerald-100' : 'text-slate-100'}`}>
+                          <p className={`text-sm font-semibold truncate leading-snug ${isLinked || isSelected ? 'text-emerald-100' : 'text-slate-100'}`}>
                             {file.filename}
                           </p>
                           <p className="text-xs text-slate-500 mt-0.5">
@@ -329,7 +351,13 @@ export function AttachFileDialog({
                         {isLinked ? (
                           <Link2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                         ) : (
-                          <span className="text-xs font-medium text-emerald-400 flex-shrink-0">Link</span>
+                          <span
+                            className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
+                              isSelected ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
+                            }`}
+                          >
+                            {isSelected && <Check className="w-3.5 h-3.5 text-slate-900" />}
+                          </span>
                         )}
                       </button>
                     );
@@ -337,13 +365,26 @@ export function AttachFileDialog({
                 )}
               </div>
 
-              <button
-                onClick={() => setMode('choose')}
-                className="mt-3 flex items-center gap-1 h-9 px-2.5 -ml-1 rounded-lg text-[13px] font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back
-              </button>
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  onClick={() => setMode('choose')}
+                  disabled={linking}
+                  className="flex items-center gap-1 h-9 px-2.5 -ml-1 rounded-lg text-[13px] font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 transition-colors disabled:opacity-50"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Back
+                </button>
+                <button
+                  onClick={handleAttachSelected}
+                  disabled={selectedIds.length === 0 || linking}
+                  className="ml-auto inline-flex items-center gap-2 h-9 px-3.5 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 transition-colors disabled:opacity-40 disabled:hover:bg-emerald-500/15"
+                >
+                  {linking && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Attach{selectedIds.length > 0 ? ` ${selectedIds.length}` : ''}
+                  {selectedIds.length === 1 ? ' file' : ' files'}
+                </button>
+              </div>
+
             </div>
           )}
         </div>
