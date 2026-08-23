@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Loader2, X, Type, Paperclip } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { AttachFileDialog } from '../AttachFileDialog';
@@ -6,6 +6,10 @@ import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
 import { ParagraphBlock } from './ParagraphBlock';
 import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
+
+const NEW_PARAGRAPH = '__new__';
+
+
 
 
 interface ParagraphListProps {
@@ -45,6 +49,8 @@ export function ParagraphList({
   const [attachTarget, setAttachTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [autoFocusId, setAutoFocusId] = useState<string | null>(null);
+  const newAttachParagraphId = useRef<string | null>(null);
+
 
   const filesByParagraph = useMemo(() => {
     const map: Record<string, FileItem[]> = {};
@@ -64,20 +70,22 @@ export function ParagraphList({
   // The hint row replaces the old "New Paragraph" button: it is pure UI, never stored.
   const showHintRow = canEdit && !pending;
 
-  const createTrailing = async (then?: (id: string) => void) => {
+  const createTrailing = async (then?: (id: string) => void): Promise<string | null> => {
     // Reuse a trailing empty paragraph instead of stacking another empty one.
     if (last && lastIsEmpty) {
       setAutoFocusId(last.id);
       then?.(last.id);
-      return;
+      return last.id;
     }
     setPending(true);
     const id = await insertAt(paragraphs.length);
     setPending(false);
-    if (!id) return;
+    if (!id) return null;
     setAutoFocusId(id);
     then?.(id);
+    return id;
   };
+
 
 
 
@@ -142,7 +150,7 @@ export function ParagraphList({
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => createTrailing((id) => setAttachTarget(id))}
+                  onClick={() => setAttachTarget(NEW_PARAGRAPH)}
                   aria-label="Attach file to new paragraph"
                   className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
                 >
@@ -171,16 +179,29 @@ export function ParagraphList({
 
       <AttachFileDialog
         open={attachTarget !== null}
-        onClose={() => setAttachTarget(null)}
+        onClose={() => {
+          setAttachTarget(null);
+          newAttachParagraphId.current = null;
+        }}
         noteId={noteId}
-        paragraphId={attachTarget}
-        paragraphFileIds={(attachTarget ? filesByParagraph[attachTarget] ?? [] : []).map((f) => f.id)}
-        onFileLinked={(file) => {
+        paragraphId={attachTarget === NEW_PARAGRAPH ? null : attachTarget}
+        paragraphFileIds={(attachTarget && attachTarget !== NEW_PARAGRAPH
+          ? filesByParagraph[attachTarget] ?? []
+          : []
+        ).map((f) => f.id)}
+        onFileLinked={async (file) => {
           onFileLinked(file);
-          if (attachTarget) attachFileToParagraph(file.id, attachTarget);
+          let target = attachTarget;
+          if (target === NEW_PARAGRAPH) {
+            // Only now, after a file was actually picked, materialize the paragraph.
+            target = newAttachParagraphId.current ?? (await createTrailing());
+            newAttachParagraphId.current = target;
+          }
+          if (target) attachFileToParagraph(file.id, target);
         }}
         existingFileIds={files.map((f) => f.id)}
       />
+
     </div>
   );
 }
