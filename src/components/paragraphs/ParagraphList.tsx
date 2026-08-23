@@ -64,20 +64,22 @@ export function ParagraphList({
   // The hint row replaces the old "New Paragraph" button: it is pure UI, never stored.
   const showHintRow = canEdit && !pending;
 
-  const createTrailing = async (then?: (id: string) => void) => {
+  const createTrailing = async (then?: (id: string) => void): Promise<string | null> => {
     // Reuse a trailing empty paragraph instead of stacking another empty one.
     if (last && lastIsEmpty) {
       setAutoFocusId(last.id);
       then?.(last.id);
-      return;
+      return last.id;
     }
     setPending(true);
     const id = await insertAt(paragraphs.length);
     setPending(false);
-    if (!id) return;
+    if (!id) return null;
     setAutoFocusId(id);
     then?.(id);
+    return id;
   };
+
 
 
 
