@@ -49,6 +49,8 @@ export function ParagraphList({
   const [attachTarget, setAttachTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [autoFocusId, setAutoFocusId] = useState<string | null>(null);
+  const newAttachParagraphId = useRef<string | null>(null);
+
 
   const filesByParagraph = useMemo(() => {
     const map: Record<string, FileItem[]> = {};
