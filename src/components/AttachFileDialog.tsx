@@ -50,6 +50,8 @@ export function AttachFileDialog({
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [linking, setLinking] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -57,8 +59,10 @@ export function AttachFileDialog({
       setMode('choose');
       setError(null);
       setSearchQuery('');
+      setSelectedIds([]);
     }
   }, [open]);
+
 
   useEffect(() => {
     if (mode === 'select') {
