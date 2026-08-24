@@ -40,6 +40,7 @@ export function ParagraphList({
     setError,
     fileParagraph,
     setContent,
+    setHeading,
     insertAt,
     removeParagraph,
     mergeInto,
@@ -128,6 +129,7 @@ export function ParagraphList({
           onAttach={() => setAttachTarget(paragraph.id)}
           onDetach={(fileId) => attachFileToParagraph(fileId, null)}
           onOpenFile={onOpenFile}
+          onHeadingChange={(heading, immediate) => setHeading(paragraph.id, heading, immediate)}
         />
       ))}
 
