@@ -67,7 +67,7 @@ export function useNoteParagraphs(params: {
     (async () => {
       const { data, error: loadError } = await supabase
         .from('note_paragraphs')
-        .select('id, note_id, position, content')
+        .select('id, note_id, position, content, heading')
         .eq('note_id', noteId)
         .order('position', { ascending: true });
 
@@ -90,7 +90,7 @@ export function useNoteParagraphs(params: {
             position: 0,
             content: (initialContentRef.current ?? null) as never,
           })
-          .select('id, note_id, position, content')
+          .select('id, note_id, position, content, heading')
           .single();
         if (!cancelled && !insertError && inserted) {
           rows = [inserted as NoteParagraph];
@@ -171,7 +171,7 @@ export function useNoteParagraphs(params: {
       const { data, error: insertError } = await supabase
         .from('note_paragraphs')
         .insert({ note_id: noteId, user_id: userId, position: index, content: null })
-        .select('id, note_id, position, content')
+        .select('id, note_id, position, content, heading')
         .single();
       if (insertError || !data) {
         setError(insertError?.message ?? 'Failed to add paragraph');
