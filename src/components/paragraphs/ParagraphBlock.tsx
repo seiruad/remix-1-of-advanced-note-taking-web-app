@@ -6,6 +6,8 @@ import {
   Paperclip,
   Trash2,
   Type,
+  Heading as HeadingIcon,
+  Pencil,
   Unlink,
   FileText,
   Image as ImageIcon,
@@ -51,6 +53,7 @@ interface ParagraphBlockProps {
   onAttach: () => void;
   onDetach: (fileId: string) => void;
   onOpenFile: (file: FileItem) => void;
+  onHeadingChange: (heading: string | null, immediate?: boolean) => void;
 }
 
 export function ParagraphBlock({
