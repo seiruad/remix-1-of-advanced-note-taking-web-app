@@ -305,6 +305,7 @@ export function useNoteParagraphs(params: {
     setError,
     fileParagraph,
     setContent,
+    setHeading,
     insertAt,
     removeParagraph,
     mergeInto,
