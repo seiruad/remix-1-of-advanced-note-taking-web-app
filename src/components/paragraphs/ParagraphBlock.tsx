@@ -156,6 +156,22 @@ export function ParagraphBlock({
         ...(textHidden
           ? [{ id: 'add-text', label: 'Add Text', icon: Type, onSelect: revealText }]
           : []),
+        ...(hasHeading
+          ? [
+              {
+                id: 'edit-heading',
+                label: 'Edit Heading',
+                icon: Pencil,
+                onSelect: focusHeading,
+              },
+              {
+                id: 'remove-heading',
+                label: 'Delete Heading',
+                icon: Trash2,
+                onSelect: () => onHeadingChange(null, true),
+              },
+            ]
+          : [{ id: 'add-heading', label: 'Add Heading', icon: HeadingIcon, onSelect: addHeading }]),
         { id: 'attach', label: 'Attach File', icon: Paperclip, onSelect: onAttach },
         { id: 'add-new', label: 'Add new', icon: Plus, onSelect: () => {} },
         ...(index > 0
