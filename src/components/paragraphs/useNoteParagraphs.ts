@@ -6,6 +6,7 @@ export interface NoteParagraph {
   note_id: string;
   position: number;
   content: Record<string, unknown> | null;
+  heading: string | null;
 }
 
 type Doc = Record<string, unknown> | null;
