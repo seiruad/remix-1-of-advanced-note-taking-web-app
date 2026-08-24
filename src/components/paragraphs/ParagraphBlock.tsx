@@ -193,6 +193,37 @@ export function ParagraphBlock({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {hasHeading && (
+        <div className="px-2 sm:px-3 pt-2">
+          <textarea
+            ref={(el) => {
+              headingRef.current = el;
+              autoSizeHeading(el);
+            }}
+            value={paragraph.heading ?? ''}
+            readOnly={!canEdit}
+            rows={1}
+            placeholder="Heading"
+            onChange={(e) => {
+              autoSizeHeading(e.currentTarget);
+              onHeadingChange(e.currentTarget.value);
+            }}
+            onFocus={() => setFocused(true)}
+            onBlur={(e) => {
+              setFocused(false);
+              if (!e.currentTarget.value.trim()) onHeadingChange(null, true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                focusEditor();
+              }
+            }}
+            className="w-full resize-none overflow-hidden bg-transparent border-0 p-0 text-base sm:text-lg font-semibold leading-7 text-slate-100 placeholder:text-slate-600 focus:outline-none"
+          />
+        </div>
+      )}
+
       <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2 min-h-11">
         <div
           className="flex-1 min-w-0"
