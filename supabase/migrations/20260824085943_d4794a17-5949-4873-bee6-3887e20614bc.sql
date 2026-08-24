@@ -1,0 +1,1 @@
+ALTER TABLE public.note_paragraphs ADD COLUMN IF NOT EXISTS heading text;

@@ -6,6 +6,7 @@ export interface NoteParagraph {
   note_id: string;
   position: number;
   content: Record<string, unknown> | null;
+  heading: string | null;
 }
 
 type Doc = Record<string, unknown> | null;
@@ -138,6 +139,30 @@ export function useNoteParagraphs(params: {
           if (e) setError(e.message);
         });
     }, 600);
+  }, []);
+
+  const headingTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  useEffect(
+    () => () => {
+      Object.values(headingTimers.current).forEach(clearTimeout);
+    },
+    [],
+  );
+
+  const setHeading = useCallback((id: string, heading: string | null, immediate = false) => {
+    setParagraphs((prev) => prev.map((p) => (p.id === id ? { ...p, heading } : p)));
+    if (headingTimers.current[id]) clearTimeout(headingTimers.current[id]);
+    const run = () => {
+      supabase
+        .from('note_paragraphs')
+        .update({ heading })
+        .eq('id', id)
+        .then(({ error: e }) => {
+          if (e) setError(e.message);
+        });
+    };
+    if (immediate) run();
+    else headingTimers.current[id] = setTimeout(run, 600);
   }, []);
 
   const insertAt = useCallback(
@@ -280,6 +305,7 @@ export function useNoteParagraphs(params: {
     setError,
     fileParagraph,
     setContent,
+    setHeading,
     insertAt,
     removeParagraph,
     mergeInto,

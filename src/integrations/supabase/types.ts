@@ -142,6 +142,7 @@ export type Database = {
         Row: {
           content: Json | null
           created_at: string
+          heading: string | null
           id: string
           note_id: string
           position: number
@@ -151,6 +152,7 @@ export type Database = {
         Insert: {
           content?: Json | null
           created_at?: string
+          heading?: string | null
           id?: string
           note_id: string
           position?: number
@@ -160,6 +162,7 @@ export type Database = {
         Update: {
           content?: Json | null
           created_at?: string
+          heading?: string | null
           id?: string
           note_id?: string
           position?: number
