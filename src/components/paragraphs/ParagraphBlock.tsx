@@ -219,7 +219,7 @@ export function ParagraphBlock({
                 focusEditor();
               }
             }}
-            className="w-full resize-none overflow-hidden bg-transparent border-0 p-0 text-base sm:text-lg font-semibold leading-7 text-slate-100 placeholder:text-slate-600 focus:outline-none"
+            className="w-full resize-none overflow-hidden bg-transparent border-0 p-0 text-base sm:text-lg font-bold leading-7 text-slate-100 placeholder:text-slate-600 focus:outline-none"
           />
         </div>
       )}
