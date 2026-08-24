@@ -72,12 +72,40 @@ export function ParagraphBlock({
   onAttach,
   onDetach,
   onOpenFile,
+  onHeadingChange,
 }: ParagraphBlockProps) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [textRevealed, setTextRevealed] = useState(false);
   const editorRef = useRef<Editor | null>(null);
+  const headingRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const hasHeading = paragraph.heading !== null && paragraph.heading !== undefined;
+
+  const focusHeading = () => {
+    requestAnimationFrame(() => {
+      const el = headingRef.current;
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    });
+  };
+
+  const addHeading = () => {
+    onHeadingChange('', true);
+    focusHeading();
+  };
+
+  const autoSizeHeading = (el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  useEffect(() => {
+    autoSizeHeading(headingRef.current);
+  }, [paragraph.heading]);
 
   const empty = isDocEmpty(paragraph.content);
   const hasFiles = files.length > 0;
