@@ -16,19 +16,8 @@ import {
   ChevronDown,
   File as FileIcon,
   FileText,
-  MoreHorizontal,
   Pencil,
   Check,
-  Bold,
-  Italic,
-  Strikethrough,
-  Quote,
-  Code,
-  CodeSquare,
-  Link as LinkIcon,
-  Undo,
-  Redo,
-  RemoveFormatting,
   ArrowLeft,
   FolderOpen,
   Inbox,
@@ -37,7 +26,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import type { Editor } from '@tiptap/react';
 
 interface NoteEditorProps {
   note: Note | null;
@@ -67,32 +55,7 @@ function getFileIcon(type: string) {
   return '📎';
 }
 
-interface ToolbarButtonProps {
-  onClick: () => void;
-  disabled?: boolean;
-  title: string;
-  children: React.ReactNode;
-}
 
-function ToolbarButton({ onClick, disabled, title, children }: ToolbarButtonProps) {
-  return (
-    <button
-      type="button"
-      onMouseDown={(e) => e.preventDefault()}
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-      aria-label={title}
-      className="w-9 h-9 rounded-lg transition-colors flex items-center justify-center text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 active:bg-emerald-500/15 active:text-emerald-300 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 disabled:cursor-not-allowed flex-shrink-0"
-    >
-      {children}
-    </button>
-  );
-}
-
-function ToolbarDivider() {
-  return <div className="w-px h-5 bg-slate-700/60 mx-1.5 flex-shrink-0" />;
-}
 
 
 export function NoteEditor({
@@ -121,22 +84,9 @@ export function NoteEditor({
   const [renamedNames, setRenamedNames] = useState<Record<string, string>>({});
 
 
-  const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const moreMenuRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!moreMenuOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
-        setMoreMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [moreMenuOpen]);
   const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const isTypingRef = useRef(false);
@@ -353,13 +303,6 @@ export function NoteEditor({
     setConfirmDelete(null);
   };
 
-  const addLink = () => {
-    if (!editorInstance) return;
-    const url = window.prompt('Enter URL:');
-    if (url) {
-      editorInstance.chain().focus().setLink({ href: url }).run();
-    }
-  };
 
   if (!note) {
     return (
@@ -474,7 +417,7 @@ export function NoteEditor({
             })
           }
 
-          onActiveEditorChange={setEditorInstance}
+          onActiveEditorChange={() => {}}
           onFileLinked={onFileLinked}
         />
 
