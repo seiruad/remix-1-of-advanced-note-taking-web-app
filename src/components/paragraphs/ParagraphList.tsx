@@ -143,7 +143,7 @@ export function ParagraphList({
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => createTrailing()}
                   aria-label="Write text in new paragraph"
-                  className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                  className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-100 hover:bg-emerald-500/20 hover:border-emerald-500/40 hover:text-emerald-50 active:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-all duration-150"
                 >
                   <Type className="w-4 h-4" />
                   <span className="text-xs font-medium">Write text</span>
@@ -154,7 +154,7 @@ export function ParagraphList({
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setAttachTarget(NEW_PARAGRAPH)}
                   aria-label="Attach file to new paragraph"
-                  className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors"
+                  className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-100 hover:bg-emerald-500/20 hover:border-emerald-500/40 hover:text-emerald-50 active:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-all duration-150"
                 >
                   <Paperclip className="w-4 h-4" />
                   <span className="text-xs font-medium">Attach file</span>
