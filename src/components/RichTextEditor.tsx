@@ -43,23 +43,32 @@ export function RichTextEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Image.configure({
-        inline: true,
-        allowBase64: true,
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-emerald-400 hover:text-emerald-300 underline cursor-pointer',
-        },
+      // Plain-text only: every rich-formatting node/mark is disabled so the
+      // paragraph body always renders with the single standard style.
+      StarterKit.configure({
+        bold: false,
+        italic: false,
+        strike: false,
+        code: false,
+        codeBlock: false,
+        blockquote: false,
+        heading: false,
+        bulletList: false,
+        orderedList: false,
+        listItem: false,
+        horizontalRule: false,
       }),
       Placeholder.configure({
         placeholder: () => placeholderRef.current,
       }),
     ],
+    editorProps: {
+      // Strip any formatting coming from the clipboard.
+      transformPastedHTML: (html) => html.replace(/<[^>]*>/g, ''),
+    },
     content: content || '',
     editable,
+
     onUpdate: ({ editor }) => {
       isEditingRef.current = true;
       onChangeRef.current(editor.getJSON());
