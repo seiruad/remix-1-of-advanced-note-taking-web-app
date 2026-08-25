@@ -257,16 +257,16 @@ export function ParagraphBlock({
                 return (
                   <span
                     key={file.id}
-                    className="inline-flex items-center gap-1.5 h-7 pl-2 pr-1 rounded-lg bg-slate-700/40 hover:bg-slate-700/60 transition-colors"
+                    className="inline-flex items-center gap-2 h-7 pl-2.5 pr-1.5 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors"
                   >
                     <button
                       type="button"
                       onClick={() => onOpenFile(file)}
-                      className="inline-flex items-center gap-1.5 min-w-0 text-[11px] font-medium text-slate-300"
+                      className="inline-flex items-center gap-2 min-w-0 text-[11px] font-medium text-slate-300"
                       title={file.filename}
                     >
-                      <Icon className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                      <span className="truncate max-w-[110px]">{shortName(file.filename)}</span>
+                      <Icon className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                      <span className="truncate max-w-[120px]">{shortName(file.filename)}</span>
                     </button>
                     {canEdit && (
                       <button
