@@ -18,6 +18,7 @@ import {
   FileText,
   Pencil,
   Check,
+  MoreHorizontal,
   ArrowLeft,
   FolderOpen,
   Inbox,
