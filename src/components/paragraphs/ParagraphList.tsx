@@ -99,7 +99,7 @@ export function ParagraphList({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {error && (
         <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-sm text-red-400">
           <span className="flex-1 min-w-0 break-words">{error}</span>

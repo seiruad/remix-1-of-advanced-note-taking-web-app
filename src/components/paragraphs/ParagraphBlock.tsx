@@ -224,7 +224,7 @@ export function ParagraphBlock({
         </div>
       )}
 
-      <div className="flex items-start gap-1.5 px-2 sm:px-3 py-2 min-h-11">
+      <div className={`flex items-start gap-1.5 px-2 sm:px-3 min-h-11 ${hasHeading ? 'pt-1 pb-2' : 'py-2'}`}>
         <div
           className="flex-1 min-w-0"
           onFocus={() => onFocusEditor(null)}
