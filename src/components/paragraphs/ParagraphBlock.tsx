@@ -299,6 +299,18 @@ export function ParagraphBlock({
                   </span>
                 );
               })}
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={onAttach}
+                  aria-label="Attach file"
+                  title="Attach file"
+                  className="inline-flex items-center gap-1.5 h-7 pl-2 pr-2.5 rounded-full bg-slate-700/30 border border-dashed border-slate-600/30 hover:bg-slate-700/50 hover:border-slate-500/40 transition-colors text-[11px] font-medium text-slate-400"
+                >
+                  <Plus className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Attach</span>
+                </button>
+              )}
             </div>
           )}
         </div>
