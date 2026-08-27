@@ -288,6 +288,15 @@ export function ParagraphBlock({
                     </button>
                     {canEdit && (
                       <>
+                        <button
+                          type="button"
+                          onClick={() => onDetach(file.id)}
+                          aria-label={`Unlink ${file.filename}`}
+                          title="Unlink from paragraph"
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+                        >
+                          <Unlink className="w-3.5 h-3.5" />
+                        </button>
                         {isLast && (
                           <button
                             type="button"
@@ -299,15 +308,6 @@ export function ParagraphBlock({
                             <Plus className="w-3.5 h-3.5" />
                           </button>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => onDetach(file.id)}
-                          aria-label={`Unlink ${file.filename}`}
-                          title="Unlink from paragraph"
-                          className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
-                        >
-                          <Unlink className="w-3.5 h-3.5" />
-                        </button>
                       </>
                     )}
                   </span>
