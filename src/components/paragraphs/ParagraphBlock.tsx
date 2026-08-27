@@ -187,12 +187,17 @@ export function ParagraphBlock({
 
   return (
     <div
-      className={`group relative rounded-xl border transition-colors bg-transparent ${
-        showBorder ? 'border-slate-700/60' : 'border-transparent'
+      className={`group relative rounded-xl border transition-all bg-transparent ${
+        showBorder
+          ? 'border-slate-700/30 ring-1 ring-white/5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.05)]'
+          : 'border-transparent shadow-none ring-0'
       }`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {showBorder && (
+        <div className="absolute -top-px left-8 right-8 h-px bg-gradient-to-r from-transparent via-slate-500/20 to-transparent pointer-events-none" />
+      )}
       {hasHeading && (
         <div className="px-2 sm:px-3 pt-2">
           <textarea
