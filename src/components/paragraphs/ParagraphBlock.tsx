@@ -269,8 +269,9 @@ export function ParagraphBlock({
 
           {files.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">
-              {files.map((file) => {
+              {files.map((file, fileIndex) => {
                 const Icon = iconFor(file.file_type);
+                const isLast = fileIndex === files.length - 1;
                 return (
                   <span
                     key={file.id}
@@ -286,31 +287,32 @@ export function ParagraphBlock({
                       <span className="truncate max-w-[120px]">{shortName(file.filename)}</span>
                     </button>
                     {canEdit && (
-                      <button
-                        type="button"
-                        onClick={() => onDetach(file.id)}
-                        aria-label={`Unlink ${file.filename}`}
-                        title="Unlink from paragraph"
-                        className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
-                      >
-                        <Unlink className="w-3.5 h-3.5" />
-                      </button>
+                      <>
+                        {isLast && (
+                          <button
+                            type="button"
+                            onClick={onAttach}
+                            aria-label="Attach file"
+                            title="Attach file"
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-emerald-400 hover:bg-slate-600/40 transition-colors"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => onDetach(file.id)}
+                          aria-label={`Unlink ${file.filename}`}
+                          title="Unlink from paragraph"
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+                        >
+                          <Unlink className="w-3.5 h-3.5" />
+                        </button>
+                      </>
                     )}
                   </span>
                 );
               })}
-              {canEdit && (
-                <button
-                  type="button"
-                  onClick={onAttach}
-                  aria-label="Attach file"
-                  title="Attach file"
-                  className="inline-flex items-center gap-1.5 h-7 pl-2 pr-2.5 rounded-full bg-slate-700/30 border border-dashed border-slate-600/30 hover:bg-slate-700/50 hover:border-slate-500/40 transition-colors text-[11px] font-medium text-slate-400"
-                >
-                  <Plus className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Attach</span>
-                </button>
-              )}
             </div>
           )}
         </div>
