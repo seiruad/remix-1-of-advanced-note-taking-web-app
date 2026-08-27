@@ -198,8 +198,20 @@ export function ParagraphBlock({
       {showBorder && (
         <div className="absolute -top-px left-8 right-8 h-px bg-gradient-to-r from-transparent via-slate-500/20 to-transparent pointer-events-none" />
       )}
+
+      {canEdit && (
+        <UnifiedMenu
+          items={items}
+          ariaLabel="Paragraph options"
+          onOpenChange={setMenuOpen}
+          triggerClassName="absolute top-2 right-2 z-10 w-7 h-7 text-slate-500 hover:text-slate-200 transition-colors"
+          iconClassName="w-4 h-4"
+          openTriggerClassName="text-slate-100"
+        />
+      )}
+
       {hasHeading && (
-        <div className="px-2 sm:px-3 pt-2">
+        <div className="px-2 sm:px-3 pt-2 pr-10">
           <textarea
             ref={(el) => {
               headingRef.current = el;
@@ -229,7 +241,7 @@ export function ParagraphBlock({
         </div>
       )}
 
-      <div className={`flex items-start gap-1.5 px-2 sm:px-3 min-h-11 ${hasHeading ? 'pt-1 pb-2' : 'py-2'}`}>
+      <div className={`flex items-start gap-1.5 px-2 sm:px-3 min-h-11 pr-10 ${hasHeading ? 'pt-1 pb-2' : 'py-2'}`}>
         <div
           className="flex-1 min-w-0"
           onFocus={() => onFocusEditor(null)}
@@ -290,19 +302,6 @@ export function ParagraphBlock({
             </div>
           )}
         </div>
-
-        {canEdit && (
-          <UnifiedMenu
-            items={items}
-            ariaLabel="Paragraph options"
-            onOpenChange={setMenuOpen}
-            triggerClassName={`w-7 h-7 text-slate-500 hover:text-slate-200 transition-opacity ${
-              hovered || focused || menuOpen ? 'opacity-100' : 'opacity-0 sm:opacity-0 max-sm:opacity-100'
-            }`}
-            iconClassName="w-4 h-4"
-            openTriggerClassName="text-slate-100"
-          />
-        )}
       </div>
     </div>
   );
