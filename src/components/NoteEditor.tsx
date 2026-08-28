@@ -228,21 +228,7 @@ export function NoteEditor({
   const isNewNote = note.is_new ?? false;
 
   return (
-    <div
-      className="flex flex-col h-full bg-slate-900/60 overflow-hidden relative"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-    >
-      {isDragging && (
-        <div className="absolute inset-0 z-40 bg-emerald-900/20 backdrop-blur-sm border-2 border-dashed border-emerald-500 rounded-lg flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <UploadCloud className="w-12 h-12 text-emerald-400 mx-auto mb-2" />
-            <p className="text-emerald-400 font-medium">Drop files to attach</p>
-          </div>
-        </div>
-      )}
+    <div className="flex flex-col h-full bg-slate-900/60 overflow-hidden relative">
 
       {/* ===== FIXED SUPERBLOCK: context + title + toolbar ===== */}
       <div className="flex-shrink-0 bg-slate-800/95 backdrop-blur-md border-b border-slate-700/50 z-30">
