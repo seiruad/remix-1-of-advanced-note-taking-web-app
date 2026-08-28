@@ -551,14 +551,6 @@ export function NoteEditor({
         </div>
       )}
 
-
-      <AttachFileDialog
-        open={attachDialogOpen}
-        onClose={() => setAttachDialogOpen(false)}
-        noteId={note.id}
-        onFileLinked={onFileLinked}
-        existingFileIds={files.map((f) => f.id)}
-      />
     </div>
   );
 }
