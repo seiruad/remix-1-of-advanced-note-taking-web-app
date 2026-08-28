@@ -179,7 +179,7 @@ export function ParagraphList({
         }}
       />
 
-      <AttachFileDialog
+      <UnifiedFileLinkerWindow
         open={attachTarget !== null}
         onClose={() => {
           setAttachTarget(null);
