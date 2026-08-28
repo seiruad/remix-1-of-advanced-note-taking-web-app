@@ -66,10 +66,7 @@ export function NoteEditor({
   workspaces = [],
 }: NoteEditorProps) {
   const [localTitle, setLocalTitle] = useState('');
-  const [isDragging, setIsDragging] = useState(false);
-  const [attachDialogOpen, setAttachDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const navigate = useNavigate();
@@ -78,10 +75,6 @@ export function NoteEditor({
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [renamedNames, setRenamedNames] = useState<Record<string, string>>({});
-
-
-  const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
