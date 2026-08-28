@@ -1,16 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { ParagraphList } from './paragraphs/ParagraphList';
-import { AttachFileDialog } from './AttachFileDialog';
 import { buildFileUrl } from './FilePreviewPage';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Note, FileItem, Folder, Workspace } from '../types/database';
 import { supabase } from '../lib/supabase';
 import {
-  Paperclip,
   Download,
   Trash2,
-  Loader2,
-  UploadCloud,
   X,
   ChevronUp,
   ChevronDown,
@@ -23,7 +19,6 @@ import {
   FolderOpen,
   Inbox,
   Notebook,
-
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
