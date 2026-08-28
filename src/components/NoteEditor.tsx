@@ -76,6 +76,7 @@ export function NoteEditor({
   const [renameValue, setRenameValue] = useState('');
   const [renamedNames, setRenamedNames] = useState<Record<string, string>>({});
 
+  const { user } = useAuth();
   const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const isTypingRef = useRef(false);
