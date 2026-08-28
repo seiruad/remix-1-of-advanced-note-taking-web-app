@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { Loader2, X, Type, Paperclip } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
-import { AttachFileDialog } from '../AttachFileDialog';
+import { UnifiedFileLinkerWindow } from '../UnifiedFileLinkerWindow';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
 import { ParagraphBlock } from './ParagraphBlock';
 import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
