@@ -1,16 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { ParagraphList } from './paragraphs/ParagraphList';
-import { AttachFileDialog } from './AttachFileDialog';
 import { buildFileUrl } from './FilePreviewPage';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Note, FileItem, Folder, Workspace } from '../types/database';
 import { supabase } from '../lib/supabase';
 import {
-  Paperclip,
   Download,
   Trash2,
-  Loader2,
-  UploadCloud,
   X,
   ChevronUp,
   ChevronDown,
@@ -23,7 +19,6 @@ import {
   FolderOpen,
   Inbox,
   Notebook,
-
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -71,10 +66,7 @@ export function NoteEditor({
   workspaces = [],
 }: NoteEditorProps) {
   const [localTitle, setLocalTitle] = useState('');
-  const [isDragging, setIsDragging] = useState(false);
-  const [attachDialogOpen, setAttachDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const navigate = useNavigate();
@@ -84,10 +76,7 @@ export function NoteEditor({
   const [renameValue, setRenameValue] = useState('');
   const [renamedNames, setRenamedNames] = useState<Record<string, string>>({});
 
-
   const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const menuRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const isTypingRef = useRef(false);
@@ -152,89 +141,6 @@ export function NoteEditor({
 
 
 
-  const uploadAndLink = async (file: File) => {
-    if (!note || !user) return;
-    setUploading(true);
-    setError(null);
-    try {
-      const filePath = `${user.id}/${Date.now()}-${file.name}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('attachments')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: fileRecord, error: insertError } = await supabase
-        .from('files')
-        .insert({
-          user_id: user.id,
-          filename: file.name,
-          storage_path: filePath,
-          file_type: file.type || 'application/octet-stream',
-          file_size: file.size,
-        })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-
-      const { error: linkError } = await supabase
-        .from('note_files')
-        .insert({
-          note_id: note.id,
-          file_id: fileRecord.id,
-          user_id: user.id,
-        });
-
-      if (linkError) throw linkError;
-
-      onFileLinked(fileRecord);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to upload file';
-      setError(message);
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) await uploadAndLink(file);
-  };
-
-  const handleDrop = useCallback(
-    async (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsDragging(false);
-      if (!canEdit) return;
-
-      const droppedFiles = Array.from(e.dataTransfer.files);
-      for (const file of droppedFiles) {
-        await uploadAndLink(file);
-      }
-    },
-    [canEdit, note, user]
-  );
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
-  const handleDragEnter = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (canEdit) setIsDragging(true);
-  }, [canEdit]);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.currentTarget === e.target) setIsDragging(false);
-  }, []);
 
   const handleDownload = async (file: FileItem) => {
     const { data, error } = await supabase.storage
@@ -322,21 +228,7 @@ export function NoteEditor({
   const isNewNote = note.is_new ?? false;
 
   return (
-    <div
-      className="flex flex-col h-full bg-slate-900/60 overflow-hidden relative"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-    >
-      {isDragging && (
-        <div className="absolute inset-0 z-40 bg-emerald-900/20 backdrop-blur-sm border-2 border-dashed border-emerald-500 rounded-lg flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <UploadCloud className="w-12 h-12 text-emerald-400 mx-auto mb-2" />
-            <p className="text-emerald-400 font-medium">Drop files to attach</p>
-          </div>
-        </div>
-      )}
+    <div className="flex flex-col h-full bg-slate-900/60 overflow-hidden relative">
 
       {/* ===== FIXED SUPERBLOCK: context + title + toolbar ===== */}
       <div className="flex-shrink-0 bg-slate-800/95 backdrop-blur-md border-b border-slate-700/50 z-30">
@@ -598,43 +490,11 @@ export function NoteEditor({
           </div>
         )}
 
-        <div className="flex items-center gap-2 px-3 sm:px-5 py-2.5">
-          {canEdit && (
-            <>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <button
-                onClick={() => setAttachDialogOpen(true)}
-                disabled={uploading}
-                className={`flex items-center justify-center gap-2 h-11 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-600 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex-shrink-0 ${
-                  files.length > 0 ? '' : 'flex-1'
-                }`}
-              >
-                {uploading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="hidden sm:inline">Uploading…</span>
-                    <span className="sm:hidden">…</span>
-                  </>
-                ) : (
-                  <>
-                    <Paperclip className="w-4 h-4" />
-                    <span className="hidden sm:inline">Attach File</span>
-                    <span className="sm:hidden">Attach</span>
-                  </>
-                )}
-              </button>
-            </>
-          )}
-
-          {files.length > 0 && (
+        {files.length > 0 && (
+          <div className="flex items-center px-3 sm:px-5 py-2.5">
             <button
               onClick={() => setAttachmentsExpanded(!attachmentsExpanded)}
-              className={`flex items-center gap-2 h-11 px-3 rounded-xl text-sm font-medium transition-colors flex-1 min-w-0 justify-between ${
+              className={`flex items-center gap-2 h-11 px-3 rounded-xl text-sm font-medium transition-colors w-full min-w-0 justify-between ${
                 attachmentsExpanded
                   ? 'bg-emerald-500/15 text-emerald-300'
                   : 'bg-slate-700/40 text-slate-300 hover:bg-slate-700/60'
@@ -652,8 +512,8 @@ export function NoteEditor({
                 <ChevronUp className="w-4 h-4 flex-shrink-0" />
               )}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
 
@@ -691,14 +551,6 @@ export function NoteEditor({
         </div>
       )}
 
-
-      <AttachFileDialog
-        open={attachDialogOpen}
-        onClose={() => setAttachDialogOpen(false)}
-        noteId={note.id}
-        onFileLinked={onFileLinked}
-        existingFileIds={files.map((f) => f.id)}
-      />
     </div>
   );
 }
