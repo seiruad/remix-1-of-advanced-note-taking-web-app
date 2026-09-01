@@ -61,7 +61,9 @@ export function UnifiedFileLinkerWindow({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedExpanded, setSelectedExpanded] = useState(false);
   const [linking, setLinking] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadFiles = useCallback(async () => {
@@ -80,6 +82,8 @@ export function UnifiedFileLinkerWindow({
     setError(null);
     setSearchQuery('');
     setSelectedIds([]);
+    setSelectedExpanded(false);
+
     loadFiles();
   }, [open, loadFiles]);
 
@@ -248,10 +252,23 @@ export function UnifiedFileLinkerWindow({
           {/* Selected files */}
           {selectedFiles.length > 0 && (
             <div className="mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2">
-              <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium mb-1.5 px-0.5">
-                Selected · {selectedFiles.length}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5">
+                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
+                  Selected · {selectedFiles.length}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSelectedExpanded((v) => !v)}
+                  className="text-[11px] font-medium text-emerald-300 hover:text-emerald-200 transition-colors"
+                >
+                  {selectedExpanded ? 'Collapse' : 'Show all'}
+                </button>
+              </div>
+              <div
+                className={`flex flex-wrap gap-1.5 overflow-y-auto ${
+                  selectedExpanded ? 'max-h-64 sm:max-h-80' : 'max-h-[4.25rem]'
+                }`}
+              >
                 {selectedFiles.map((file) => (
                   <span
                     key={file.id}
@@ -275,62 +292,75 @@ export function UnifiedFileLinkerWindow({
           )}
 
           {/* Storage list */}
-          <div className="max-h-56 sm:max-h-72 overflow-y-auto space-y-1">
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
-              </div>
-            ) : filteredFiles.length === 0 ? (
-              <div className="text-center py-10">
-                <FileIcon className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                <p className="text-sm text-slate-500">No files found</p>
-              </div>
-            ) : (
-              filteredFiles.map((file) => {
-                const linked = isLinked(file.id);
-                const isSelected = selectedIds.includes(file.id);
-                return (
-                  <button
-                    key={file.id}
-                    onClick={() => !linked && toggle(file.id)}
-                    disabled={linked || linking}
-                    className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors text-left ${
-                      linked
-                        ? 'bg-emerald-500/10 cursor-not-allowed'
-                        : isSelected
-                          ? 'bg-emerald-500/15'
-                          : 'hover:bg-slate-700/40 active:bg-slate-700/60'
-                    }`}
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
-                      {getFileIcon(file.file_type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm font-semibold truncate leading-snug ${
-                          linked || isSelected ? 'text-emerald-100' : 'text-slate-100'
-                        }`}
-                      >
-                        {file.filename}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-0.5">{formatFileSize(file.file_size)}</p>
-                    </div>
-                    {linked ? (
-                      <Link2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    ) : (
-                      <span
-                        className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
-                          isSelected ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
-                        }`}
-                      >
-                        {isSelected && <Check className="w-3.5 h-3.5 text-slate-900" />}
-                      </span>
-                    )}
-                  </button>
-                );
-              })
-            )}
-          </div>
+          {selectedExpanded && selectedFiles.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => setSelectedExpanded(false)}
+              className="w-full h-11 rounded-xl border border-slate-700/50 text-[13px] font-medium text-slate-300 hover:bg-slate-700/40 transition-colors"
+            >
+              Back to files
+            </button>
+          ) : (
+            <div className="max-h-56 sm:max-h-72 overflow-y-auto space-y-1">
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+                </div>
+              ) : filteredFiles.length === 0 ? (
+                <div className="text-center py-10">
+                  <FileIcon className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500">No files found</p>
+                </div>
+              ) : (
+                filteredFiles.map((file) => {
+                  const linked = isLinked(file.id);
+                  const isSelected = selectedIds.includes(file.id);
+                  return (
+                    <button
+                      key={file.id}
+                      onClick={() => !linked && toggle(file.id)}
+                      disabled={linked || linking}
+                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors text-left ${
+                        linked
+                          ? 'bg-emerald-500/10 cursor-not-allowed'
+                          : isSelected
+                            ? 'bg-emerald-500/15'
+                            : 'hover:bg-slate-700/40 active:bg-slate-700/60'
+                      }`}
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
+                        {getFileIcon(file.file_type)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className={`text-sm font-semibold truncate leading-snug ${
+                            linked || isSelected ? 'text-emerald-100' : 'text-slate-100'
+                          }`}
+                        >
+                          {file.filename}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {formatFileSize(file.file_size)}
+                        </p>
+                      </div>
+                      {linked ? (
+                        <Link2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      ) : (
+                        <span
+                          className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
+                            isSelected ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
+                          }`}
+                        >
+                          {isSelected && <Check className="w-3.5 h-3.5 text-slate-900" />}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+
 
           <div className="mt-3 flex items-center gap-2">
             <button
