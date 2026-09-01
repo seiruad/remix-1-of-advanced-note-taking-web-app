@@ -250,12 +250,12 @@ export function UnifiedFileLinkerWindow({
           </div>
 
           {/* Selected files */}
-          {selectedFiles.length > 0 && (
-            <div className="mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2">
-              <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5">
-                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
-                  Selected · {selectedFiles.length}
-                </p>
+          <div className="mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2">
+            <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5">
+              <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
+                Selected · {selectedFiles.length}
+              </p>
+              {selectedFiles.length > 0 && (
                 <button
                   type="button"
                   onClick={() => setSelectedExpanded((v) => !v)}
@@ -263,22 +263,26 @@ export function UnifiedFileLinkerWindow({
                 >
                   {selectedExpanded ? 'Collapse' : 'Show all'}
                 </button>
-              </div>
-              <div
-                className={`flex gap-1.5 ${
-                  selectedExpanded
-                    ? 'flex-wrap overflow-y-auto max-h-64 sm:max-h-80'
-                    : 'flex-nowrap overflow-hidden'
-                }`}
-              >
-
-                {selectedFiles.map((file) => (
+              )}
+            </div>
+            <div
+              className={`flex gap-1.5 ${
+                selectedExpanded && selectedFiles.length > 0
+                  ? 'flex-wrap overflow-y-auto max-h-64 sm:max-h-80'
+                  : 'flex-nowrap overflow-hidden'
+              }`}
+            >
+              {selectedFiles.length === 0 ? (
+                <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500 truncate">
+                  No files selected yet — pick files below or upload a new one.
+                </span>
+              ) : (
+                selectedFiles.map((file) => (
                   <span
                     key={file.id}
                     className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-[11px] font-medium text-emerald-100 flex-shrink-0"
                   >
                     <span className="truncate max-w-[140px]" title={file.filename}>
-
                       {file.filename}
                     </span>
                     <button
@@ -290,10 +294,11 @@ export function UnifiedFileLinkerWindow({
                       <X className="w-3 h-3" />
                     </button>
                   </span>
-                ))}
-              </div>
+                ))
+              )}
             </div>
-          )}
+          </div>
+
 
           {/* Storage list */}
           {selectedExpanded && selectedFiles.length > 0 ? (
