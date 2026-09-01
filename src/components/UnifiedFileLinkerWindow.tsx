@@ -266,10 +266,10 @@ export function UnifiedFileLinkerWindow({
               )}
             </div>
             <div
-              className={`flex gap-1.5 ${
+              className={`flex gap-1.5 items-center ${
                 selectedExpanded && selectedFiles.length > 0
                   ? 'flex-wrap overflow-y-auto max-h-64 sm:max-h-80'
-                  : 'flex-nowrap overflow-hidden'
+                  : 'flex-nowrap overflow-hidden h-7'
               }`}
             >
               {selectedFiles.length === 0 ? (
