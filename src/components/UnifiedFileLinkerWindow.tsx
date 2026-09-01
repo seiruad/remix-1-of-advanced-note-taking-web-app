@@ -265,16 +265,20 @@ export function UnifiedFileLinkerWindow({
                 </button>
               </div>
               <div
-                className={`flex flex-wrap gap-1.5 overflow-y-auto ${
-                  selectedExpanded ? 'max-h-64 sm:max-h-80' : 'max-h-[4.25rem]'
+                className={`flex gap-1.5 ${
+                  selectedExpanded
+                    ? 'flex-wrap overflow-y-auto max-h-64 sm:max-h-80'
+                    : 'flex-nowrap overflow-hidden'
                 }`}
               >
+
                 {selectedFiles.map((file) => (
                   <span
                     key={file.id}
-                    className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-[11px] font-medium text-emerald-100"
+                    className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-[11px] font-medium text-emerald-100 flex-shrink-0"
                   >
                     <span className="truncate max-w-[140px]" title={file.filename}>
+
                       {file.filename}
                     </span>
                     <button
