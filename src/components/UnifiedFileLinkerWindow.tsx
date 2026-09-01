@@ -251,7 +251,7 @@ export function UnifiedFileLinkerWindow({
 
           {/* Selected files */}
           <div className="mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2">
-            <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5">
+            <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5 h-4">
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
                 Selected · {selectedFiles.length}
               </p>
