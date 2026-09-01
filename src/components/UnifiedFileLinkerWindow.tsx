@@ -82,6 +82,8 @@ export function UnifiedFileLinkerWindow({
     setError(null);
     setSearchQuery('');
     setSelectedIds([]);
+    setSelectedExpanded(false);
+
     loadFiles();
   }, [open, loadFiles]);
 
