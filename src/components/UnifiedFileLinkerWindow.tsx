@@ -290,20 +290,20 @@ export function UnifiedFileLinkerWindow({
                 ))
               )}
             </div>
-            {selectedFiles.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setSelectedExpanded((v) => !v)}
-                aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
-                className="mt-1.5 w-full h-6 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-200 hover:bg-slate-700/40 transition-colors"
-              >
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    selectedExpanded ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => selectedFiles.length > 0 && setSelectedExpanded((v) => !v)}
+              disabled={selectedFiles.length === 0}
+              aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
+              className="mt-1.5 w-full h-6 rounded-lg flex items-center justify-center text-slate-500 transition-colors enabled:hover:text-slate-200 enabled:hover:bg-slate-700/40 disabled:text-slate-700 disabled:cursor-default"
+            >
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  selectedExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
           </div>
 
 
