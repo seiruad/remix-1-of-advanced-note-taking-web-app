@@ -337,6 +337,17 @@ export function UnifiedFileLinkerWindow({
                             : 'hover:bg-slate-700/40 active:bg-slate-700/60'
                       }`}
                     >
+                      {linked ? (
+                        <Link2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      ) : (
+                        <span
+                          className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
+                            isSelected ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
+                          }`}
+                        >
+                          {isSelected && <Check className="w-3.5 h-3.5 text-slate-900" />}
+                        </span>
+                      )}
                       <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
                         {getFileIcon(file.file_type)}
                       </div>
@@ -352,17 +363,6 @@ export function UnifiedFileLinkerWindow({
                           {formatFileSize(file.file_size)}
                         </p>
                       </div>
-                      {linked ? (
-                        <Link2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                      ) : (
-                        <span
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
-                            isSelected ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
-                          }`}
-                        >
-                          {isSelected && <Check className="w-3.5 h-3.5 text-slate-900" />}
-                        </span>
-                      )}
                     </button>
                   );
                 })
