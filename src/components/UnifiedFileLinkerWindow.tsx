@@ -310,7 +310,7 @@ export function UnifiedFileLinkerWindow({
               Back to files
             </button>
           ) : (
-            <div className="max-h-56 sm:max-h-72 overflow-y-auto space-y-1">
+            <div className="max-h-56 sm:max-h-72 lg:max-h-[26rem] overflow-y-auto space-y-1">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
