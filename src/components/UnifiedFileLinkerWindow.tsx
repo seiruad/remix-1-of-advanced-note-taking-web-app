@@ -8,6 +8,8 @@ import {
   Link2,
   Paperclip,
   Check,
+  ChevronDown,
+
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -255,15 +257,6 @@ export function UnifiedFileLinkerWindow({
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
                 Selected · {selectedFiles.length}
               </p>
-              {selectedFiles.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedExpanded((v) => !v)}
-                  className="text-[11px] font-medium text-emerald-300 hover:text-emerald-200 transition-colors"
-                >
-                  {selectedExpanded ? 'Collapse' : 'Show all'}
-                </button>
-              )}
             </div>
             <div
               className={`flex gap-1.5 items-center ${
@@ -297,7 +290,22 @@ export function UnifiedFileLinkerWindow({
                 ))
               )}
             </div>
+            {selectedFiles.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setSelectedExpanded((v) => !v)}
+                aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
+                className="mt-1.5 w-full h-6 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-200 hover:bg-slate-700/40 transition-colors"
+              >
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    selectedExpanded ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+            )}
           </div>
+
 
 
           {/* Storage list */}
