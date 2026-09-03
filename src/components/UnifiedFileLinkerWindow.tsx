@@ -280,7 +280,7 @@ export function UnifiedFileLinkerWindow({
                 selectedFiles.map((file) => (
                   <span
                     key={file.id}
-                    className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-[11px] font-medium text-emerald-100 flex-shrink-0"
+                    className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors text-[11px] font-medium text-slate-300 flex-shrink-0"
                   >
                     <span className="truncate max-w-[140px]" title={file.filename}>
                       {file.filename}
@@ -289,7 +289,7 @@ export function UnifiedFileLinkerWindow({
                       type="button"
                       onClick={() => toggle(file.id)}
                       aria-label={`Deselect ${file.filename}`}
-                      className="w-5 h-5 rounded-full flex items-center justify-center text-emerald-200/70 hover:text-white hover:bg-emerald-500/25 transition-colors"
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
                     >
                       <X className="w-3 h-3" />
                     </button>
