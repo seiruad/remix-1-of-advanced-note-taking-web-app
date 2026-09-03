@@ -175,7 +175,7 @@ export function UnifiedFileLinkerWindow({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-slate-800 rounded-t-2xl sm:rounded-2xl border-0 sm:border sm:border-slate-700/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] w-full max-w-lg sm:max-w-2xl lg:max-w-4xl sm:mx-4 overflow-hidden max-h-[90vh] lg:max-h-[85vh] flex flex-col">
+      <div className="bg-slate-800 rounded-t-2xl sm:rounded-2xl border-0 sm:border sm:border-slate-700/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] w-full max-w-lg sm:max-w-2xl lg:max-w-4xl sm:mx-4 overflow-hidden h-[85vh] sm:h-[600px] lg:h-[680px] max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="h-14 flex items-center justify-between gap-2 px-4 sm:px-5 border-b border-slate-700/50 flex-shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -199,7 +199,7 @@ export function UnifiedFileLinkerWindow({
         </div>
 
         {/* Body */}
-        <div className="p-3 sm:p-5 overflow-y-auto">
+        <div className="p-3 sm:p-5 flex-1 min-h-0 flex flex-col">
           {error && (
             <div className="mb-3 flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-sm text-red-400">
               <span className="flex-1 min-w-0 break-words">{error}</span>
@@ -310,7 +310,7 @@ export function UnifiedFileLinkerWindow({
               Back to files
             </button>
           ) : (
-            <div className="max-h-56 sm:max-h-72 lg:max-h-[26rem] overflow-y-auto space-y-1">
+            <div className="flex-1 min-h-0 overflow-y-auto space-y-1">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
@@ -371,7 +371,7 @@ export function UnifiedFileLinkerWindow({
           )}
 
 
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex items-center gap-2 flex-shrink-0">
             <button
               onClick={onClose}
               disabled={linking}
