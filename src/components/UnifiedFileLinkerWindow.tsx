@@ -252,19 +252,24 @@ export function UnifiedFileLinkerWindow({
           </div>
 
           {/* Selected files */}
-          <div className="mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2">
+          <div
+            className={`mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex flex-col ${
+              selectedExpanded && selectedFiles.length > 0 ? 'flex-1 min-h-0' : ''
+            }`}
+          >
             <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5 h-4">
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
                 Selected · {selectedFiles.length}
               </p>
             </div>
             <div
-              className={`flex gap-1.5 items-center ${
+              className={`flex gap-1.5 ${
                 selectedExpanded && selectedFiles.length > 0
-                  ? 'flex-wrap overflow-y-auto max-h-64 sm:max-h-80'
-                  : 'flex-nowrap overflow-hidden h-7'
+                  ? 'flex-wrap content-start items-start overflow-y-auto flex-1 min-h-0'
+                  : 'flex-nowrap items-center overflow-hidden h-7'
               }`}
             >
+
               {selectedFiles.length === 0 ? (
                 <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500 truncate">
                   No files selected yet — pick files below or upload a new one.
