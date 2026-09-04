@@ -9,9 +9,7 @@ import {
   Paperclip,
   Check,
   ChevronDown,
-  ListFilter,
-
-
+  EyeOff,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -315,9 +313,9 @@ export function UnifiedFileLinkerWindow({
 
           {/* Reminder: the file list is hidden while the Selected block is expanded */}
           {selectedExpanded && selectedFiles.length > 0 && (
-            <div className="mb-2 flex-shrink-0 w-full flex items-center justify-center gap-2 h-8 rounded-xl bg-slate-900/40 border border-slate-700/40 text-[11px] text-slate-500">
-              <ListFilter className="w-3.5 h-3.5" />
-              <span>The storage file list is hidden below</span>
+            <div className="mb-2 flex-shrink-0 w-full flex items-center justify-center gap-2.5 h-11 rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 text-[11px] text-slate-500">
+              <EyeOff className="w-4 h-4 text-slate-600" />
+              <span>The file list is hidden here — collapse Selected to bring it back</span>
             </div>
           )}
 
