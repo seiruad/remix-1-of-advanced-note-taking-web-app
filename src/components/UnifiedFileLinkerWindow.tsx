@@ -9,7 +9,6 @@ import {
   Paperclip,
   Check,
   ChevronDown,
-  EyeOff,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
