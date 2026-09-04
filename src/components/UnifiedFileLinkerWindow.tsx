@@ -312,21 +312,13 @@ export function UnifiedFileLinkerWindow({
 
           {/* Reminder: the file list is hidden while the Selected block is expanded */}
           {selectedExpanded && selectedFiles.length > 0 && (
-            <div className="mb-2 flex-shrink-0 w-full rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 p-2 flex flex-col gap-0.5">
-              {['document.pdf', 'image.png'].map((name) => (
-                <div
-                  key={name}
-                  className="flex items-center gap-3 rounded-lg px-2 py-1.5 opacity-50 pointer-events-none"
-                  aria-hidden="true"
-                >
-                  <div className="w-7 h-7 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-xs">
-                    📄
-                  </div>
-                  <p className="text-xs font-semibold text-slate-400 truncate">{name}</p>
-                </div>
-              ))}
-              <p className="text-[10px] text-slate-500 text-center py-1 border-t border-dashed border-slate-700/50">
-                File list is hidden here — collapse Selected to show it
+            <div className="mb-2 flex-shrink-0 w-full h-16 rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 flex items-center justify-center gap-2.5 pointer-events-none">
+              <span className="relative w-6 h-7 flex-shrink-0" aria-hidden="true">
+                <FileIcon className="absolute inset-0 w-5 h-6 text-slate-700 translate-x-1 -translate-y-0.5" />
+                <FileIcon className="absolute inset-0 w-5 h-6 text-slate-500" />
+              </span>
+              <p className="text-[11px] text-slate-500">
+                The file list lives here — collapse Selected to show it
               </p>
             </div>
           )}
