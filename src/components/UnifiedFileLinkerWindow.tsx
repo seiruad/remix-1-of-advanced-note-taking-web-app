@@ -9,7 +9,6 @@ import {
   Paperclip,
   Check,
   ChevronDown,
-  EyeOff,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -313,9 +312,25 @@ export function UnifiedFileLinkerWindow({
 
           {/* Reminder: the file list is hidden while the Selected block is expanded */}
           {selectedExpanded && selectedFiles.length > 0 && (
-            <div className="mb-2 flex-shrink-0 w-full flex items-center justify-center gap-2.5 h-11 rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 text-[11px] text-slate-500">
-              <EyeOff className="w-4 h-4 text-slate-600" />
-              <span>The file list is hidden here — collapse Selected to bring it back</span>
+            <div className="mb-2 flex-shrink-0 w-full rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 p-2 flex flex-col gap-1.5">
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 rounded-lg px-2 py-1.5 opacity-40 pointer-events-none"
+                  aria-hidden="true"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0">
+                    <FileIcon className="w-3.5 h-3.5 text-slate-500" />
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-1.5">
+                    <div className="h-2 w-1/3 rounded bg-slate-700/70" />
+                    <div className="h-1.5 w-1/5 rounded bg-slate-700/50" />
+                  </div>
+                </div>
+              ))}
+              <p className="text-[10px] text-slate-500 text-center py-1 border-t border-dashed border-slate-700/50">
+                File list is hidden here — collapse Selected to show it
+              </p>
             </div>
           )}
 
