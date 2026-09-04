@@ -311,10 +311,22 @@ export function UnifiedFileLinkerWindow({
 
           </div>
 
-
+          {/* Reminder: the file list is hidden while the Selected block is expanded */}
+          {selectedExpanded && selectedFiles.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setSelectedExpanded(false)}
+              className="mb-2 flex-shrink-0 w-full flex items-center justify-center gap-2 h-8 rounded-xl bg-slate-900/40 border border-slate-700/40 text-[11px] text-slate-500 hover:text-slate-300 hover:border-slate-600/50 transition-colors"
+            >
+              <ListFiles className="w-3.5 h-3.5" />
+              <span>The storage file list is hidden below — tap to show it</span>
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+          )}
 
           {/* Storage list */}
           {selectedExpanded && selectedFiles.length > 0 ? null : (
+
 
             <div className="flex-1 min-h-0 overflow-y-auto space-y-1">
               {loading ? (
