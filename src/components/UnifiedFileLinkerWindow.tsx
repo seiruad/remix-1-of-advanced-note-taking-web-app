@@ -314,15 +314,8 @@ export function UnifiedFileLinkerWindow({
 
 
           {/* Storage list */}
-          {selectedExpanded && selectedFiles.length > 0 ? (
-            <button
-              type="button"
-              onClick={() => setSelectedExpanded(false)}
-              className="w-full h-11 rounded-xl border border-slate-700/50 text-[13px] font-medium text-slate-300 hover:bg-slate-700/40 transition-colors"
-            >
-              Back to files
-            </button>
-          ) : (
+          {selectedExpanded && selectedFiles.length > 0 ? null : (
+
             <div className="flex-1 min-h-0 overflow-y-auto space-y-1">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
