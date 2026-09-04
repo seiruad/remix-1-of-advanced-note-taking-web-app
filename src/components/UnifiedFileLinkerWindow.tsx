@@ -312,20 +312,17 @@ export function UnifiedFileLinkerWindow({
 
           {/* Reminder: the file list is hidden while the Selected block is expanded */}
           {selectedExpanded && selectedFiles.length > 0 && (
-            <div className="mb-2 flex-shrink-0 w-full rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 p-2 flex flex-col gap-1.5">
-              {[0, 1].map((i) => (
+            <div className="mb-2 flex-shrink-0 w-full rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 p-2 flex flex-col gap-0.5">
+              {['document.pdf', 'image.png'].map((name) => (
                 <div
-                  key={i}
-                  className="flex items-center gap-3 rounded-lg px-2 py-1.5 opacity-40 pointer-events-none"
+                  key={name}
+                  className="flex items-center gap-3 rounded-lg px-2 py-1.5 opacity-50 pointer-events-none"
                   aria-hidden="true"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0">
-                    <FileIcon className="w-3.5 h-3.5 text-slate-500" />
+                  <div className="w-7 h-7 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-xs">
+                    📄
                   </div>
-                  <div className="flex-1 min-w-0 space-y-1.5">
-                    <div className="h-2 w-1/3 rounded bg-slate-700/70" />
-                    <div className="h-1.5 w-1/5 rounded bg-slate-700/50" />
-                  </div>
+                  <p className="text-xs font-semibold text-slate-400 truncate">{name}</p>
                 </div>
               ))}
               <p className="text-[10px] text-slate-500 text-center py-1 border-t border-dashed border-slate-700/50">
