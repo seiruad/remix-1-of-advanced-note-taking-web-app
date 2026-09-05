@@ -9,6 +9,7 @@ import {
   Paperclip,
   Check,
   ChevronDown,
+  FolderOpen,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -312,11 +313,8 @@ export function UnifiedFileLinkerWindow({
 
           {/* Reminder: the file list is hidden while the Selected block is expanded */}
           {selectedExpanded && selectedFiles.length > 0 && (
-            <div className="mb-2 flex-shrink-0 w-full h-16 rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 flex items-center justify-center gap-2.5 pointer-events-none">
-              <span className="relative w-6 h-7 flex-shrink-0" aria-hidden="true">
-                <FileIcon className="absolute inset-0 w-5 h-6 text-slate-700 translate-x-1 -translate-y-0.5" />
-                <FileIcon className="absolute inset-0 w-5 h-6 text-slate-500" />
-              </span>
+            <div className="mb-2 flex-shrink-0 w-full h-16 rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 flex items-center gap-2.5 px-4 pointer-events-none">
+              <FolderOpen className="w-5 h-5 text-slate-500 flex-shrink-0" aria-hidden="true" />
               <p className="text-[11px] text-slate-500">
                 The file list lives here — collapse Selected to show it
               </p>
