@@ -9,6 +9,7 @@ import {
   Paperclip,
   Check,
   ChevronDown,
+  FolderOpen,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
