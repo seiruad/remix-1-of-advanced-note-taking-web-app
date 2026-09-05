@@ -65,8 +65,30 @@ export function UnifiedFileLinkerWindow({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedExpanded, setSelectedExpanded] = useState(false);
   const [linking, setLinking] = useState(false);
+  const [chipsClipped, setChipsClipped] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chipsOuterRef = useRef<HTMLDivElement>(null);
+  const chipsInnerRef = useRef<HTMLDivElement>(null);
+
+  // In collapsed mode the chips row is right-aligned and clipped on the left;
+  // detect overflow to fade out the hidden left edge.
+  useEffect(() => {
+    if (selectedExpanded) {
+      setChipsClipped(false);
+      return;
+    }
+    const check = () => {
+      const outer = chipsOuterRef.current;
+      const inner = chipsInnerRef.current;
+      if (!outer || !inner) return;
+      setChipsClipped(inner.offsetWidth > outer.clientWidth + 1);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    if (chipsOuterRef.current) ro.observe(chipsOuterRef.current);
+    return () => ro.disconnect();
+  }, [selectedExpanded, selectedIds]);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
