@@ -68,25 +68,23 @@ export function UnifiedFileLinkerWindow({
   const [chipsClipped, setChipsClipped] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const chipsOuterRef = useRef<HTMLDivElement>(null);
-  const chipsInnerRef = useRef<HTMLDivElement>(null);
+  const chipsMiddleRef = useRef<HTMLDivElement>(null);
 
-  // In collapsed mode the chips row is right-aligned and clipped on the left;
-  // detect overflow to fade out the hidden left edge.
+  // In collapsed mode the first and last chips are pinned; middle chips live in a
+  // clipped container between them. Detect overflow there to fade out the hidden edge.
   useEffect(() => {
     if (selectedExpanded) {
       setChipsClipped(false);
       return;
     }
     const check = () => {
-      const outer = chipsOuterRef.current;
-      const inner = chipsInnerRef.current;
-      if (!outer || !inner) return;
-      setChipsClipped(inner.offsetWidth > outer.clientWidth + 1);
+      const middle = chipsMiddleRef.current;
+      if (!middle) return;
+      setChipsClipped(middle.scrollWidth > middle.clientWidth + 1);
     };
     check();
     const ro = new ResizeObserver(check);
-    if (chipsOuterRef.current) ro.observe(chipsOuterRef.current);
+    if (chipsMiddleRef.current) ro.observe(chipsMiddleRef.current);
     return () => ro.disconnect();
   }, [selectedExpanded, selectedIds]);
 
@@ -197,6 +195,25 @@ export function UnifiedFileLinkerWindow({
     .map((id) => files.find((f) => f.id === id))
     .filter((f): f is FileItem => Boolean(f));
 
+  const renderChip = (file: FileItem) => (
+    <span
+      key={file.id}
+      className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors text-[11px] font-medium text-slate-300 flex-shrink-0"
+    >
+      <span className="truncate max-w-[140px]" title={file.filename}>
+        {file.filename}
+      </span>
+      <button
+        type="button"
+        onClick={() => toggle(file.id)}
+        aria-label={`Deselect ${file.filename}`}
+        className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+      >
+        <X className="w-3 h-3" />
+      </button>
+    </span>
+  );
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-slate-800 rounded-t-2xl sm:rounded-2xl border-0 sm:border sm:border-slate-700/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] w-full max-w-lg sm:max-w-2xl lg:max-w-4xl sm:mx-4 overflow-hidden h-[85vh] sm:h-[600px] lg:h-[680px] max-h-[90vh] flex flex-col">
@@ -285,51 +302,35 @@ export function UnifiedFileLinkerWindow({
               </p>
             </div>
             <div
-              ref={chipsOuterRef}
               className={`${
                 selectedExpanded && selectedFiles.length > 0
                   ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
-                  : `flex items-center overflow-hidden h-7 ${
-                      chipsClipped ? 'justify-end' : 'justify-start'
-                    }`
-              } ${
-                chipsClipped
-                  ? '[mask-image:linear-gradient(to_right,transparent,black_28px)]'
-                  : ''
+                  : 'flex items-center overflow-hidden h-7'
               }`}
             >
               {selectedFiles.length === 0 ? (
                 <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500 truncate">
                   No files selected yet — pick files below or upload a new one.
                 </span>
+              ) : selectedExpanded && selectedFiles.length > 0 ? (
+                selectedFiles.map(renderChip)
+              ) : selectedFiles.length === 1 ? (
+                renderChip(selectedFiles[0])
               ) : (
-                <div
-                  ref={chipsInnerRef}
-                  className={
-                    selectedExpanded && selectedFiles.length > 0
-                      ? 'contents'
-                      : 'flex gap-1.5 items-center w-max'
-                  }
-                >
-                  {selectedFiles.map((file) => (
-                    <span
-                      key={file.id}
-                      className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors text-[11px] font-medium text-slate-300 flex-shrink-0"
-                    >
-                      <span className="truncate max-w-[140px]" title={file.filename}>
-                        {file.filename}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => toggle(file.id)}
-                        aria-label={`Deselect ${file.filename}`}
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
+                <>
+                  {renderChip(selectedFiles[0])}
+                  <div
+                    ref={chipsMiddleRef}
+                    className={`flex gap-1.5 items-center overflow-hidden min-w-0 ${
+                      chipsClipped
+                        ? '[mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)]'
+                        : ''
+                    }`}
+                  >
+                    {selectedFiles.slice(1, -1).map(renderChip)}
+                  </div>
+                  {renderChip(selectedFiles[selectedFiles.length - 1])}
+                </>
               )}
             </div>
           </div>
