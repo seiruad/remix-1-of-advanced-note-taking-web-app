@@ -232,10 +232,18 @@ export function UnifiedFileLinkerWindow({
   const selectedFiles = selectedIds
     .map((id) => files.find((f) => f.id === id))
     .filter((f): f is FileItem => Boolean(f));
+  const middleFiles = selectedFiles.slice(1, -1);
+  const middleHiddenCount =
+    middleVisibleCount === null ? 0 : Math.max(middleFiles.length - middleVisibleCount, 0);
+  const visibleMiddleFiles =
+    middleVisibleCount === null || middleVisibleCount === 0
+      ? []
+      : middleFiles.slice(-middleVisibleCount);
 
   const renderChip = (file: FileItem) => (
     <span
       key={file.id}
+      data-chip-id={file.id}
       className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors text-[11px] font-medium text-slate-300 flex-shrink-0"
     >
       <span className="truncate max-w-[140px]" title={file.filename}>
