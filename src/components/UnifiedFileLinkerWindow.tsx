@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import {
   UploadCloud,
   File as FileIcon,
@@ -65,28 +65,66 @@ export function UnifiedFileLinkerWindow({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedExpanded, setSelectedExpanded] = useState(false);
   const [linking, setLinking] = useState(false);
-  const [chipsClipped, setChipsClipped] = useState(false);
+  /** How many middle chips fit between the pinned first/last ones; null = not measured yet (show all). */
+  const [middleVisibleCount, setMiddleVisibleCount] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chipsRowRef = useRef<HTMLDivElement>(null);
   const chipsMiddleRef = useRef<HTMLDivElement>(null);
+  const ellipsisRef = useRef<HTMLSpanElement>(null);
+  const chipWidthsRef = useRef<Map<string, number>>(new Map());
 
-  // In collapsed mode the first and last chips are pinned; middle chips live in a
-  // clipped container between them. Detect overflow there to fade out the hidden edge.
-  useEffect(() => {
+  // In collapsed mode the first and last chips are always pinned. Middle chips
+  // are shown only while they fit; the rest collapse into a "•••" pill.
+  useLayoutEffect(() => {
     if (selectedExpanded) {
-      setChipsClipped(false);
+      setMiddleVisibleCount(null);
       return;
     }
-    const check = () => {
+    const selFiles = selectedIds
+      .map((id) => files.find((f) => f.id === id))
+      .filter((f): f is FileItem => Boolean(f));
+    const mids = selFiles.slice(1, -1);
+    if (mids.length === 0) {
+      setMiddleVisibleCount(null);
+      return;
+    }
+    const gap = 6; // gap-1.5
+    const widthOf = (f: FileItem) => chipWidthsRef.current.get(f.id) ?? 90;
+    const fitFromEnd = (budget: number) => {
+      let sum = 0;
+      let k = 0;
+      for (let i = mids.length - 1; i >= 0; i--) {
+        const need = widthOf(mids[i]) + (k > 0 ? gap : 0);
+        if (sum + need > budget) break;
+        sum += need;
+        k++;
+      }
+      return k;
+    };
+    const measure = () => {
+      // Cache the real rendered width of every chip (pinned ones too).
+      chipsRowRef.current
+        ?.querySelectorAll<HTMLElement>('[data-chip-id]')
+        .forEach((el) => {
+          const id = el.dataset.chipId;
+          if (id) chipWidthsRef.current.set(id, el.offsetWidth);
+        });
       const middle = chipsMiddleRef.current;
       if (!middle) return;
-      setChipsClipped(middle.scrollWidth > middle.clientWidth + 1);
+      const available = middle.clientWidth;
+      if (fitFromEnd(available) >= mids.length) {
+        setMiddleVisibleCount(mids.length);
+        return;
+      }
+      const ellipsisW = ellipsisRef.current?.offsetWidth || 34;
+      setMiddleVisibleCount(Math.max(fitFromEnd(available - ellipsisW - gap), 0));
     };
-    check();
-    const ro = new ResizeObserver(check);
+    measure();
+    const ro = new ResizeObserver(measure);
     if (chipsMiddleRef.current) ro.observe(chipsMiddleRef.current);
     return () => ro.disconnect();
-  }, [selectedExpanded, selectedIds]);
+  }, [selectedExpanded, selectedIds, files, middleVisibleCount]);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -194,10 +232,18 @@ export function UnifiedFileLinkerWindow({
   const selectedFiles = selectedIds
     .map((id) => files.find((f) => f.id === id))
     .filter((f): f is FileItem => Boolean(f));
+  const middleFiles = selectedFiles.slice(1, -1);
+  const middleHiddenCount =
+    middleVisibleCount === null ? 0 : Math.max(middleFiles.length - middleVisibleCount, 0);
+  const visibleMiddleFiles =
+    middleVisibleCount === null || middleVisibleCount === 0
+      ? []
+      : middleFiles.slice(-middleVisibleCount);
 
   const renderChip = (file: FileItem) => (
     <span
       key={file.id}
+      data-chip-id={file.id}
       className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors text-[11px] font-medium text-slate-300 flex-shrink-0"
     >
       <span className="truncate max-w-[140px]" title={file.filename}>
@@ -302,10 +348,11 @@ export function UnifiedFileLinkerWindow({
               </p>
             </div>
             <div
+              ref={chipsRowRef}
               className={`${
                 selectedExpanded && selectedFiles.length > 0
                   ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
-                  : 'flex items-center overflow-hidden h-7'
+                  : 'flex items-center gap-1.5 overflow-hidden h-7'
               }`}
             >
               {selectedFiles.length === 0 ? (
@@ -319,16 +366,23 @@ export function UnifiedFileLinkerWindow({
               ) : (
                 <>
                   {renderChip(selectedFiles[0])}
-                  <div
-                    ref={chipsMiddleRef}
-                    className={`flex gap-1.5 items-center overflow-hidden min-w-0 ${
-                      chipsClipped
-                        ? '[mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)]'
-                        : ''
-                    }`}
-                  >
-                    {selectedFiles.slice(1, -1).map(renderChip)}
-                  </div>
+                  {middleFiles.length > 0 && (
+                    <div
+                      ref={chipsMiddleRef}
+                      className="flex items-center gap-1.5 overflow-hidden min-w-0 h-7"
+                    >
+                      {middleHiddenCount > 0 && (
+                        <span
+                          ref={ellipsisRef}
+                          title={`${middleHiddenCount} more file${middleHiddenCount === 1 ? '' : 's'} selected`}
+                          className="inline-flex items-center justify-center h-7 px-3 rounded-full bg-slate-700/40 border border-slate-600/30 text-[11px] font-medium text-slate-400 tracking-[2px] flex-shrink-0 select-none"
+                        >
+                          •••
+                        </span>
+                      )}
+                      {visibleMiddleFiles.map(renderChip)}
+                    </div>
+                  )}
                   {renderChip(selectedFiles[selectedFiles.length - 1])}
                 </>
               )}
