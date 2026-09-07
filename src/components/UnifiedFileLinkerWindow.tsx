@@ -289,7 +289,9 @@ export function UnifiedFileLinkerWindow({
               className={`${
                 selectedExpanded && selectedFiles.length > 0
                   ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
-                  : 'flex justify-end items-center overflow-hidden h-7'
+                  : `flex items-center overflow-hidden h-7 ${
+                      chipsClipped ? 'justify-end' : 'justify-start'
+                    }`
               } ${
                 chipsClipped
                   ? '[mask-image:linear-gradient(to_right,transparent,black_28px)]'
