@@ -195,6 +195,25 @@ export function UnifiedFileLinkerWindow({
     .map((id) => files.find((f) => f.id === id))
     .filter((f): f is FileItem => Boolean(f));
 
+  const renderChip = (file: FileItem) => (
+    <span
+      key={file.id}
+      className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors text-[11px] font-medium text-slate-300 flex-shrink-0"
+    >
+      <span className="truncate max-w-[140px]" title={file.filename}>
+        {file.filename}
+      </span>
+      <button
+        type="button"
+        onClick={() => toggle(file.id)}
+        aria-label={`Deselect ${file.filename}`}
+        className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+      >
+        <X className="w-3 h-3" />
+      </button>
+    </span>
+  );
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-slate-800 rounded-t-2xl sm:rounded-2xl border-0 sm:border sm:border-slate-700/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] w-full max-w-lg sm:max-w-2xl lg:max-w-4xl sm:mx-4 overflow-hidden h-[85vh] sm:h-[600px] lg:h-[680px] max-h-[90vh] flex flex-col">
