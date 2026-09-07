@@ -68,25 +68,23 @@ export function UnifiedFileLinkerWindow({
   const [chipsClipped, setChipsClipped] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const chipsOuterRef = useRef<HTMLDivElement>(null);
-  const chipsInnerRef = useRef<HTMLDivElement>(null);
+  const chipsMiddleRef = useRef<HTMLDivElement>(null);
 
-  // In collapsed mode the chips row is right-aligned and clipped on the left;
-  // detect overflow to fade out the hidden left edge.
+  // In collapsed mode the first and last chips are pinned; middle chips live in a
+  // clipped container between them. Detect overflow there to fade out the hidden edge.
   useEffect(() => {
     if (selectedExpanded) {
       setChipsClipped(false);
       return;
     }
     const check = () => {
-      const outer = chipsOuterRef.current;
-      const inner = chipsInnerRef.current;
-      if (!outer || !inner) return;
-      setChipsClipped(inner.offsetWidth > outer.clientWidth + 1);
+      const middle = chipsMiddleRef.current;
+      if (!middle) return;
+      setChipsClipped(middle.scrollWidth > middle.clientWidth + 1);
     };
     check();
     const ro = new ResizeObserver(check);
-    if (chipsOuterRef.current) ro.observe(chipsOuterRef.current);
+    if (chipsMiddleRef.current) ro.observe(chipsMiddleRef.current);
     return () => ro.disconnect();
   }, [selectedExpanded, selectedIds]);
 
