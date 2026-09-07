@@ -302,7 +302,6 @@ export function UnifiedFileLinkerWindow({
               </p>
             </div>
             <div
-              ref={chipsOuterRef}
               className={`${
                 selectedExpanded && selectedFiles.length > 0
                   ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
