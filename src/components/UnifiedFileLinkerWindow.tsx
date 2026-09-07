@@ -348,10 +348,11 @@ export function UnifiedFileLinkerWindow({
               </p>
             </div>
             <div
+              ref={chipsRowRef}
               className={`${
                 selectedExpanded && selectedFiles.length > 0
                   ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
-                  : 'flex items-center overflow-hidden h-7'
+                  : 'flex items-center gap-1.5 overflow-hidden h-7'
               }`}
             >
               {selectedFiles.length === 0 ? (
@@ -365,16 +366,23 @@ export function UnifiedFileLinkerWindow({
               ) : (
                 <>
                   {renderChip(selectedFiles[0])}
-                  <div
-                    ref={chipsMiddleRef}
-                    className={`flex gap-1.5 items-center overflow-hidden min-w-0 ${
-                      chipsClipped
-                        ? '[mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)]'
-                        : ''
-                    }`}
-                  >
-                    {selectedFiles.slice(1, -1).map(renderChip)}
-                  </div>
+                  {middleFiles.length > 0 && (
+                    <div
+                      ref={chipsMiddleRef}
+                      className="flex items-center gap-1.5 overflow-hidden min-w-0 h-7"
+                    >
+                      {middleHiddenCount > 0 && (
+                        <span
+                          ref={ellipsisRef}
+                          title={`${middleHiddenCount} more file${middleHiddenCount === 1 ? '' : 's'} selected`}
+                          className="inline-flex items-center justify-center h-7 px-3 rounded-full bg-slate-700/40 border border-slate-600/30 text-[11px] font-medium text-slate-400 tracking-[2px] flex-shrink-0 select-none"
+                        >
+                          •••
+                        </span>
+                      )}
+                      {visibleMiddleFiles.map(renderChip)}
+                    </div>
+                  )}
                   {renderChip(selectedFiles[selectedFiles.length - 1])}
                 </>
               )}
