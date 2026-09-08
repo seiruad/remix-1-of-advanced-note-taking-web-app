@@ -103,26 +103,29 @@ export function UnifiedFileLinkerWindow({
       return k;
     };
     const measure = () => {
-      // Cache the real rendered width of every chip (pinned ones too).
-      chipsRowRef.current
-        ?.querySelectorAll<HTMLElement>('[data-chip-id]')
-        .forEach((el) => {
-          const id = el.dataset.chipId;
-          if (id) chipWidthsRef.current.set(id, el.offsetWidth);
-        });
-      const middle = chipsMiddleRef.current;
-      if (!middle) return;
-      const available = middle.clientWidth;
-      if (fitFromEnd(available) >= mids.length) {
+      const row = chipsRowRef.current;
+      if (!row) return;
+      // Cache the real rendered width of every chip currently in the row.
+      row.querySelectorAll<HTMLElement>('[data-chip-id]').forEach((el) => {
+        const id = el.dataset.chipId;
+        if (id) chipWidthsRef.current.set(id, el.offsetWidth);
+      });
+      const firstW = widthOf(selFiles[0]);
+      const lastW = widthOf(selFiles[selFiles.length - 1]);
+      // Space left for the middle chips once the pinned edge chips are placed.
+      const base = row.clientWidth - firstW - lastW - 2 * gap;
+      // Everything fits -> show all middle chips, no ••• pill.
+      if (fitFromEnd(base) >= mids.length) {
         setMiddleVisibleCount(mids.length);
         return;
       }
+      // Not everything fits -> reserve room for the ••• pill.
       const ellipsisW = ellipsisRef.current?.offsetWidth || 34;
-      setMiddleVisibleCount(Math.max(fitFromEnd(available - ellipsisW - gap), 0));
+      setMiddleVisibleCount(Math.max(fitFromEnd(base - ellipsisW - gap), 0));
     };
     measure();
     const ro = new ResizeObserver(measure);
-    if (chipsMiddleRef.current) ro.observe(chipsMiddleRef.current);
+    ro.observe(row);
     return () => ro.disconnect();
   }, [selectedExpanded, selectedIds, files, middleVisibleCount]);
 
