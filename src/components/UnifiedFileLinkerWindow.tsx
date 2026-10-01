@@ -102,9 +102,9 @@ export function UnifiedFileLinkerWindow({
       }
       return k;
     };
+    const row = chipsRowRef.current;
+    if (!row) return;
     const measure = () => {
-      const row = chipsRowRef.current;
-      if (!row) return;
       // Cache the real rendered width of every chip currently in the row.
       row.querySelectorAll<HTMLElement>('[data-chip-id]').forEach((el) => {
         const id = el.dataset.chipId;
