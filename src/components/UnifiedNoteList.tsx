@@ -5,8 +5,7 @@ import {
   FileText,
   Clock,
   FolderOpen,
-  LayoutList,
-  FolderInput,
+  ArrowRight,
   X,
   Trash2,
   Notebook,
@@ -58,6 +57,8 @@ function NoteFolderLinker({
     return a.name.localeCompare(b.name);
   });
   const [selected, setSelected] = useState<string | null>(note.folder_id);
+  const selectedFolder = selected === null ? null : folders.find((f) => f.id === selected) || null;
+  const changed = selected !== note.folder_id;
 
   const handleConfirm = () => {
     if (selected !== note.folder_id) onMove(selected);
