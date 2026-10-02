@@ -89,24 +89,68 @@ function NoteFolderLinker({
           </button>
         </div>
 
-        {/* Note info card */}
+        {/* From → To route (updates live as the user picks a folder) */}
         <div className="px-5 py-3.5 bg-slate-900/30 border-b border-slate-700/40">
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="flex items-center gap-2">
+            {/* From */}
+            <div className="flex items-center gap-1.5 min-w-0 flex-1 rounded-lg bg-slate-700/40 border border-slate-600/40 px-2.5 py-2">
+              <FolderOpen className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+              <span className="text-xs text-slate-400 truncate">
+                {currentFolder ? currentFolder.name : 'No folder'}
+              </span>
+            </div>
+
+            {/* Arrow */}
+            <ArrowRight
+              className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                changed ? 'text-emerald-400' : 'text-slate-600'
+              }`}
+            />
+
+            {/* To */}
+            <div
+              className={`flex items-center gap-1.5 min-w-0 flex-1 rounded-lg px-2.5 py-2 border transition-colors duration-150 ${
+                changed
+                  ? 'bg-emerald-600/15 border-emerald-500/30'
+                  : 'bg-slate-700/40 border-slate-600/40'
+              }`}
+            >
+              {selectedFolder?.is_new ? (
+                <FolderPlus
+                  className={`w-3.5 h-3.5 flex-shrink-0 ${
+                    changed ? 'text-amber-400' : 'text-amber-500/70'
+                  }`}
+                />
+              ) : (
+                <FolderIcon
+                  className={`w-3.5 h-3.5 flex-shrink-0 ${
+                    changed ? 'text-emerald-400' : 'text-slate-500'
+                  }`}
+                />
+              )}
+              <span
+                className={`text-xs truncate ${
+                  changed ? 'text-emerald-300 font-medium' : 'text-slate-400'
+                }`}
+              >
+                {selectedFolder ? selectedFolder.name : 'No folder'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Note info card */}
+        <div className="px-5 py-3 bg-slate-900/20 border-b border-slate-700/40">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0">
               <FileText className="w-4 h-4 text-slate-400" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-white truncate">{note.title || 'Untitled'}</p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+              <div className="flex items-center gap-3 mt-0.5">
                 <span className="flex items-center gap-1 text-xs text-slate-500">
                   <Clock className="w-3 h-3" />
                   {formatDate(note.updated_at)}
-                </span>
-                <span className={`flex items-center gap-1 text-xs ${currentFolder ? 'text-emerald-400/80' : 'text-slate-500'}`}>
-                  <FolderOpen className="w-3 h-3" />
-                  <span className="truncate max-w-[120px]">
-                    {currentFolder ? currentFolder.name : 'No folder'}
-                  </span>
                 </span>
                 {note.files && note.files.length > 0 && (
                   <span className="flex items-center gap-1 text-xs text-slate-500">
@@ -114,12 +158,6 @@ function NoteFolderLinker({
                     {note.files.length}
                   </span>
                 )}
-                <span className="flex items-center gap-1 text-xs text-slate-500">
-                  <LayoutList className="w-3 h-3" />
-                  <span className="truncate max-w-[120px]">
-                    {workspaceName || 'My Notes'}
-                  </span>
-                </span>
               </div>
             </div>
           </div>
