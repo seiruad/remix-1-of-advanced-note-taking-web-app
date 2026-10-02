@@ -578,7 +578,6 @@ export function UnifiedSidebar({
             folders={sortedFolders}
             currentNoteId={currentNoteId}
             searchQuery={searchQuery}
-            workspaceName={workspaceName}
             onSelectNote={onSelectNote}
             onDeleteNote={(note) => setNoteToDelete(note)}
             onMoveNote={onMoveNote}
