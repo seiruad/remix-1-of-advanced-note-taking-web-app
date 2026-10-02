@@ -5,6 +5,7 @@ import {
   FileText,
   Clock,
   FolderOpen,
+  FolderInput,
   ArrowRight,
   X,
   Trash2,
