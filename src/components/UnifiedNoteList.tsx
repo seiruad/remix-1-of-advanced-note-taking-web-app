@@ -344,7 +344,6 @@ export function NoteCard({
           folders={folders}
           onMove={onMove}
           onClose={() => setMoveSheetOpen(false)}
-          workspaceName={workspaceName}
         />
       )}
     </>
@@ -466,7 +465,6 @@ export function UnifiedNoteList({
                   onSelect={() => onSelectNote(note.id)}
                   onDelete={() => onDeleteNote(note)}
                   onMove={(fid) => onMoveNote(note.id, fid)}
-                  workspaceName={workspaceName}
                 />
               ))}
             </div>
@@ -515,7 +513,6 @@ export function UnifiedNoteList({
                   onDelete={() => onDeleteNote(note)}
                   onMove={(fid) => onMoveNote(note.id, fid)}
                   showFolder={false}
-                  workspaceName={workspaceName}
                 />
               ))}
             </div>
