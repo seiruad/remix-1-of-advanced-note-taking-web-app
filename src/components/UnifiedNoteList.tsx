@@ -89,6 +89,30 @@ function NoteFolderLinker({
           </button>
         </div>
 
+        {/* Note info card */}
+        <div className="px-5 py-3 bg-slate-900/20 border-b border-slate-700/40">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0">
+              <FileText className="w-4 h-4 text-slate-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-white truncate">{note.title || 'Untitled'}</p>
+              <div className="flex items-center gap-3 mt-0.5">
+                <span className="flex items-center gap-1 text-xs text-slate-500">
+                  <Clock className="w-3 h-3" />
+                  {formatDate(note.updated_at)}
+                </span>
+                {note.files && note.files.length > 0 && (
+                  <span className="flex items-center gap-1 text-xs text-slate-500">
+                    <FileText className="w-3 h-3" />
+                    {note.files.length}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* From → To route (updates live as the user picks a folder) */}
         <div className="px-5 py-3.5 bg-slate-900/30 border-b border-slate-700/40">
           <div className="flex items-center gap-2">
@@ -135,30 +159,6 @@ function NoteFolderLinker({
               >
                 {selectedFolder ? selectedFolder.name : 'No folder'}
               </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Note info card */}
-        <div className="px-5 py-3 bg-slate-900/20 border-b border-slate-700/40">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0">
-              <FileText className="w-4 h-4 text-slate-400" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white truncate">{note.title || 'Untitled'}</p>
-              <div className="flex items-center gap-3 mt-0.5">
-                <span className="flex items-center gap-1 text-xs text-slate-500">
-                  <Clock className="w-3 h-3" />
-                  {formatDate(note.updated_at)}
-                </span>
-                {note.files && note.files.length > 0 && (
-                  <span className="flex items-center gap-1 text-xs text-slate-500">
-                    <FileText className="w-3 h-3" />
-                    {note.files.length}
-                  </span>
-                )}
-              </div>
             </div>
           </div>
         </div>
