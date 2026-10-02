@@ -240,7 +240,6 @@ export function NoteCard({
   onDelete,
   onMove,
   showFolder = true,
-  workspaceName,
 }: {
   note: NoteWithDetails;
   folders: FolderType[];
@@ -249,7 +248,6 @@ export function NoteCard({
   onDelete: () => void;
   onMove: (folderId: string | null) => void;
   showFolder?: boolean;
-  workspaceName?: string;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [moveSheetOpen, setMoveSheetOpen] = useState(false);
@@ -359,7 +357,6 @@ export interface UnifiedNoteListProps {
   folders: FolderType[];
   currentNoteId: string | null;
   searchQuery: string;
-  workspaceName?: string;
   onSelectNote: (noteId: string) => void;
   onDeleteNote: (note: NoteWithDetails) => void;
   onMoveNote: (noteId: string, folderId: string | null) => void;
@@ -374,7 +371,6 @@ export function UnifiedNoteList({
   folders,
   currentNoteId,
   searchQuery,
-  workspaceName,
   onSelectNote,
   onDeleteNote,
   onMoveNote,
