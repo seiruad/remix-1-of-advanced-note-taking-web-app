@@ -42,13 +42,11 @@ function NoteFolderLinker({
   folders,
   onMove,
   onClose,
-  workspaceName,
 }: {
   note: NoteWithDetails;
   folders: FolderType[];
   onMove: (folderId: string | null) => void;
   onClose: () => void;
-  workspaceName?: string;
 }) {
   const currentFolder = folders.find((f) => f.id === note.folder_id) || null;
   const sortedFolders = [...folders].sort((a, b) => {
