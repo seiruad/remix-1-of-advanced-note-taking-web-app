@@ -187,7 +187,8 @@ function NoteFolderLinker({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
