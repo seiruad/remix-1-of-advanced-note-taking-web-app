@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { UnifiedMenu } from './UnifiedMenu';
 import {
   FileText,
@@ -63,9 +64,9 @@ function NoteFolderLinker({
     onClose();
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -186,7 +187,8 @@ function NoteFolderLinker({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
