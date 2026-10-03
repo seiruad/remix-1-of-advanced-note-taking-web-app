@@ -15,7 +15,7 @@ import {
   X,
   Pencil,
 } from 'lucide-react';
-import { NoteWithDetails, Folder as FolderType } from '../types/database';
+import { NoteWithDetails, Folder as FolderType, Workspace } from '../types/database';
 import { StorageUsage } from './StorageUsage';
 import { UnifiedNoteList } from './UnifiedNoteList';
 import { UnifiedFolderList } from './UnifiedFolderList';
@@ -25,6 +25,8 @@ interface UnifiedSidebarProps {
   workspaceName?: string;
   folders: FolderType[];
   notes: NoteWithDetails[];
+  workspaces: Workspace[];
+  activeWorkspaceId: string | null;
   currentNoteId: string | null;
   searchQuery: string;
   onSearchChange: (q: string) => void;
@@ -34,7 +36,7 @@ interface UnifiedSidebarProps {
   onDeleteFolder: (folderId: string) => void;
   onRenameFolder: (folderId: string, name: string) => void;
   onDeleteNote: (noteId: string) => void;
-  onMoveNote: (noteId: string, folderId: string | null) => void;
+  onMoveNote: (noteId: string, folderId: string | null, workspaceId?: string) => void;
   totalStorageBytes: number;
   onOpenStorage: () => void;
   onOpenWorkspaceManagement: () => void;
