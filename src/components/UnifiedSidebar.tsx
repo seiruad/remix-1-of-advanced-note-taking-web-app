@@ -319,6 +319,8 @@ export function UnifiedSidebar({
   workspaceName,
   folders,
   notes,
+  workspaces,
+  activeWorkspaceId,
   currentNoteId,
   searchQuery,
   onSearchChange,
@@ -578,6 +580,8 @@ export function UnifiedSidebar({
             selectedFolderId={selectedFolderId}
             notes={notes}
             folders={sortedFolders}
+            workspaces={workspaces}
+            activeWorkspaceId={activeWorkspaceId}
             currentNoteId={currentNoteId}
             searchQuery={searchQuery}
             onSelectNote={onSelectNote}
