@@ -364,8 +364,9 @@ function NotesApp() {
   );
 
   const handleMoveNote = useCallback(
-    async (noteId: string, folderId: string | null) => {
-      const updates = { folder_id: folderId };
+    async (noteId: string, folderId: string | null, workspaceId?: string) => {
+      const updates: { folder_id: string | null; workspace_id?: string } = { folder_id: folderId };
+      if (workspaceId) updates.workspace_id = workspaceId;
 
       setNotes((prev) =>
         prev.map((n) =>
@@ -517,6 +518,8 @@ function NotesApp() {
               workspaceName={activeWorkspace?.name}
               folders={workspaceFolders}
               notes={workspaceNotes}
+              workspaces={workspaces}
+              activeWorkspaceId={activeWorkspaceId}
               currentNoteId={currentNoteId}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -566,6 +569,8 @@ function NotesApp() {
               workspaceName={activeWorkspace?.name}
               folders={workspaceFolders}
               notes={workspaceNotes}
+              workspaces={workspaces}
+              activeWorkspaceId={activeWorkspaceId}
               currentNoteId={currentNoteId}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
