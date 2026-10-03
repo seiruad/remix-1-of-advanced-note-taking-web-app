@@ -13,8 +13,9 @@ import {
   Search,
   Folder as FolderIcon,
   FolderPlus,
+  Layers,
 } from 'lucide-react';
-import { NoteWithDetails, Folder as FolderType } from '../types/database';
+import { NoteWithDetails, Folder as FolderType, Workspace } from '../types/database';
 
 export const NO_FOLDER_ID = '__no_folder__';
 
@@ -35,17 +36,23 @@ export function formatDate(date: string) {
   return then.toLocaleDateString();
 }
 
-/* ---------- NoteFolderLinker (mobile-first folder picker for a note) ---------- */
+type MoveTarget = { kind: 'folder' | 'workspace' | 'none'; id: string | null };
+
+/* ---------- NoteFolderLinker (mobile-first folder/workspace picker for a note) ---------- */
 
 function NoteFolderLinker({
   note,
   folders,
+  workspaces,
+  activeWorkspaceId,
   onMove,
   onClose,
 }: {
   note: NoteWithDetails;
   folders: FolderType[];
-  onMove: (folderId: string | null) => void;
+  workspaces: Workspace[];
+  activeWorkspaceId: string | null;
+  onMove: (folderId: string | null, workspaceId?: string) => void;
   onClose: () => void;
 }) {
   const currentFolder = folders.find((f) => f.id === note.folder_id) || null;
@@ -55,12 +62,24 @@ function NoteFolderLinker({
     if (aNew !== bNew) return aNew ? -1 : 1;
     return a.name.localeCompare(b.name);
   });
-  const [selected, setSelected] = useState<string | null>(note.folder_id);
-  const selectedFolder = selected === null ? null : folders.find((f) => f.id === selected) || null;
-  const changed = selected !== note.folder_id;
+  const [tab, setTab] = useState<'folders' | 'workspaces'>('folders');
+  const initialTarget = useMemo<MoveTarget>(
+    () => (note.folder_id ? { kind: 'folder', id: note.folder_id } : { kind: 'none', id: null }),
+    [note.folder_id]
+  );
+  const [selected, setSelected] = useState<MoveTarget>(initialTarget);
+
+  const selectedFolder = selected.kind === 'folder' ? folders.find((f) => f.id === selected.id) || null : null;
+  const selectedWorkspace = selected.kind === 'workspace' ? workspaces.find((w) => w.id === selected.id) || null : null;
+  const changed = JSON.stringify(selected) !== JSON.stringify(initialTarget);
 
   const handleConfirm = () => {
-    if (selected !== note.folder_id) onMove(selected);
+    if (!changed) return;
+    if (selected.kind === 'workspace' && selected.id) {
+      onMove(null, selected.id);
+    } else {
+      onMove(selected.kind === 'folder' ? selected.id : null);
+    }
     onClose();
   };
 
@@ -79,7 +98,7 @@ function NoteFolderLinker({
             <div className="w-8 h-8 rounded-lg bg-emerald-600/15 border border-emerald-500/20 flex items-center justify-center">
               <FolderInput className="w-4 h-4 text-emerald-400" />
             </div>
-            <h3 className="text-sm font-semibold text-white">Move to folder</h3>
+            <h3 className="text-sm font-semibold text-white">Move</h3>
           </div>
           <button
             onClick={onClose}
@@ -113,7 +132,7 @@ function NoteFolderLinker({
           </div>
         </div>
 
-        {/* From → To route (updates live as the user picks a folder) */}
+        {/* From → To route (updates live as the user picks a folder or workspace) */}
         <div className="px-5 py-3.5 bg-slate-900/30 border-b border-slate-700/40">
           <div className="flex items-center gap-2">
             {/* From */}
@@ -139,7 +158,13 @@ function NoteFolderLinker({
                   : 'bg-slate-700/40 border-slate-600/40'
               }`}
             >
-              {selectedFolder?.is_new ? (
+              {selected.kind === 'workspace' ? (
+                <Layers
+                  className={`w-3.5 h-3.5 flex-shrink-0 ${
+                    changed ? 'text-emerald-400' : 'text-slate-500'
+                  }`}
+                />
+              ) : selectedFolder?.is_new ? (
                 <FolderPlus
                   className={`w-3.5 h-3.5 flex-shrink-0 ${
                     changed ? 'text-amber-400' : 'text-amber-500/70'
@@ -157,55 +182,127 @@ function NoteFolderLinker({
                   changed ? 'text-emerald-300 font-medium' : 'text-slate-400'
                 }`}
               >
-                {selectedFolder ? selectedFolder.name : 'No folder'}
+                {selected.kind === 'workspace'
+                  ? selectedWorkspace
+                    ? selectedWorkspace.name
+                    : 'Workspace'
+                  : selectedFolder
+                    ? selectedFolder.name
+                    : 'No folder'}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Folder list (radio-style single selection) */}
+        {/* Folders / Workspaces switch */}
+        <div className="px-5 pt-3 pb-3 bg-slate-900/20 border-b border-slate-700/40">
+          <div className="flex p-1 rounded-xl bg-slate-900/60 border border-slate-700/60">
+            <button
+              onClick={() => setTab('folders')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                tab === 'folders'
+                  ? 'bg-emerald-600/20 text-emerald-300'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <FolderIcon className="w-3.5 h-3.5" />
+              Folders
+            </button>
+            <button
+              onClick={() => setTab('workspaces')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                tab === 'workspaces'
+                  ? 'bg-emerald-600/20 text-emerald-300'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Workspaces
+            </button>
+          </div>
+        </div>
+
+        {/* List (radio-style single selection) */}
         <div className="flex-1 overflow-y-auto py-2">
-          <button
-            onClick={() => setSelected(null)}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
-              selected === null ? 'bg-emerald-600/10' : 'hover:bg-slate-700/40'
-            }`}
-          >
-            <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-              selected === null ? 'border-emerald-500' : 'border-slate-600'
-            }`}>
-              {selected === null && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
-            </span>
-            <FolderOpen className={`w-4 h-4 flex-shrink-0 ${selected === null ? 'text-emerald-400' : 'text-slate-500'}`} />
-            <span className={selected === null ? 'text-emerald-400 font-medium' : 'text-slate-300'}>No folder</span>
-          </button>
-
-          {sortedFolders.length > 0 && <div className="border-t border-slate-700/40 my-1" />}
-
-          {sortedFolders.map((f) => {
-            const isSelected = selected === f.id;
-            return (
+          {tab === 'folders' ? (
+            <>
               <button
-                key={f.id}
-                onClick={() => setSelected(f.id)}
+                onClick={() => setSelected({ kind: 'none', id: null })}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
-                  isSelected ? 'bg-emerald-600/10' : 'hover:bg-slate-700/40'
+                  selected.kind === 'none' ? 'bg-emerald-600/10' : 'hover:bg-slate-700/40'
                 }`}
               >
                 <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                  isSelected ? 'border-emerald-500' : 'border-slate-600'
+                  selected.kind === 'none' ? 'border-emerald-500' : 'border-slate-600'
                 }`}>
-                  {isSelected && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
+                  {selected.kind === 'none' && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
                 </span>
-                {f.is_new ? (
-                  <FolderPlus className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-amber-400' : 'text-amber-500/70'}`} />
-                ) : (
-                  <FolderIcon className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-emerald-400' : 'text-slate-500'}`} />
-                )}
-                <span className={isSelected ? 'text-emerald-400 font-medium' : 'text-slate-300'}>{f.name}</span>
+                <FolderOpen className={`w-4 h-4 flex-shrink-0 ${selected.kind === 'none' ? 'text-emerald-400' : 'text-slate-500'}`} />
+                <span className={selected.kind === 'none' ? 'text-emerald-400 font-medium' : 'text-slate-300'}>No folder</span>
               </button>
-            );
-          })}
+
+              {sortedFolders.length > 0 && <div className="border-t border-slate-700/40 my-1" />}
+
+              {sortedFolders.map((f) => {
+                const isSelected = selected.kind === 'folder' && selected.id === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setSelected({ kind: 'folder', id: f.id })}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                      isSelected ? 'bg-emerald-600/10' : 'hover:bg-slate-700/40'
+                    }`}
+                  >
+                    <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                      isSelected ? 'border-emerald-500' : 'border-slate-600'
+                    }`}>
+                      {isSelected && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
+                    </span>
+                    {f.is_new ? (
+                      <FolderPlus className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-amber-400' : 'text-amber-500/70'}`} />
+                    ) : (
+                      <FolderIcon className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-emerald-400' : 'text-slate-500'}`} />
+                    )}
+                    <span className={isSelected ? 'text-emerald-400 font-medium' : 'text-slate-300'}>{f.name}</span>
+                  </button>
+                );
+              })}
+            </>
+          ) : (
+            <>
+              {workspaces.map((w) => {
+                const isCurrent = w.id === activeWorkspaceId;
+                const isSelected = selected.kind === 'workspace' && selected.id === w.id;
+                return (
+                  <button
+                    key={w.id}
+                    disabled={isCurrent}
+                    onClick={() => setSelected({ kind: 'workspace', id: w.id })}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                      isCurrent
+                        ? 'cursor-not-allowed opacity-50'
+                        : isSelected
+                          ? 'bg-emerald-600/10'
+                          : 'hover:bg-slate-700/40'
+                    }`}
+                  >
+                    <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                      isSelected ? 'border-emerald-500' : 'border-slate-600'
+                    }`}>
+                      {isSelected && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
+                    </span>
+                    <Layers className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-emerald-400' : 'text-slate-500'}`} />
+                    <span className={isSelected ? 'text-emerald-400 font-medium' : 'text-slate-300'}>{w.name}</span>
+                    {isCurrent && (
+                      <span className="ml-auto flex-shrink-0 text-[10px] uppercase tracking-wider font-bold text-slate-500 bg-slate-700/60 rounded-full px-1.5 py-0.5">
+                        Current
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </>
+          )}
         </div>
 
         {/* Footer with confirm/cancel */}
@@ -218,7 +315,7 @@ function NoteFolderLinker({
           </button>
           <button
             onClick={handleConfirm}
-            disabled={selected === note.folder_id}
+            disabled={!changed}
             className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm transition-colors"
           >
             Move
@@ -235,6 +332,8 @@ function NoteFolderLinker({
 export function NoteCard({
   note,
   folders,
+  workspaces,
+  activeWorkspaceId,
   isActive,
   onSelect,
   onDelete,
@@ -243,10 +342,12 @@ export function NoteCard({
 }: {
   note: NoteWithDetails;
   folders: FolderType[];
+  workspaces: Workspace[];
+  activeWorkspaceId: string | null;
   isActive: boolean;
   onSelect: () => void;
   onDelete: () => void;
-  onMove: (folderId: string | null) => void;
+  onMove: (folderId: string | null, workspaceId?: string) => void;
   showFolder?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -340,6 +441,8 @@ export function NoteCard({
         <NoteFolderLinker
           note={note}
           folders={folders}
+          workspaces={workspaces}
+          activeWorkspaceId={activeWorkspaceId}
           onMove={onMove}
           onClose={() => setMoveSheetOpen(false)}
         />
@@ -355,11 +458,13 @@ export interface UnifiedNoteListProps {
   selectedFolderId: string | null;
   notes: NoteWithDetails[];
   folders: FolderType[];
+  workspaces: Workspace[];
+  activeWorkspaceId: string | null;
   currentNoteId: string | null;
   searchQuery: string;
   onSelectNote: (noteId: string) => void;
   onDeleteNote: (note: NoteWithDetails) => void;
-  onMoveNote: (noteId: string, folderId: string | null) => void;
+  onMoveNote: (noteId: string, folderId: string | null, workspaceId?: string) => void;
   onCreateNoteInFolder?: (folderId: string) => void;
   onSwitchToAllNotes?: () => void;
 }
@@ -369,6 +474,8 @@ export function UnifiedNoteList({
   selectedFolderId,
   notes,
   folders,
+  workspaces,
+  activeWorkspaceId,
   currentNoteId,
   searchQuery,
   onSelectNote,
@@ -457,10 +564,12 @@ export function UnifiedNoteList({
                   key={note.id}
                   note={note}
                   folders={folders}
+                  workspaces={workspaces}
+                  activeWorkspaceId={activeWorkspaceId}
                   isActive={currentNoteId === note.id}
                   onSelect={() => onSelectNote(note.id)}
                   onDelete={() => onDeleteNote(note)}
-                  onMove={(fid) => onMoveNote(note.id, fid)}
+                  onMove={(fid, wid) => onMoveNote(note.id, fid, wid)}
                 />
               ))}
             </div>
@@ -504,10 +613,12 @@ export function UnifiedNoteList({
                   key={note.id}
                   note={note}
                   folders={folders}
+                  workspaces={workspaces}
+                  activeWorkspaceId={activeWorkspaceId}
                   isActive={currentNoteId === note.id}
                   onSelect={() => onSelectNote(note.id)}
                   onDelete={() => onDeleteNote(note)}
-                  onMove={(fid) => onMoveNote(note.id, fid)}
+                  onMove={(fid, wid) => onMoveNote(note.id, fid, wid)}
                   showFolder={false}
                 />
               ))}
