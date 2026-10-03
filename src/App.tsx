@@ -569,6 +569,8 @@ function NotesApp() {
               workspaceName={activeWorkspace?.name}
               folders={workspaceFolders}
               notes={workspaceNotes}
+              workspaces={workspaces}
+              activeWorkspaceId={activeWorkspaceId}
               currentNoteId={currentNoteId}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
