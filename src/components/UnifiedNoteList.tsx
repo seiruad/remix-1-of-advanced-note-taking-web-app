@@ -56,6 +56,8 @@ function NoteFolderLinker({
   onClose: () => void;
 }) {
   const currentFolder = folders.find((f) => f.id === note.folder_id) || null;
+  const originWorkspace = workspaces.find((w) => w.id === note.workspace_id) || null;
+  const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId) || null;
   const sortedFolders = [...folders].sort((a, b) => {
     const aNew = a.is_new ?? false;
     const bNew = b.is_new ?? false;
