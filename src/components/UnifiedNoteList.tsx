@@ -132,6 +132,69 @@ function NoteFolderLinker({
               </div>
             </div>
           </div>
+
+          {/* Compact route: origin → destination (updates live) */}
+          <div className="mt-2.5 flex items-center gap-1.5 min-w-0">
+            <div className="flex items-center gap-1 min-w-0 flex-1 rounded-md bg-slate-700/30 border border-slate-600/30 px-2 py-1">
+              <Layers className="w-3 h-3 text-slate-500 flex-shrink-0" />
+              <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500 truncate">
+                {originWorkspace?.name || 'Workspace'}
+              </span>
+              <span className="text-slate-600 flex-shrink-0">·</span>
+              <FolderOpen className="w-3 h-3 text-slate-500 flex-shrink-0" />
+              <span className="text-[11px] text-slate-400 truncate">
+                {currentFolder ? currentFolder.name : 'No folder'}
+              </span>
+            </div>
+            <ArrowRight
+              className={`w-3.5 h-3.5 flex-shrink-0 transition-colors ${
+                changed ? 'text-emerald-400' : 'text-slate-600'
+              }`}
+            />
+            <div
+              className={`flex items-center gap-1 min-w-0 flex-1 rounded-md px-2 py-1 border transition-colors duration-150 ${
+                changed
+                  ? 'bg-emerald-600/15 border-emerald-500/30'
+                  : 'bg-slate-700/30 border-slate-600/30'
+              }`}
+            >
+              <Layers
+                className={`w-3 h-3 flex-shrink-0 ${
+                  selected.kind === 'workspace' && changed ? 'text-emerald-400' : 'text-slate-500'
+                }`}
+              />
+              <span
+                className={`text-[10px] font-medium uppercase tracking-wider truncate ${
+                  selected.kind === 'workspace' && changed ? 'text-emerald-300' : 'text-slate-500'
+                }`}
+              >
+                {(selected.kind === 'workspace' ? selectedWorkspace?.name : activeWorkspace?.name) || 'Workspace'}
+              </span>
+              <span className="text-slate-600 flex-shrink-0">·</span>
+              {selectedFolder?.is_new ? (
+                <FolderPlus
+                  className={`w-3 h-3 flex-shrink-0 ${changed ? 'text-amber-400' : 'text-amber-500/70'}`}
+                />
+              ) : (
+                <FolderOpen
+                  className={`w-3 h-3 flex-shrink-0 ${
+                    selected.kind === 'folder' && changed ? 'text-emerald-400' : 'text-slate-500'
+                  }`}
+                />
+              )}
+              <span
+                className={`text-[11px] truncate ${
+                  selected.kind === 'folder' && changed ? 'text-emerald-300 font-medium' : 'text-slate-400'
+                }`}
+              >
+                {selected.kind === 'folder'
+                  ? selectedFolder
+                    ? selectedFolder.name
+                    : 'No folder'
+                  : 'No folder'}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Folders / Workspaces switch */}
