@@ -132,6 +132,34 @@ function NoteFolderLinker({
           </div>
         </div>
 
+        {/* Folders / Workspaces switch */}
+        <div className="px-5 pt-3 pb-3 bg-slate-900/20 border-b border-slate-700/40">
+          <div className="flex p-1 rounded-xl bg-slate-900/60 border border-slate-700/60">
+            <button
+              onClick={() => setTab('folders')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                tab === 'folders'
+                  ? 'bg-emerald-600/20 text-emerald-300'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <FolderIcon className="w-3.5 h-3.5" />
+              Folders
+            </button>
+            <button
+              onClick={() => setTab('workspaces')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                tab === 'workspaces'
+                  ? 'bg-emerald-600/20 text-emerald-300'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Workspaces
+            </button>
+          </div>
+        </div>
+
         {/* From → To route (updates live as the user picks a folder or workspace) */}
         <div className="px-5 py-3.5 bg-slate-900/30 border-b border-slate-700/40">
           <div className="flex items-center gap-2">
@@ -191,34 +219,6 @@ function NoteFolderLinker({
                     : 'No folder'}
               </span>
             </div>
-          </div>
-        </div>
-
-        {/* Folders / Workspaces switch */}
-        <div className="px-5 pt-3 pb-3 bg-slate-900/20 border-b border-slate-700/40">
-          <div className="flex p-1 rounded-xl bg-slate-900/60 border border-slate-700/60">
-            <button
-              onClick={() => setTab('folders')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                tab === 'folders'
-                  ? 'bg-emerald-600/20 text-emerald-300'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <FolderIcon className="w-3.5 h-3.5" />
-              Folders
-            </button>
-            <button
-              onClick={() => setTab('workspaces')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                tab === 'workspaces'
-                  ? 'bg-emerald-600/20 text-emerald-300'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              Workspaces
-            </button>
           </div>
         </div>
 
