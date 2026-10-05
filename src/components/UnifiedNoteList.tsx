@@ -118,7 +118,7 @@ function NoteFolderLinker({
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-white truncate">{note.title || 'Untitled'}</p>
-              <div className="flex items-center gap-x-3 gap-y-1 mt-0.5 flex-wrap min-w-0">
+              <div className="flex items-center gap-x-3 mt-0.5 min-w-0">
                 <span className="flex items-center gap-1 text-xs text-slate-500 flex-shrink-0">
                   <Clock className="w-3 h-3" />
                   {formatDate(note.updated_at)}
@@ -129,50 +129,66 @@ function NoteFolderLinker({
                     {note.files.length}
                   </span>
                 )}
+              </div>
 
-                {/* Live route: origin → destination, same line style as the time */}
-                <span className="flex items-center gap-1.5 min-w-0 text-xs">
-                  <span className="flex items-center gap-1 min-w-0 text-slate-500">
-                    <Layers className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">
-                      {(originWorkspace?.name || 'Workspace') +
-                        ' · ' +
-                        (currentFolder ? currentFolder.name : 'No folder')}
-                    </span>
-                  </span>
+              {/* Live route: two panels, workspace on top, folder below */}
+              <div className="flex items-stretch gap-2 mt-2.5 min-w-0">
+                <div className="flex-1 min-w-0 rounded-lg border border-slate-700/60 bg-slate-900/60 px-2.5 py-1.5">
+                  <p className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-slate-500 min-w-0">
+                    <Layers className="w-2.5 h-2.5 flex-shrink-0" />
+                    <span className="truncate">{originWorkspace?.name || 'Workspace'}</span>
+                  </p>
+                  <p className="flex items-center gap-1 text-xs text-slate-300 truncate mt-0.5 min-w-0">
+                    <FolderOpen className="w-3 h-3 flex-shrink-0 text-slate-500" />
+                    <span className="truncate">{currentFolder ? currentFolder.name : 'No folder'}</span>
+                  </p>
+                </div>
+                <div className="flex items-center flex-shrink-0">
                   <ArrowRight
-                    className={`w-3 h-3 flex-shrink-0 transition-colors ${
+                    className={`w-3.5 h-3.5 transition-colors ${
                       changed ? 'text-emerald-400' : 'text-slate-600'
                     }`}
                   />
-                  <span
-                    className={`flex items-center gap-1 min-w-0 transition-colors duration-150 ${
-                      changed ? 'text-emerald-300' : 'text-slate-500'
+                </div>
+                <div
+                  className={`flex-1 min-w-0 rounded-lg border px-2.5 py-1.5 transition-colors duration-150 ${
+                    changed ? 'border-emerald-500/40 bg-emerald-600/10' : 'border-slate-700/60 bg-slate-900/60'
+                  }`}
+                >
+                  <p
+                    className={`flex items-center gap-1 text-[10px] uppercase tracking-wider min-w-0 ${
+                      changed ? 'text-emerald-400/80' : 'text-slate-500'
+                    }`}
+                  >
+                    <Layers className="w-2.5 h-2.5 flex-shrink-0" />
+                    <span className="truncate">
+                      {(selected.kind === 'workspace' ? selectedWorkspace?.name : activeWorkspace?.name) ||
+                        'Workspace'}
+                    </span>
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 text-xs truncate mt-0.5 min-w-0 ${
+                      changed ? 'text-emerald-200 font-medium' : 'text-slate-300'
                     }`}
                   >
                     {selectedFolder?.is_new ? (
-                      <FolderPlus
-                        className={`w-3 h-3 flex-shrink-0 ${changed ? 'text-amber-400' : 'text-amber-500/70'}`}
-                      />
+                      <FolderPlus className="w-3 h-3 flex-shrink-0 text-amber-400" />
                     ) : (
                       <FolderOpen
                         className={`w-3 h-3 flex-shrink-0 ${
-                          selected.kind === 'folder' && changed ? 'text-emerald-400' : 'text-slate-500'
+                          changed ? 'text-emerald-400' : 'text-slate-500'
                         }`}
                       />
                     )}
-                    <span className={`truncate ${changed ? 'font-medium' : ''}`}>
-                      {(selected.kind === 'workspace' ? selectedWorkspace?.name : activeWorkspace?.name) ||
-                        'Workspace'}
-                      {' · '}
+                    <span className="truncate">
                       {selected.kind === 'folder'
                         ? selectedFolder
                           ? selectedFolder.name
                           : 'No folder'
                         : 'No folder'}
                     </span>
-                  </span>
-                </span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
