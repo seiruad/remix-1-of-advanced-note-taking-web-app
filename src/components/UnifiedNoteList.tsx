@@ -127,8 +127,8 @@ function NoteFolderLinker({
               <FileText className="w-4 h-4 text-slate-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-x-3 min-w-0">
-                <p className="text-sm font-semibold text-white truncate min-w-0 flex-1">
+              <div className="flex items-center gap-x-2 min-w-0">
+                <p className="text-sm font-semibold text-white truncate min-w-0">
                   {note.title || 'Untitled'}
                 </p>
                 <span className="flex items-center gap-1 text-xs text-slate-500 flex-shrink-0">
