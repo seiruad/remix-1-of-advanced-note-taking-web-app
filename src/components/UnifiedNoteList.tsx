@@ -75,6 +75,16 @@ function NoteFolderLinker({
   const selectedWorkspace = selected.kind === 'workspace' ? workspaces.find((w) => w.id === selected.id) || null : null;
   const changed = JSON.stringify(selected) !== JSON.stringify(initialTarget);
 
+  const originWorkspaceName = originWorkspace?.name || 'Workspace';
+  const destWorkspaceName =
+    (selected.kind === 'workspace' ? selectedWorkspace?.name : activeWorkspace?.name) || 'Workspace';
+  const workspaceChanged = destWorkspaceName !== originWorkspaceName;
+  const originFolderName = currentFolder ? currentFolder.name : 'No folder';
+  const destFolderName =
+    selected.kind === 'folder' ? (selectedFolder ? selectedFolder.name : 'No folder') : 'No folder';
+  const folderChanged = destFolderName !== originFolderName;
+
+
   const handleConfirm = () => {
     if (!changed) return;
     if (selected.kind === 'workspace' && selected.id) {
