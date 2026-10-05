@@ -127,18 +127,10 @@ function NoteFolderLinker({
               <FileText className="w-4 h-4 text-slate-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-1 text-xs text-slate-500 min-w-0">
-                <Layers className="w-3 h-3 flex-shrink-0" />
-                <span className="truncate">{originWorkspaceName}</span>
-                {workspaceChanged && (
-                  <>
-                    <ArrowRight className="w-3 h-3 flex-shrink-0 text-emerald-400" />
-                    <span className="truncate text-emerald-300 font-medium">{destWorkspaceName}</span>
-                  </>
-                )}
-              </p>
-              <p className="text-sm font-semibold text-white truncate">{note.title || 'Untitled'}</p>
-              <div className="flex items-center gap-x-3 mt-0.5 min-w-0">
+              <div className="flex items-center gap-x-3 min-w-0">
+                <p className="text-sm font-semibold text-white truncate min-w-0 flex-1">
+                  {note.title || 'Untitled'}
+                </p>
                 <span className="flex items-center gap-1 text-xs text-slate-500 flex-shrink-0">
                   <Clock className="w-3 h-3" />
                   {formatDate(note.updated_at)}
@@ -150,6 +142,16 @@ function NoteFolderLinker({
                   </span>
                 )}
               </div>
+              <p className="flex items-center gap-1 text-xs text-slate-500 mt-1 min-w-0">
+                <Layers className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">{originWorkspaceName}</span>
+                {workspaceChanged && (
+                  <>
+                    <ArrowRight className="w-3 h-3 flex-shrink-0 text-emerald-400" />
+                    <span className="truncate text-emerald-300 font-medium">{destWorkspaceName}</span>
+                  </>
+                )}
+              </p>
               <p className="flex items-center gap-1 text-xs text-slate-500 mt-0.5 min-w-0">
                 <FolderOpen className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">{originFolderName}</span>
