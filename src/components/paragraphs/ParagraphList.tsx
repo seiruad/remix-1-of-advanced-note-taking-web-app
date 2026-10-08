@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { Loader2, Plus, X, Type, Paperclip, Heading } from 'lucide-react';
+import { Loader2, Plus, X } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { UnifiedFileLinkerWindow } from '../UnifiedFileLinkerWindow';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
@@ -7,7 +7,6 @@ import { ParagraphBlock } from './ParagraphBlock';
 import { NoteHeaderBlock } from './NoteHeaderBlock';
 import { AddBlockWindow } from './AddBlockWindow';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
-import { Button } from '../Button';
 import { createPortal } from 'react-dom';
 import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
@@ -70,14 +69,11 @@ export function ParagraphList({
     return map;
   }, [files, fileParagraph]);
 
-  const [pending, setPending] = useState(false);
+  const [, setPending] = useState(false);
 
   const last = paragraphs[paragraphs.length - 1];
   const lastIsEmpty =
     !last || (last.kind !== 'header' && isDocEmpty(last.content) && (filesByParagraph[last.id] ?? []).length === 0);
-  // The hint row replaces the old "New Paragraph" button: it is pure UI, never stored.
-  const showHintRow = canEdit && !pending;
-
   const createTrailing = async (then?: (id: string) => void): Promise<string | null> => {
     // Reuse a trailing empty paragraph instead of stacking another empty one.
     if (last && lastIsEmpty) {
@@ -171,48 +167,6 @@ export function ParagraphList({
         onAddParagraph={() => { setAddOpen(false); void createTrailing(id => setEditTarget(id)); }}
       />
 
-      {(showHintRow || pending) && (
-        <div className="rounded-xl border border-dashed border-transparent max-w-[var(--note-block-max-width)]">
-          <div className="flex items-center gap-2 pl-12 pr-2 sm:pr-3 py-2 min-h-11 text-xs text-slate-500">
-            {showHintRow && (
-              <>
-                <Button variant="primary"
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={createHeader}
-                  aria-label="Add header"
-                  className="gap-1 h-7 px-1.5"
-                >
-                  <Heading className="w-4 h-4" />
-                  <span className="text-xs font-medium">Header</span>
-                </Button>
-                <span className="text-slate-500">·</span>
-                <Button variant="primary"
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => createTrailing(id => setEditTarget(id))}
-                  aria-label="Write text in new paragraph"
-                  className="gap-1 h-7 px-1.5"
-                >
-                  <Type className="w-4 h-4" />
-                  <span className="text-xs font-medium">Write text</span>
-                </Button>
-                <span className="text-slate-500">or</span>
-                <Button variant="primary"
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => setAttachTarget(NEW_PARAGRAPH)}
-                  aria-label="Attach file to new paragraph"
-                  className="gap-1 h-7 px-1.5"
-                >
-                  <Paperclip className="w-4 h-4" />
-                  <span className="text-xs font-medium">Attach file</span>
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
 
 
