@@ -22,6 +22,20 @@ export function isDocEmpty(doc: Doc): boolean {
   return !hasText && !hasMedia;
 }
 
+/** Plain text of a block's document, collapsed to a single line. */
+export function docPlainText(doc: Doc): string {
+  const parts: string[] = [];
+  const walk = (node: unknown) => {
+    if (!node || typeof node !== 'object') return;
+    const n = node as { text?: unknown; content?: unknown };
+    if (typeof n.text === 'string') parts.push(n.text);
+    if (Array.isArray(n.content)) n.content.forEach(walk);
+  };
+  walk(doc);
+  return parts.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+
 
 function mergeDocs(a: Doc, b: Doc): Doc {
   const aContent = (a as { content?: unknown[] } | null)?.content ?? [];
