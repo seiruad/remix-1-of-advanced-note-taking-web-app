@@ -76,12 +76,15 @@ export function UnifiedFileLinkerWindow({
 
   // In collapsed mode the first and last chips are always pinned. Middle chips
   // are shown only while they fit; the rest collapse into a "•••" pill.
+  const linkedIds = paragraphFileIds ?? existingFileIds;
+
   useLayoutEffect(() => {
     if (selectedExpanded) {
       setMiddleVisibleCount(null);
       return;
     }
-    const selFiles = selectedIds
+    // Chips shown in the Selected block: already-attached files first, then newly picked ones.
+    const selFiles = [...linkedIds, ...selectedIds]
       .map((id) => files.find((f) => f.id === id))
       .filter((f): f is FileItem => Boolean(f));
     const mids = selFiles.slice(1, -1);
