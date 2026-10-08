@@ -1,10 +1,11 @@
 import { useMemo, useRef, useState } from 'react';
-import { Loader2, X, Type, Paperclip, Heading } from 'lucide-react';
+import { Loader2, Plus, X, Type, Paperclip, Heading } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { UnifiedFileLinkerWindow } from '../UnifiedFileLinkerWindow';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
 import { ParagraphBlock } from './ParagraphBlock';
 import { NoteHeaderBlock } from './NoteHeaderBlock';
+import { AddBlockWindow } from './AddBlockWindow';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
 import { Button } from '../Button';
 import { createPortal } from 'react-dom';
@@ -55,6 +56,7 @@ export function ParagraphList({
   const [attachTarget, setAttachTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
   const newAttachParagraphId = useRef<string | null>(null);
 
 
@@ -147,7 +149,27 @@ export function ParagraphList({
           onAttach={() => setAttachTarget(paragraph.id)}
         />
       ))}
+      {canEdit && (
+        <div className="pl-2 pt-2.5">
+          <button
+            type="button"
+            aria-label="Add block at the end of the note"
+            onClick={() => setAddOpen(true)}
+            className="relative flex w-6 h-6 items-center justify-center rounded-full border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground transition-colors"
+          >
+            <Plus className="w-3 h-3" />
+          </button>
+        </div>
+      )}
       </div>
+
+      <AddBlockWindow
+        open={addOpen}
+        noteTitle={noteTitle}
+        onClose={() => setAddOpen(false)}
+        onAddHeader={() => { setAddOpen(false); void createHeader(); }}
+        onAddParagraph={() => { setAddOpen(false); void createTrailing(id => setEditTarget(id)); }}
+      />
 
       {(showHintRow || pending) && (
         <div className="rounded-xl border border-dashed border-transparent max-w-[var(--note-block-max-width)]">
