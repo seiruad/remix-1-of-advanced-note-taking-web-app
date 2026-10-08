@@ -187,7 +187,7 @@ export function ParagraphList({
         onFocusEditor={editor => onActiveEditorChange(editor as Editor | null)}
         onAttach={() => setAttachTarget(editingParagraph.id)}
         onDetach={id => attachFileToParagraph(id, null)}
-        onOpenFile={onOpenFile}
+        onOpenFile={file => { closeEditor(); onOpenFile(file); }}
       />}
 
       {attachTarget !== null && createPortal(<div className="relative z-[9995]"><UnifiedFileLinkerWindow
@@ -204,13 +204,13 @@ export function ParagraphList({
         ).map((f) => f.id)}
         onFileLinked={async (file) => {
           onFileLinked(file);
-          let target = attachTarget;
+          let target: string | null = attachTarget;
           if (target === NEW_PARAGRAPH) {
             // Only now, after a file was actually picked, materialize the paragraph.
             target = newAttachParagraphId.current ?? (await createTrailing());
             newAttachParagraphId.current = target;
           }
-          if (target) attachFileToParagraph(file.id, target);
+          if (target) await attachFileToParagraph(file.id, target);
         }}
         existingFileIds={files.map((f) => f.id)}
       /></div>, document.body)}
