@@ -431,7 +431,27 @@ export function UnifiedFileLinkerWindow({
               )}
               </div>
             </div>
+
+            {/* Full-height right arrow rail: expands / collapses the selected files */}
+            <button
+              type="button"
+              onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
+              disabled={displayFiles.length === 0}
+              aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
+              aria-expanded={selectedExpanded}
+              className="group w-8 self-stretch flex-shrink-0 rounded-lg border border-slate-700/50 bg-slate-800/60 flex flex-col items-center justify-center gap-1.5 py-1.5 text-slate-500 transition-all duration-200 enabled:hover:border-emerald-500/45 enabled:hover:bg-emerald-500/10 enabled:hover:text-emerald-300 enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-default"
+            >
+              <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
+              <ArrowDown
+                className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
+                  selectedExpanded ? 'rotate-180' : ''
+                }`}
+              />
+
+              <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
+            </button>
           </div>
+
 
           {/* Search + upload */}
 
