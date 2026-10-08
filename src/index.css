@@ -19,7 +19,7 @@
 
 .paragraph-reading .ProseMirror { cursor: text; }
 .paragraph-reading .ProseMirror p { margin: 0; }
-.paragraph-edit-body .ProseMirror { min-height: 180px; }
+.paragraph-edit-body .ProseMirror { min-height: 0; overflow-wrap: anywhere; }
 .paragraph-edit-body .ProseMirror p { margin: 0; }
 
 /* Tiptap Editor Styles */
