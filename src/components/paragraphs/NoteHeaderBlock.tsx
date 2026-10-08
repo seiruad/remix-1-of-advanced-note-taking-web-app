@@ -15,7 +15,7 @@ export function NoteHeaderBlock({ title }: NoteHeaderBlockProps) {
   return (
     <article
       aria-label="Note header"
-      className="sticky top-0 z-20 relative pt-1 pr-2 sm:pr-3"
+      className="sticky top-0 z-20 pt-1 pr-2 sm:pr-3"
     >
       {/* Opaque backing so scrolling content never shows through the panel. */}
       <div aria-hidden="true" className="absolute inset-0 bg-background" />
