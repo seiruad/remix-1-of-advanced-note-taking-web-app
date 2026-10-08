@@ -155,7 +155,7 @@ export function ParagraphList({
             type="button"
             aria-label="Add block at the end of the note"
             onClick={() => setAddOpen(true)}
-            className="relative flex w-6 h-6 items-center justify-center rounded-full border border-primary/60 bg-primary/10 text-primary hover:border-primary hover:bg-primary/20 transition-colors"
+            className="relative flex w-6 h-6 items-center justify-center rounded-full border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground transition-colors"
           >
             <Plus className="w-3 h-3" />
           </button>
