@@ -18,7 +18,7 @@ export function NoteHeaderBlock({ title }: NoteHeaderBlockProps) {
       className="sticky top-0 z-20 pt-1 pr-2 sm:pr-3"
     >
       {/* Opaque backing so scrolling content never shows through the panel. */}
-      <div aria-hidden="true" className="absolute inset-0 bg-background" />
+      <div aria-hidden="true" className="absolute -top-6 -left-6 -right-6 bottom-0 bg-background" />
       <div className="relative rounded-xl border border-border/70 bg-surface/40 px-4 py-3">
         <p className="text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
           Note
