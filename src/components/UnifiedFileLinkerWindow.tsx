@@ -418,33 +418,6 @@ export function UnifiedFileLinkerWindow({
             </button>
           </div>
 
-          {/* Expand/collapse Selected — sits between the Selected block and the file list */}
-          <div className="mb-2 w-full h-6 flex items-center gap-2.5 flex-shrink-0">
-            <div
-              className={`flex-1 h-px transition-colors ${
-                displayFiles.length > 0 ? 'bg-slate-700/50' : 'bg-transparent'
-              }`}
-            />
-            <button
-              type="button"
-              onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
-              disabled={displayFiles.length === 0}
-              aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
-              className="h-6 w-11 rounded-full flex items-center justify-center flex-shrink-0 border border-slate-700/50 bg-slate-800/60 text-emerald-400 shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-all duration-200 enabled:hover:border-emerald-500/50 enabled:hover:bg-emerald-500/15 enabled:hover:text-emerald-300 enabled:hover:shadow-[0_0_8px_rgba(16,185,129,0.25)] enabled:active:scale-95 disabled:text-slate-600 disabled:cursor-default"
-            >
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                  selectedExpanded ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-            <div
-              className={`flex-1 h-px transition-colors ${
-                displayFiles.length > 0 ? 'bg-slate-700/50' : 'bg-transparent'
-              }`}
-            />
-
-          </div>
 
 
           {/* Reminder: the file list is hidden while the Selected block is expanded */}
