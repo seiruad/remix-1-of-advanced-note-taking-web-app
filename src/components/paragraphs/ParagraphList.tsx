@@ -132,7 +132,7 @@ export function ParagraphList({
       <div className="max-w-[var(--note-block-max-width)]">
         <NoteHeaderBlock title={noteTitle} />
         {/* The line belongs to the blocks only — it starts below the note header. */}
-        <div className="relative">
+        <div className="relative pt-6">
           <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-border/60" />
           {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
             <ParagraphBlock
