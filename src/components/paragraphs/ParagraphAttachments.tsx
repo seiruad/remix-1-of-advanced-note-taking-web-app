@@ -28,7 +28,7 @@ export function ParagraphAttachments({ files, onOpenFile, onDetach }: {
       return (
         <span
           key={file.id}
-          className="inline-flex items-center gap-2 h-7 pl-2.5 pr-1.5 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors"
+          className="inline-flex items-center gap-2 h-7 pl-2.5 pr-2.5 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors"
         >
           <button
             type="button"
