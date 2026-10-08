@@ -1,10 +1,11 @@
 import { useMemo, useRef, useState } from 'react';
-import { Loader2, X, Type, Paperclip, Heading } from 'lucide-react';
+import { Loader2, Plus, X, Type, Paperclip, Heading } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { UnifiedFileLinkerWindow } from '../UnifiedFileLinkerWindow';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
 import { ParagraphBlock } from './ParagraphBlock';
 import { NoteHeaderBlock } from './NoteHeaderBlock';
+import { AddBlockWindow } from './AddBlockWindow';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
 import { Button } from '../Button';
 import { createPortal } from 'react-dom';
@@ -55,6 +56,7 @@ export function ParagraphList({
   const [attachTarget, setAttachTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
   const newAttachParagraphId = useRef<string | null>(null);
 
 
