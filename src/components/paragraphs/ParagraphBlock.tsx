@@ -30,7 +30,6 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
       </div>}
       {files.length > 0 && <ParagraphAttachments files={files} onOpenFile={onOpenFile} onAdd={canEdit ? onAttach : undefined} />}
     </div>}
-    <div aria-hidden="true" className="absolute right-5 top-2 bottom-2 w-px bg-border/60" />
     {canEdit && <div className="absolute right-5 top-[33.333%] translate-x-1/2 -translate-y-1/2">
       <UnifiedMenu items={items} ariaLabel="Paragraph options" triggerClassName="!rounded-full w-7 h-7 border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground" iconClassName="w-3.5 h-3.5" openTriggerClassName="!bg-surface !text-primary-foreground" />
     </div>}
