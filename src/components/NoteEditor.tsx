@@ -8,9 +8,6 @@ import {
   Download,
   Trash2,
   X,
-  ChevronUp,
-  ChevronDown,
-  File as FileIcon,
   FileText,
   Pencil,
   Check,
@@ -68,7 +65,7 @@ export function NoteEditor({
   const [localTitle, setLocalTitle] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
+  const [attachmentsExpanded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -473,30 +470,6 @@ export function NoteEditor({
           </div>
         )}
 
-        {files.length > 0 && (
-          <div className="flex items-center px-3 sm:px-5 py-2.5">
-            <button
-              onClick={() => setAttachmentsExpanded(!attachmentsExpanded)}
-              className={`flex items-center gap-2 h-11 px-3 rounded-xl text-sm font-medium transition-colors w-full min-w-0 justify-between ${
-                attachmentsExpanded
-                  ? 'bg-emerald-500/15 text-emerald-300'
-                  : 'bg-slate-700/40 text-slate-300 hover:bg-slate-700/60'
-              }`}
-            >
-              <span className="flex items-center gap-2 min-w-0">
-                <FileIcon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">
-                  {files.length} attachment{files.length !== 1 ? 's' : ''}
-                </span>
-              </span>
-              {attachmentsExpanded ? (
-                <ChevronDown className="w-4 h-4 flex-shrink-0" />
-              ) : (
-                <ChevronUp className="w-4 h-4 flex-shrink-0" />
-              )}
-            </button>
-          </div>
-        )}
       </div>
 
 
