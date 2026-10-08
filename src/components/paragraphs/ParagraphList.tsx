@@ -128,7 +128,7 @@ export function ParagraphList({
         </div>
       )}
 
-      <div className="relative">
+      <div className="relative max-w-[var(--note-block-max-width)]">
         <div aria-hidden="true" className="absolute right-5 top-0 bottom-0 w-px bg-border/60" />
       {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
         <ParagraphBlock
@@ -146,7 +146,7 @@ export function ParagraphList({
       </div>
 
       {(showHintRow || pending) && (
-        <div className="rounded-xl border border-dashed border-transparent">
+        <div className="rounded-xl border border-dashed border-transparent max-w-[var(--note-block-max-width)]">
           <div className="flex items-center gap-2 px-2 sm:px-3 py-2 min-h-11 text-xs text-slate-500">
             {showHintRow && (
               <>
