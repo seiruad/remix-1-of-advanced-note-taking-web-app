@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ParagraphList } from './paragraphs/ParagraphList';
 import { buildFileUrl } from './FilePreviewPage';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -120,15 +120,6 @@ export function NoteEditor({
     onUpdateNoteRef.current = onUpdateNote;
   }, [onUpdateNote]);
 
-  const handleTitleChange = useCallback((newTitle: string) => {
-    isTypingRef.current = true;
-    setLocalTitle(newTitle);
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      isTypingRef.current = false;
-      onUpdateNoteRef.current({ title: newTitle });
-    }, 600);
-  }, []);
 
   const contentTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
@@ -281,17 +272,6 @@ export function NoteEditor({
           </div>
         </div>
 
-        {/* Title row — on desktop match the sidebar workspace header (56 px) */}
-        <div className="px-4 sm:px-6 lg:px-3 pt-3 sm:pt-4 pb-2 sm:pb-3 lg:pt-0 lg:pb-0 lg:h-14 lg:flex lg:items-center bg-slate-900 border-b border-slate-700/30">
-          <input
-            type="text"
-            value={localTitle}
-            onChange={(e) => handleTitleChange(e.target.value)}
-            placeholder="Untitled"
-            className="w-full min-w-0 text-xl sm:text-2xl font-bold bg-transparent border-none outline-none text-slate-100 placeholder-slate-600 focus:ring-0 cursor-text"
-            disabled={!canEdit}
-          />
-        </div>
 
       </div>
 
