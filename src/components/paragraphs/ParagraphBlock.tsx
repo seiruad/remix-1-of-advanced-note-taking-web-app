@@ -34,12 +34,8 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
       </div>}
       {files.length > 0 && <ParagraphAttachments files={files} onOpenFile={onOpenFile} onAdd={canEdit ? onAttach : undefined} />}
     </div>}
-    {isHeader
-      ? <div aria-hidden="true" className="absolute right-5 top-2 translate-x-1/2 flex h-6 w-6 items-center justify-center">
-          <span className="block h-0.5 w-6 rounded-full bg-border/80" />
-        </div>
-      : canEdit && <div className="absolute right-5 top-2 translate-x-1/2">
-          <UnifiedMenu items={items} ariaLabel="Paragraph options" triggerClassName="!rounded-full w-6 h-6 border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground" iconClassName="w-3 h-3" openTriggerClassName="!bg-surface !text-primary-foreground" />
-        </div>}
+    {canEdit && !isHeader && <div className="absolute right-5 top-2 translate-x-1/2">
+      <UnifiedMenu items={items} ariaLabel="Paragraph options" triggerClassName="!rounded-full w-6 h-6 border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground" iconClassName="w-3 h-3" openTriggerClassName="!bg-surface !text-primary-foreground" />
+    </div>}
   </article>;
 }
