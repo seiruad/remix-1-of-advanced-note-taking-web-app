@@ -6,7 +6,6 @@ import {
   Loader2,
   X,
   Link2,
-  Paperclip,
   Check,
   ArrowDown,
   ListTree,
