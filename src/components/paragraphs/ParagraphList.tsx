@@ -129,42 +129,45 @@ export function ParagraphList({
         </div>
       )}
 
-      <div className="relative max-w-[var(--note-block-max-width)]">
-        <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-border/60" />
+      <div className="max-w-[var(--note-block-max-width)]">
         <NoteHeaderBlock title={noteTitle} />
-      {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
-        <ParagraphBlock
-          key={paragraph.id}
-          className={index === 0 ? '' : visible[index - 1].kind === 'header' ? '-mt-2' : 'mt-4'}
-          paragraph={paragraph}
-          files={filesByParagraph[paragraph.id] ?? []}
-          canEdit={canEdit}
-          onEdit={() => setEditTarget(paragraph.id)}
-          onDelete={() => setDeleteTarget(paragraph.id)}
-          onOpenFile={onOpenFile}
-          onAttach={() => setAttachTarget(paragraph.id)}
-        />
-      ))}
-      {canEdit && (
-        <div className="relative pl-12 pr-2 sm:pr-3 pt-2.5 pb-1">
-          {/* End-of-line node: mirrors the note header's diamond, but muted. */}
-          <div
-            aria-hidden="true"
-            className="absolute left-5 top-[28px] -translate-x-1/2 -translate-y-1/2"
-          >
-            <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-background" />
-          </div>
-          <button
-            type="button"
-            aria-label="Add block at the end of the note"
-            onClick={() => setAddOpen(true)}
-            className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-primary/50 bg-primary/10 px-4 py-3 text-left text-primary hover:border-primary hover:bg-primary/20 transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5 shrink-0" />
-            <span className="text-sm font-medium">Add block</span>
-          </button>
+        {/* The line belongs to the blocks only — it starts below the note header. */}
+        <div className="relative">
+          <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-border/60" />
+          {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
+            <ParagraphBlock
+              key={paragraph.id}
+              className={index === 0 ? '' : visible[index - 1].kind === 'header' ? '-mt-2' : 'mt-4'}
+              paragraph={paragraph}
+              files={filesByParagraph[paragraph.id] ?? []}
+              canEdit={canEdit}
+              onEdit={() => setEditTarget(paragraph.id)}
+              onDelete={() => setDeleteTarget(paragraph.id)}
+              onOpenFile={onOpenFile}
+              onAttach={() => setAttachTarget(paragraph.id)}
+            />
+          ))}
+          {canEdit && (
+            <div className="relative pl-12 pr-2 sm:pr-3 pt-2.5 pb-1">
+              {/* End-of-line node: marks where the line stops. */}
+              <div
+                aria-hidden="true"
+                className="absolute left-5 top-[28px] -translate-x-1/2 -translate-y-1/2"
+              >
+                <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-background" />
+              </div>
+              <button
+                type="button"
+                aria-label="Add block at the end of the note"
+                onClick={() => setAddOpen(true)}
+                className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-primary/50 bg-primary/10 px-4 py-3 text-left text-primary hover:border-primary hover:bg-primary/20 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5 shrink-0" />
+                <span className="text-sm font-medium">Add block</span>
+              </button>
+            </div>
+          )}
         </div>
-      )}
       </div>
 
       <AddBlockWindow
