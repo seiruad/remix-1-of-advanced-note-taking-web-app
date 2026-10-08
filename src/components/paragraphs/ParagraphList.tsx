@@ -165,10 +165,6 @@ export function ParagraphList({
                 <Plus className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-sm font-medium">Add block</span>
               </button>
-              {/* Terminal node: a very small solid dot that closes the line under the panel. */}
-              <div aria-hidden="true" className="relative h-3">
-                <span className="absolute left-5 bottom-0 -translate-x-1/2 translate-y-1/2 block w-1.5 h-1.5 rounded-full bg-primary" />
-              </div>
             </div>
           )}
         </div>
