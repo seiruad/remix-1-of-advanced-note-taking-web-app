@@ -5,3 +5,5 @@
 - [x] Fit paragraph editing text to its content and provide a clickable attachments row with a full attachment view.
 - [x] Verify text sizing and attachment navigation in the preview.
 - [x] Move the Selected block's arrow control to its right edge and hide search plus "Upload New File" while Selected is open.
+- [x] Replace the Selected block with two mobile-first options: "Edit paragraph" (double left arrow) and "Edit attachments" (single left arrow).
+
