@@ -4,6 +4,7 @@ import type { Editor } from '@tiptap/react';
 import { UnifiedFileLinkerWindow } from '../UnifiedFileLinkerWindow';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
 import { ParagraphBlock } from './ParagraphBlock';
+import { NoteHeaderBlock } from './NoteHeaderBlock';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
 import { Button } from '../Button';
 import { createPortal } from 'react-dom';
@@ -17,6 +18,7 @@ const NEW_PARAGRAPH = '__new__';
 
 interface ParagraphListProps {
   noteId: string;
+  noteTitle: string;
   userId: string | null;
   canEdit: boolean;
   initialContent: Record<string, unknown> | null;
@@ -28,6 +30,7 @@ interface ParagraphListProps {
 
 export function ParagraphList({
   noteId,
+  noteTitle,
   userId,
   canEdit,
   initialContent,
@@ -130,6 +133,7 @@ export function ParagraphList({
 
       <div className="relative max-w-[var(--note-block-max-width)]">
         <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-border/60" />
+        <NoteHeaderBlock title={noteTitle} />
       {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
         <ParagraphBlock
           key={paragraph.id}

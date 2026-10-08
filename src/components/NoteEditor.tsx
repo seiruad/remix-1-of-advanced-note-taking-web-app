@@ -300,6 +300,7 @@ export function NoteEditor({
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-32 sm:pb-28">
         <ParagraphList
           noteId={note.id}
+          noteTitle={localTitle}
           userId={user?.id ?? null}
           canEdit={canEdit}
           initialContent={note.content}
