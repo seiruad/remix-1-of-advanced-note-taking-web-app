@@ -6,7 +6,6 @@ import {
   Loader2,
   X,
   Link2,
-  Paperclip,
   Check,
   ArrowDown,
   ListTree,
@@ -316,9 +315,6 @@ export function UnifiedFileLinkerWindow({
               <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
               <span className="text-[13px] font-medium whitespace-nowrap">Edit Paragraph</span>
             </button>
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-              <Paperclip className="w-4 h-4 text-emerald-400" />
-            </div>
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">
                 Attach files
