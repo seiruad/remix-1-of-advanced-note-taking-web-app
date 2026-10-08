@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { Loader2, X, Type, Paperclip } from 'lucide-react';
+import { Loader2, X, Type, Paperclip, Heading } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { UnifiedFileLinkerWindow } from '../UnifiedFileLinkerWindow';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
@@ -69,7 +69,7 @@ export function ParagraphList({
 
   const last = paragraphs[paragraphs.length - 1];
   const lastIsEmpty =
-    !last || (isDocEmpty(last.content) && (filesByParagraph[last.id] ?? []).length === 0);
+    !last || (last.kind !== 'header' && isDocEmpty(last.content) && (filesByParagraph[last.id] ?? []).length === 0);
   // The hint row replaces the old "New Paragraph" button: it is pure UI, never stored.
   const showHintRow = canEdit && !pending;
 
@@ -88,8 +88,18 @@ export function ParagraphList({
   };
 
   const editingParagraph = paragraphs.find(p => p.id === editTarget);
+  const isBlockEmpty = (p: typeof paragraphs[number]) => p.kind === 'header'
+    ? !p.heading?.trim()
+    : isDocEmpty(p.content) && !(filesByParagraph[p.id]?.length);
+  const createHeader = async () => {
+    setPending(true);
+    const index = last && lastIsEmpty ? paragraphs.length - 1 : paragraphs.length;
+    const id = await insertAt(index, 'header');
+    setPending(false);
+    if (id) setEditTarget(id);
+  };
   const closeEditor = () => {
-    if (editingParagraph && isDocEmpty(editingParagraph.content) && !editingParagraph.heading?.trim() && !(filesByParagraph[editingParagraph.id]?.length)) {
+    if (editingParagraph && isBlockEmpty(editingParagraph)) {
       void removeParagraph(editingParagraph.id);
     }
     setEditTarget(null);
@@ -118,7 +128,7 @@ export function ParagraphList({
         </div>
       )}
 
-      {paragraphs.filter(paragraph => !isDocEmpty(paragraph.content) || paragraph.heading?.trim() || (filesByParagraph[paragraph.id]?.length ?? 0) > 0).map((paragraph) => (
+      {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph) => (
         <ParagraphBlock
           key={paragraph.id}
           paragraph={paragraph}
@@ -136,6 +146,17 @@ export function ParagraphList({
           <div className="flex items-center gap-2 px-2 sm:px-3 py-2 min-h-11 text-xs text-slate-500">
             {showHintRow && (
               <>
+                <Button variant="primary"
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={createHeader}
+                  aria-label="Add header"
+                  className="gap-1 h-7 px-1.5"
+                >
+                  <Heading className="w-4 h-4" />
+                  <span className="text-xs font-medium">Header</span>
+                </Button>
+                <span className="text-slate-500">·</span>
                 <Button variant="primary"
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
@@ -167,7 +188,7 @@ export function ParagraphList({
 
       <UnifiedWarningWindow
         open={deleteTarget !== null}
-        title="Delete Paragraph"
+        title={paragraphs.find(p => p.id === deleteTarget)?.kind === 'header' ? "Delete Header" : "Delete Paragraph"}
         description="This paragraph and its text will be removed. Attached files stay in the note and in your storage."
         confirmLabel="Delete"
         onCancel={() => setDeleteTarget(null)}

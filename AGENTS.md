@@ -11,3 +11,4 @@
 
 - Paragraph reading and editing are separate views; use ParagraphEditWindow for edits and reuse existing paragraph persistence to avoid parallel content models.
 - New paragraph UI uses the shared Button and semantic HSL tokens so interactive states remain consistent without recoloring existing pages.
+- Note blocks are typed (`note_paragraphs.kind` = header | paragraph); a header holds only `heading`, a paragraph only content/files — keeps reading and editing layouts unambiguous.
