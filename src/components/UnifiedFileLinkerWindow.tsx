@@ -10,6 +10,10 @@ import {
   Check,
   ArrowDown,
   ListTree,
+  Heading,
+  Type,
+  Plus,
+
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +25,10 @@ interface UnifiedFileLinkerWindowProps {
   noteId: string;
   /** Title of the note this window is opened from; shown in the header. */
   noteTitle?: string;
+  /** Which block the picked files land in; shown briefly above the Selected block. */
+  targetBlockKind?: 'header' | 'paragraph' | 'new';
+  targetBlockLabel?: string;
+
 
   onFileLinked: (file: FileItem) => void | Promise<void>;
   existingFileIds: string[];
@@ -55,6 +63,9 @@ export function UnifiedFileLinkerWindow({
   onClose,
   noteId,
   noteTitle,
+  targetBlockKind = 'paragraph',
+  targetBlockLabel,
+
 
   onFileLinked,
   existingFileIds,
@@ -257,7 +268,10 @@ export function UnifiedFileLinkerWindow({
       ? []
       : middleFiles.slice(-middleVisibleCount);
 
+  const TargetIcon = targetBlockKind === 'header' ? Heading : targetBlockKind === 'new' ? Plus : Type;
+
   const renderChip = (file: FileItem, linked = false) => (
+
     <span
       key={file.id}
       data-chip-id={file.id}
@@ -336,8 +350,20 @@ export function UnifiedFileLinkerWindow({
           )}
 
 
+          {/* Which block the picked files will land in */}
+          {targetBlockLabel && (
+            <div className="mb-2 flex items-center gap-2 px-0.5 min-w-0">
+              <TargetIcon className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" aria-hidden="true" />
+              <p className="text-[11px] text-slate-500 truncate min-w-0">
+                <span className="uppercase tracking-wider font-medium">Adding to</span>
+                <span className="text-slate-300"> · {targetBlockLabel}</span>
+              </p>
+            </div>
+          )}
+
           {/* Selected files */}
           <div
+
             className={`mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex items-stretch gap-2 ${
               selectedExpanded && displayFiles.length > 0 ? 'flex-1 min-h-0' : ''
             }`}
