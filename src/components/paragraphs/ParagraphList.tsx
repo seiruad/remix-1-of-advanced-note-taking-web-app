@@ -142,6 +142,7 @@ export function ParagraphList({
           onAttach={() => setAttachTarget(paragraph.id)}
         />
       ))}
+      </div>
 
       {(showHintRow || pending) && (
         <div className="rounded-xl border border-dashed border-transparent">
