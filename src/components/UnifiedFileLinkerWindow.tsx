@@ -19,6 +19,9 @@ interface UnifiedFileLinkerWindowProps {
   open: boolean;
   onClose: () => void;
   noteId: string;
+  /** Title of the note this window is opened from; shown in the header. */
+  noteTitle?: string;
+
   onFileLinked: (file: FileItem) => void | Promise<void>;
   existingFileIds: string[];
   /** When set, newly linked files are attached to this paragraph. */
@@ -51,6 +54,8 @@ export function UnifiedFileLinkerWindow({
   open,
   onClose,
   noteId,
+  noteTitle,
+
   onFileLinked,
   existingFileIds,
   paragraphId = null,
@@ -296,10 +301,16 @@ export function UnifiedFileLinkerWindow({
             </div>
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">
-                Paragraph
+                Attach files
               </p>
-              <h2 className="text-sm font-semibold text-slate-100 truncate">Attach Files</h2>
+              <h2
+                className="text-sm font-semibold text-slate-100 truncate"
+                title={noteTitle || 'Attach Files'}
+              >
+                {noteTitle || 'Attach Files'}
+              </h2>
             </div>
+
           </div>
           <button
             onClick={onClose}
