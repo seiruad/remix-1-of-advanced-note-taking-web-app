@@ -8,7 +8,7 @@ import { NoteHeaderBlock } from './NoteHeaderBlock';
 import { AddBlockWindow } from './AddBlockWindow';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
 import { createPortal } from 'react-dom';
-import { useNoteParagraphs, isDocEmpty, docPlainText } from './useNoteParagraphs';
+import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
 
 const NEW_PARAGRAPH = '__new__';
