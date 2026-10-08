@@ -236,19 +236,23 @@ export function UnifiedFileLinkerWindow({
               onClick={onEditParagraph ?? onClose}
               aria-label="Edit paragraph"
               title="Edit paragraph"
-              className="group inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-700/50 bg-slate-900/40 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
+              className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3 rounded-lg border border-slate-700/50 bg-slate-900/40 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
             >
-              <ChevronsLeft className="w-5 h-5 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
+              <ChevronsLeft className="w-5 h-5 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
+              <span className="hidden sm:inline text-[13px] font-semibold text-slate-200 group-hover:text-emerald-100">Paragraph</span>
             </button>
+
             <button
               type="button"
               onClick={onEditAttachments ?? onClose}
               aria-label="Edit attachments"
               title="Edit attachments"
-              className="group inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-700/50 bg-slate-900/40 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
+              className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3 rounded-lg border border-slate-700/50 bg-slate-900/40 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
             >
-              <ArrowLeft className="w-4 h-4 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
+              <ArrowLeft className="w-4 h-4 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
+              <span className="hidden sm:inline text-[13px] font-semibold text-slate-200 group-hover:text-emerald-100">Attachments</span>
             </button>
+
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
