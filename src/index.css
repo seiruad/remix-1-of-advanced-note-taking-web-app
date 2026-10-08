@@ -13,6 +13,8 @@
   --primary-foreground: 152 81% 96%;
   --destructive: 0 91% 71%;
   --overlay: 0 0% 0%;
+  /* Reading column: every note block (and its right-hand rail) is capped here. */
+  --note-block-max-width: 720px;
 }
 
 .paragraph-reading .ProseMirror { cursor: text; }
