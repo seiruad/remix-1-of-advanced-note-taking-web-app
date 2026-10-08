@@ -133,7 +133,7 @@ export function ParagraphList({
       {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
         <ParagraphBlock
           key={paragraph.id}
-          className={index === 0 ? '' : visible[index - 1].kind === 'header' ? 'mt-1' : 'mt-4'}
+          className={index === 0 ? '' : visible[index - 1].kind === 'header' ? '-mt-2' : 'mt-4'}
           paragraph={paragraph}
           files={filesByParagraph[paragraph.id] ?? []}
           canEdit={canEdit}
