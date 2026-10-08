@@ -154,7 +154,7 @@ export function ParagraphList({
               {/* End-of-line node: marks where the line stops. */}
               <div
                 aria-hidden="true"
-                className="absolute left-5 top-[28px] -translate-x-1/2 -translate-y-1/2"
+                className="absolute left-5 top-[35px] -translate-x-1/2 -translate-y-1/2"
               >
                 <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-background" />
               </div>
@@ -162,10 +162,12 @@ export function ParagraphList({
                 type="button"
                 aria-label="Add block at the end of the note"
                 onClick={() => setAddOpen(true)}
-                className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-primary/50 bg-primary/10 px-4 py-3 text-left text-primary hover:border-primary hover:bg-primary/20 transition-colors"
+                className="group flex w-full items-center gap-3 rounded-xl border border-primary/70 bg-primary/90 px-4 py-3 text-left text-primary-foreground shadow-[0_12px_30px_-14px_hsl(var(--primary)/0.55)] transition-all hover:border-primary hover:bg-primary hover:shadow-[0_16px_36px_-12px_hsl(var(--primary)/0.7)] active:translate-y-px"
               >
-                <Plus className="w-3.5 h-3.5 shrink-0" />
-                <span className="text-sm font-medium">Add block</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-primary-foreground/30 bg-primary-foreground/15 transition-colors group-hover:bg-primary-foreground/25">
+                  <Plus className="h-3.5 w-3.5" />
+                </span>
+                <span className="text-sm font-semibold tracking-wide">Add block</span>
               </button>
               {/* End-of-note node: a framed square that closes the line. */}
               <div aria-hidden="true" className="h-12">
