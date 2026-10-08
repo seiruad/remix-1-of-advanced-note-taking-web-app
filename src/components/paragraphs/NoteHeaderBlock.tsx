@@ -18,13 +18,13 @@ export function NoteHeaderBlock({ title }: NoteHeaderBlockProps) {
         aria-hidden="true"
         className="absolute left-5 top-[22px] -translate-x-1/2 -translate-y-1/2"
       >
-        <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-background" />
-      </div>
+          <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-border ring-4 ring-background" />
+        </div>
 
-      <div className="rounded-xl border border-primary/25 bg-surface/40 px-4 py-3">
-        <p className="text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-primary/80">
-          Note
-        </p>
+        <div className="rounded-xl border border-border/70 bg-surface/40 px-4 py-3">
+          <p className="text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
+            Note
+          </p>
         <h2 className="mt-2 text-2xl font-bold leading-tight break-words text-foreground">
           {title.trim() || 'Untitled'}
         </h2>
