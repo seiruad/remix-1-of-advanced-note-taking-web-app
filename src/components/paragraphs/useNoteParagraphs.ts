@@ -7,6 +7,7 @@ export interface NoteParagraph {
   position: number;
   content: Record<string, unknown> | null;
   heading: string | null;
+  kind: 'header' | 'paragraph';
 }
 
 type Doc = Record<string, unknown> | null;
@@ -67,7 +68,7 @@ export function useNoteParagraphs(params: {
     (async () => {
       const { data, error: loadError } = await supabase
         .from('note_paragraphs')
-        .select('id, note_id, position, content, heading')
+        .select('id, note_id, position, content, heading, kind')
         .eq('note_id', noteId)
         .order('position', { ascending: true });
 
@@ -90,7 +91,7 @@ export function useNoteParagraphs(params: {
             position: 0,
             content: (initialContentRef.current ?? null) as never,
           })
-          .select('id, note_id, position, content, heading')
+          .select('id, note_id, position, content, heading, kind')
           .single();
         if (!cancelled && !insertError && inserted) {
           rows = [inserted as NoteParagraph];
@@ -166,12 +167,12 @@ export function useNoteParagraphs(params: {
   }, []);
 
   const insertAt = useCallback(
-    async (index: number) => {
+    async (index: number, kind: 'header' | 'paragraph' = 'paragraph') => {
       if (!noteId || !userId) return null;
       const { data, error: insertError } = await supabase
         .from('note_paragraphs')
-        .insert({ note_id: noteId, user_id: userId, position: index, content: null })
-        .select('id, note_id, position, content, heading')
+        .insert({ note_id: noteId, user_id: userId, position: index, content: null, kind })
+        .select('id, note_id, position, content, heading, kind')
         .single();
       if (insertError || !data) {
         setError(insertError?.message ?? 'Failed to add paragraph');
