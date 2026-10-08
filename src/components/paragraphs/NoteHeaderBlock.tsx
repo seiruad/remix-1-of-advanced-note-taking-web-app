@@ -13,7 +13,7 @@ export function NoteHeaderBlock({ title }: NoteHeaderBlockProps) {
   return (
     <article
       aria-label="Note header"
-      className="pt-1 pb-4 pr-2 sm:pr-3"
+      className="pt-1 pr-2 sm:pr-3"
     >
       <div className="rounded-xl border border-border/70 bg-surface/40 px-4 py-3">
         <p className="text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
