@@ -347,9 +347,23 @@ export function UnifiedFileLinkerWindow({
           )}
 
 
+          {/* Back to the paragraph edit window these files belong to */}
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Edit Paragraph"
+            title="Edit Paragraph"
+            className="group mb-2 w-full flex items-center gap-2 h-9 px-3 rounded-lg border border-slate-700/50 bg-slate-800/60 text-slate-400 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 hover:text-emerald-300 active:translate-y-px"
+          >
+            <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
+            <span className="text-[13px] font-medium">Edit Paragraph</span>
+            <span className="flex-1 h-px rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
+          </button>
+
           {/* Selected files */}
 
           <div
+
 
             className={`mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex items-stretch gap-2 ${
               selectedExpanded && displayFiles.length > 0 ? 'flex-1 min-h-0' : ''
@@ -427,19 +441,8 @@ export function UnifiedFileLinkerWindow({
             </div>
           </div>
 
-          {/* Back to the block these files belong to */}
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={targetBlockLabel ? `Back to ${targetBlockLabel}` : 'Back to the block'}
-            title={targetBlockLabel ? `Back to ${targetBlockLabel}` : 'Back to the block'}
-            className="group mb-2 w-full flex items-center gap-2 h-9 px-3 rounded-lg border border-slate-700/50 bg-slate-800/60 text-slate-400 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 hover:text-emerald-300 active:translate-y-px"
-          >
-            <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
-            <span className="flex-1 h-px rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
-          </button>
-
           {/* Search + upload */}
+
 
           <div className="flex items-center gap-2 mb-2">
             <div className="relative h-9 flex-1 min-w-0">
