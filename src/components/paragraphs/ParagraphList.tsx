@@ -4,6 +4,9 @@ import type { Editor } from '@tiptap/react';
 import { UnifiedFileLinkerWindow } from '../UnifiedFileLinkerWindow';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
 import { ParagraphBlock } from './ParagraphBlock';
+import { ParagraphEditWindow } from './ParagraphEditWindow';
+import { Button } from '../Button';
+import { createPortal } from 'react-dom';
 import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
 
@@ -43,13 +46,12 @@ export function ParagraphList({
     setHeading,
     insertAt,
     removeParagraph,
-    mergeInto,
     attachFileToParagraph,
   } = useNoteParagraphs({ noteId, userId, initialContent, canEdit });
 
   const [attachTarget, setAttachTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-  const [autoFocusId, setAutoFocusId] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<string | null>(null);
   const newAttachParagraphId = useRef<string | null>(null);
 
 
@@ -74,7 +76,6 @@ export function ParagraphList({
   const createTrailing = async (then?: (id: string) => void): Promise<string | null> => {
     // Reuse a trailing empty paragraph instead of stacking another empty one.
     if (last && lastIsEmpty) {
-      setAutoFocusId(last.id);
       then?.(last.id);
       return last.id;
     }
@@ -82,9 +83,17 @@ export function ParagraphList({
     const id = await insertAt(paragraphs.length);
     setPending(false);
     if (!id) return null;
-    setAutoFocusId(id);
     then?.(id);
     return id;
+  };
+
+  const editingParagraph = paragraphs.find(p => p.id === editTarget);
+  const closeEditor = () => {
+    if (editingParagraph && isDocEmpty(editingParagraph.content) && !editingParagraph.heading?.trim() && !(filesByParagraph[editingParagraph.id]?.length)) {
+      void removeParagraph(editingParagraph.id);
+    }
+    setEditTarget(null);
+    onActiveEditorChange(null);
   };
 
 
@@ -109,27 +118,15 @@ export function ParagraphList({
         </div>
       )}
 
-      {paragraphs.map((paragraph, index) => (
+      {paragraphs.filter(paragraph => !isDocEmpty(paragraph.content) || paragraph.heading?.trim() || (filesByParagraph[paragraph.id]?.length ?? 0) > 0).map((paragraph) => (
         <ParagraphBlock
           key={paragraph.id}
           paragraph={paragraph}
-          index={index}
-          total={paragraphs.length}
           files={filesByParagraph[paragraph.id] ?? []}
           canEdit={canEdit}
-          autoFocus={autoFocusId === paragraph.id}
-          onChange={(content) => setContent(paragraph.id, content)}
-          onFocusEditor={(editor) => {
-            if (editor) onActiveEditorChange(editor as Editor);
-          }}
-          onMergeUp={() => mergeInto(paragraph.id, paragraphs[index - 1].id, 'below')}
-          onMergeDown={() => mergeInto(paragraph.id, paragraphs[index + 1].id, 'above')}
+          onEdit={() => setEditTarget(paragraph.id)}
           onDelete={() => setDeleteTarget(paragraph.id)}
-          onAutoDelete={() => removeParagraph(paragraph.id)}
-          onAttach={() => setAttachTarget(paragraph.id)}
-          onDetach={(fileId) => attachFileToParagraph(fileId, null)}
           onOpenFile={onOpenFile}
-          onHeadingChange={(heading, immediate) => setHeading(paragraph.id, heading, immediate)}
         />
       ))}
 
@@ -138,27 +135,27 @@ export function ParagraphList({
           <div className="flex items-center gap-2 px-2 sm:px-3 py-2 min-h-11 text-xs text-slate-500">
             {showHintRow && (
               <>
-                <button
+                <Button variant="primary"
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => createTrailing()}
+                  onClick={() => createTrailing(id => setEditTarget(id))}
                   aria-label="Write text in new paragraph"
-                  className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-100 hover:bg-emerald-500/20 hover:border-emerald-500/40 hover:text-emerald-50 active:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-all duration-150"
+                  className="gap-1 h-7 px-1.5"
                 >
                   <Type className="w-4 h-4" />
                   <span className="text-xs font-medium">Write text</span>
-                </button>
+                </Button>
                 <span className="text-slate-500">or</span>
-                <button
+                <Button variant="primary"
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setAttachTarget(NEW_PARAGRAPH)}
                   aria-label="Attach file to new paragraph"
-                  className="inline-flex items-center gap-1 h-7 px-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-100 hover:bg-emerald-500/20 hover:border-emerald-500/40 hover:text-emerald-50 active:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-all duration-150"
+                  className="gap-1 h-7 px-1.5"
                 >
                   <Paperclip className="w-4 h-4" />
                   <span className="text-xs font-medium">Attach file</span>
-                </button>
+                </Button>
               </>
             )}
           </div>
@@ -179,7 +176,21 @@ export function ParagraphList({
         }}
       />
 
-      <UnifiedFileLinkerWindow
+      {editingParagraph && canEdit && <ParagraphEditWindow
+        key={editingParagraph.id}
+        paragraph={editingParagraph}
+        files={filesByParagraph[editingParagraph.id] ?? []}
+        suspended={attachTarget !== null}
+        onClose={closeEditor}
+        onChange={content => setContent(editingParagraph.id, content)}
+        onHeadingChange={(heading, immediate) => setHeading(editingParagraph.id, heading, immediate)}
+        onFocusEditor={editor => onActiveEditorChange(editor as Editor | null)}
+        onAttach={() => setAttachTarget(editingParagraph.id)}
+        onDetach={id => attachFileToParagraph(id, null)}
+        onOpenFile={file => { closeEditor(); onOpenFile(file); }}
+      />}
+
+      {attachTarget !== null && createPortal(<div className="relative z-[9995]"><UnifiedFileLinkerWindow
         open={attachTarget !== null}
         onClose={() => {
           setAttachTarget(null);
@@ -193,16 +204,16 @@ export function ParagraphList({
         ).map((f) => f.id)}
         onFileLinked={async (file) => {
           onFileLinked(file);
-          let target = attachTarget;
+          let target: string | null = attachTarget;
           if (target === NEW_PARAGRAPH) {
             // Only now, after a file was actually picked, materialize the paragraph.
             target = newAttachParagraphId.current ?? (await createTrailing());
             newAttachParagraphId.current = target;
           }
-          if (target) attachFileToParagraph(file.id, target);
+          if (target) await attachFileToParagraph(file.id, target);
         }}
         existingFileIds={files.map((f) => f.id)}
-      />
+      /></div>, document.body)}
 
     </div>
   );
