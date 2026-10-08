@@ -16,9 +16,9 @@ interface NoteHeaderBlockProps {
  * behind the panel so the blocks scroll cleanly underneath it while the panel
  * itself keeps its usual translucent design.
  *
- * The small slate edit button is absolutely positioned inside the panel, so it
- * never changes the panel's size; clicking it swaps the title for an inline
- * field with identical typography.
+ * The small slate edit button is absolutely positioned in the panel's bottom
+ * left corner, level with the title, so it never changes the panel's size;
+ * clicking it overlays an inline field exactly on top of the title.
  */
 export function NoteHeaderBlock({
   title,
@@ -47,13 +47,14 @@ export function NoteHeaderBlock({
       {/* Opaque backing so scrolling content never shows through the panel. */}
       <div aria-hidden="true" className="absolute -top-6 -left-6 -right-6 bottom-0 bg-background" />
       <div className="relative rounded-xl border border-border/70 bg-surface/40 px-4 py-3">
-        <p className="pl-6 text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
+        <p className="text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
           Note
         </p>
         {/* The title stays in the layout even while editing, so the panel
-            never changes size; the input is overlaid exactly on top of it. */}
+            never changes size; the input is overlaid exactly on top of it.
+            It is indented to make room for the edit button on its left. */}
         <h2
-          className={`mt-2 text-2xl font-bold leading-tight break-words text-foreground ${
+          className={`mt-2 pl-7 text-2xl font-bold leading-tight break-words text-foreground ${
             editing ? 'invisible' : ''
           }`}
         >
@@ -77,7 +78,7 @@ export function NoteHeaderBlock({
             onBlur={commit}
             aria-label="Note title"
             placeholder="Untitled"
-            className="absolute inset-x-4 bottom-3 h-[30px] border-0 bg-transparent p-0 text-2xl font-bold leading-tight text-foreground outline-none"
+            className="absolute right-4 bottom-3 left-11 h-[30px] border-0 bg-transparent p-0 text-2xl font-bold leading-tight text-foreground outline-none"
           />
         )}
         {canEdit && !editing && (
@@ -86,7 +87,7 @@ export function NoteHeaderBlock({
             onClick={startEditing}
             aria-label="Edit note title"
             title="Edit title"
-            className="absolute left-2 top-1 flex h-6 w-6 items-center justify-center rounded-md border border-border/70 bg-surface/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+            className="absolute left-2 bottom-[15px] flex h-6 w-6 items-center justify-center rounded-md border border-border/70 bg-surface/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground"
           >
             <Pencil className="h-3 w-3" />
           </button>
