@@ -154,7 +154,7 @@ export function ParagraphList({
               {/* End-of-line node: marks where the line stops. */}
               <div
                 aria-hidden="true"
-                className="absolute left-5 top-[28px] -translate-x-1/2 -translate-y-1/2"
+                className="absolute left-5 top-[35px] -translate-x-1/2 -translate-y-1/2"
               >
                 <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-background" />
               </div>
