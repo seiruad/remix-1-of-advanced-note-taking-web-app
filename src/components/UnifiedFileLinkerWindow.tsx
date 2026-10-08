@@ -253,7 +253,7 @@ export function UnifiedFileLinkerWindow({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading || linking}
-              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 border border-emerald-500/20 hover:bg-emerald-500/25 hover:border-emerald-500/40 transition-colors disabled:opacity-50 flex-shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 h-9 px-3 min-w-0 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 border border-emerald-500/20 hover:bg-emerald-500/25 hover:border-emerald-500/40 transition-colors disabled:opacity-50 flex-1"
             >
               {uploading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
