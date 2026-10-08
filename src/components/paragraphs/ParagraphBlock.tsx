@@ -1,4 +1,4 @@
-import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react';
+import { ArrowUpDown, ChevronDown, Pencil, Trash2 } from 'lucide-react';
 import { RichTextEditor } from '../RichTextEditor';
 import { UnifiedMenu, type UnifiedMenuItem } from '../UnifiedMenu';
 import { ParagraphAttachments } from './ParagraphAttachments';
@@ -26,7 +26,7 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
   return <article aria-label={isHeader ? 'Header' : 'Paragraph'} className={`relative ${isHeader ? 'min-h-[48px] flex items-center' : 'min-h-[72px]'} pl-2 sm:pl-3 pr-12 py-2 ${className ?? ''}`}>
     {isHeader ? <div className="flex items-center gap-2 min-w-0">
       <h3 className="min-w-0 break-words text-base sm:text-lg font-bold leading-7 text-foreground">{paragraph.heading}</h3>
-      {canEdit && <span className="shrink-0"><UnifiedMenu items={items} ariaLabel="Header options" triggerClassName="!rounded-md w-6 h-6 border border-border/60 bg-transparent text-muted-foreground hover:border-primary/60 hover:text-primary-foreground" openTriggerClassName="!bg-surface !text-primary-foreground" triggerContent={<span className="text-[13px] font-bold leading-none tracking-tight">T</span>} /></span>}
+      {canEdit && <span className="shrink-0"><UnifiedMenu items={items} ariaLabel="Header options" triggerClassName="!rounded-md w-6 h-6 border border-border/50 bg-muted/20 text-muted-foreground hover:border-primary/60 hover:bg-muted/50 hover:text-primary-foreground" openTriggerClassName="!bg-surface !text-primary-foreground" triggerContent={<ChevronDown className="w-3.5 h-3.5" strokeWidth={2.5} />} /></span>}
     </div> :
     <div className="space-y-2 min-w-0 break-words">
       {!isDocEmpty(paragraph.content) && <div className="paragraph-reading [&_.ProseMirror]:leading-7">
