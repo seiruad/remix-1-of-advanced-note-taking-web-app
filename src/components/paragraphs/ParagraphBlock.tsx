@@ -24,7 +24,10 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
   ];
   const isHeader = paragraph.kind === 'header';
   return <article aria-label={isHeader ? 'Header' : 'Paragraph'} className={`relative ${isHeader ? 'min-h-[48px] flex items-center' : 'min-h-[72px]'} pl-2 sm:pl-3 pr-12 py-2 ${className ?? ''}`}>
-    {isHeader ? <h3 className="min-w-0 break-words text-base sm:text-lg font-bold leading-7 text-foreground">{paragraph.heading}</h3> :
+    {isHeader ? <div className="flex items-center gap-2 min-w-0">
+      <h3 className="min-w-0 break-words text-base sm:text-lg font-bold leading-7 text-foreground">{paragraph.heading}</h3>
+      {canEdit && <span className="shrink-0"><UnifiedMenu items={items} ariaLabel="Header options" triggerClassName="!rounded-full w-6 h-6 border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground" iconClassName="w-3 h-3" openTriggerClassName="!bg-surface !text-primary-foreground" /></span>}
+    </div> :
     <div className="space-y-2 min-w-0 break-words">
       {!isDocEmpty(paragraph.content) && <div className="paragraph-reading [&_.ProseMirror]:leading-7">
         <RichTextEditor content={paragraph.content} onChange={() => {}} editable={false} placeholder="" minHeightClassName="min-h-0" />
