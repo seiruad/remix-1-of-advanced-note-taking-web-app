@@ -8,9 +8,6 @@ import {
   Download,
   Trash2,
   X,
-  ChevronUp,
-  ChevronDown,
-  File as FileIcon,
   FileText,
   Pencil,
   Check,
@@ -68,7 +65,7 @@ export function NoteEditor({
   const [localTitle, setLocalTitle] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
+  const [attachmentsExpanded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
