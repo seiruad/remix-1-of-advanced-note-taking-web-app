@@ -1,12 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react';
 import { createPortal } from 'react-dom';
 import { MoreHorizontal } from 'lucide-react';
+import { Button } from './Button';
 
 export interface UnifiedMenuItem {
   id: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
   danger?: boolean;
+  disabled?: boolean;
   onSelect: () => void;
 }
 
@@ -98,7 +100,7 @@ export function UnifiedMenu({
 
   return (
     <>
-      <button
+      <Button
         ref={triggerRef}
         type="button"
         aria-label={ariaLabel}
@@ -115,7 +117,7 @@ export function UnifiedMenu({
         }`}
       >
         <MoreHorizontal className={iconClassName} strokeWidth={2.25} />
-      </button>
+      </Button>
 
       {open && createPortal(
         <div
@@ -145,12 +147,14 @@ export function UnifiedMenu({
                   <button
                     type="button"
                     role="menuitem"
+                    disabled={item.disabled}
+                    aria-disabled={item.disabled}
                     onClick={(e) => {
                       e.stopPropagation();
                       close();
                       item.onSelect();
                     }}
-                    className={`w-full flex items-center gap-2.5 px-2.5 py-2 text-left text-sm sm:text-[13px] font-medium transition-colors ${
+                    className={`w-full flex items-center gap-2.5 px-2.5 py-2 text-left text-sm sm:text-[13px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                       item.danger
                         ? 'text-red-400 hover:bg-red-500/10 active:bg-red-500/15'
                         : 'text-slate-100 hover:bg-slate-700/60 active:bg-slate-700/80'
