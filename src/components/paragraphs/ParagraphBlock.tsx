@@ -29,7 +29,7 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
       {canEdit && <span className="shrink-0"><UnifiedMenu items={items} ariaLabel="Header options" triggerClassName="!rounded-md w-6 h-6 border border-border/50 bg-muted/20 text-muted-foreground hover:border-primary/60 hover:bg-muted/50 hover:text-primary-foreground" openTriggerClassName="!bg-surface !text-primary-foreground" triggerContent={<ChevronDown className="w-3.5 h-3.5" strokeWidth={2.5} />} /></span>}
     </div> :
     <div className="flex items-start gap-2 min-w-0">
-      <div className="flex-1 min-w-0 space-y-2 break-words">
+      <div className="min-w-0 max-w-full space-y-2 break-words">
         {!isDocEmpty(paragraph.content) && <div className="paragraph-reading [&_.ProseMirror]:leading-7">
           <RichTextEditor content={paragraph.content} onChange={() => {}} editable={false} placeholder="" minHeightClassName="min-h-0" />
         </div>}
