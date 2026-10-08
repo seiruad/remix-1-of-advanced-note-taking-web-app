@@ -1,4 +1,4 @@
-import { FileText, File as FileIcon, Image, Music, Video, Unlink } from 'lucide-react';
+import { FileText, File as FileIcon, Image, Music, Video, Unlink, Plus } from 'lucide-react';
 import type { FileItem } from '../../types/database';
 
 function iconFor(type: string) {
@@ -17,14 +17,16 @@ function shortName(name: string, max = 14) {
   return `${base.slice(0, Math.max(3, max - ext.length - 1))}…${ext}`;
 }
 
-export function ParagraphAttachments({ files, onOpenFile, onDetach }: {
+export function ParagraphAttachments({ files, onOpenFile, onDetach, onAdd }: {
   files: FileItem[];
   onOpenFile: (file: FileItem) => void;
   onDetach?: (id: string) => void;
+  onAdd?: () => void;
 }) {
   return <div className="flex flex-wrap gap-1.5">
-    {files.map(file => {
+    {files.map((file, fileIndex) => {
       const Icon = iconFor(file.file_type);
+      const isLast = fileIndex === files.length - 1;
       return (
         <span
           key={file.id}
@@ -48,6 +50,17 @@ export function ParagraphAttachments({ files, onOpenFile, onDetach }: {
               className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
             >
               <Unlink className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {onAdd && isLast && (
+            <button
+              type="button"
+              onClick={onAdd}
+              aria-label="Attach file"
+              title="Attach file"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-emerald-400 hover:bg-slate-600/40 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
             </button>
           )}
         </span>

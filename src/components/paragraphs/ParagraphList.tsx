@@ -127,6 +127,7 @@ export function ParagraphList({
           onEdit={() => setEditTarget(paragraph.id)}
           onDelete={() => setDeleteTarget(paragraph.id)}
           onOpenFile={onOpenFile}
+          onAttach={() => setAttachTarget(paragraph.id)}
         />
       ))}
 

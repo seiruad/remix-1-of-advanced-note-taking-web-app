@@ -12,9 +12,10 @@ interface ParagraphBlockProps {
   onEdit: () => void;
   onDelete: () => void;
   onOpenFile: (file: FileItem) => void;
+  onAttach: () => void;
 }
 
-export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, onOpenFile }: ParagraphBlockProps) {
+export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, onOpenFile, onAttach }: ParagraphBlockProps) {
   const items: UnifiedMenuItem[] = [
     { id: 'edit', label: 'Edit', icon: Pencil, onSelect: onEdit },
     { id: 'move', label: 'Move', icon: ArrowUpDown, disabled: true, onSelect: () => {} },
@@ -26,7 +27,7 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
       {!isDocEmpty(paragraph.content) && <div className="paragraph-reading [&_.ProseMirror]:leading-7">
         <RichTextEditor content={paragraph.content} onChange={() => {}} editable={false} placeholder="" minHeightClassName="min-h-0" />
       </div>}
-      {files.length > 0 && <ParagraphAttachments files={files} onOpenFile={onOpenFile} />}
+      {files.length > 0 && <ParagraphAttachments files={files} onOpenFile={onOpenFile} onAdd={canEdit ? onAttach : undefined} />}
     </div>
     <div aria-hidden="true" className="absolute right-5 top-2 bottom-2 w-px bg-border/60" />
     {canEdit && <div className="absolute right-5 top-[33.333%] translate-x-1/2 -translate-y-1/2">
