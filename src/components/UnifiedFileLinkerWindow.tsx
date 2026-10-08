@@ -268,7 +268,10 @@ export function UnifiedFileLinkerWindow({
       ? []
       : middleFiles.slice(-middleVisibleCount);
 
+  const TargetIcon = targetBlockKind === 'header' ? Heading : targetBlockKind === 'new' ? Plus : Type;
+
   const renderChip = (file: FileItem, linked = false) => (
+
     <span
       key={file.id}
       data-chip-id={file.id}
