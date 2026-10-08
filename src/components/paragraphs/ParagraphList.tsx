@@ -242,8 +242,8 @@ export function ParagraphList({
         }}
         noteId={noteId}
         noteTitle={noteTitle}
-        targetBlockKind={attachTargetInfo?.kind}
         targetBlockLabel={attachTargetInfo?.label}
+
 
 
         paragraphId={attachTarget === NEW_PARAGRAPH ? null : attachTarget}
