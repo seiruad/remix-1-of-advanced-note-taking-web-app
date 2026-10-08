@@ -8,7 +8,7 @@ import {
   Link2,
   Paperclip,
   Check,
-  ChevronDown,
+  ArrowLeft,
   ListTree,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -327,28 +327,35 @@ export function UnifiedFileLinkerWindow({
 
           {/* Selected files */}
           <div
-            className={`mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex flex-col ${
+            className={`mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex items-stretch gap-2 ${
               selectedExpanded && displayFiles.length > 0 ? 'flex-1 min-h-0' : ''
             }`}
           >
-            <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5 h-6">
-              <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
-                Selected · {displayFiles.length}
-              </p>
-              <button
-                type="button"
-                onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
-                disabled={displayFiles.length === 0}
-                aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
-                className="h-5 w-8 rounded-full flex items-center justify-center flex-shrink-0 border border-slate-700/50 bg-slate-800/60 text-emerald-400 shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-all duration-200 enabled:hover:border-emerald-500/50 enabled:hover:bg-emerald-500/15 enabled:hover:text-emerald-300 enabled:hover:shadow-[0_0_8px_rgba(16,185,129,0.25)] enabled:active:scale-95 disabled:text-slate-600 disabled:cursor-default"
-              >
-                <ChevronDown
-                  className={`w-3 h-3 transition-transform duration-200 ${
-                    selectedExpanded ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-            </div>
+            {/* Full-height left arrow rail: expands / collapses the selected files */}
+            <button
+              type="button"
+              onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
+              disabled={displayFiles.length === 0}
+              aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
+              aria-expanded={selectedExpanded}
+              className="group w-8 self-stretch flex-shrink-0 rounded-lg border border-slate-700/50 bg-slate-800/60 flex flex-col items-center justify-center gap-1.5 py-1.5 text-slate-500 transition-all duration-200 enabled:hover:border-emerald-500/45 enabled:hover:bg-emerald-500/10 enabled:hover:text-emerald-300 enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-default"
+            >
+              <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
+              <ArrowLeft
+                className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
+                  selectedExpanded ? 'rotate-180' : ''
+                }`}
+              />
+              <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
+            </button>
+
+            <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-1.5 px-0.5 h-6">
+                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
+                  Selected · {displayFiles.length}
+                </p>
+              </div>
+
             <div
               ref={chipsRowRef}
               className={`${
@@ -391,8 +398,10 @@ export function UnifiedFileLinkerWindow({
                   )}
                 </>
               )}
+              </div>
             </div>
           </div>
+
 
           {/* Search + upload */}
           <div className="flex items-center gap-2 mb-2">
