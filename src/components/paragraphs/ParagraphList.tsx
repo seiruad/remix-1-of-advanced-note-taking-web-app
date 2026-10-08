@@ -152,16 +152,16 @@ export function ParagraphList({
             aria-hidden="true"
             className="absolute left-5 top-[28px] -translate-x-1/2 -translate-y-1/2"
           >
-            <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-border ring-4 ring-background" />
+            <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-background" />
           </div>
           <button
             type="button"
             aria-label="Add block at the end of the note"
             onClick={() => setAddOpen(true)}
-            className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-border/70 bg-surface/40 px-4 py-3 text-left text-muted-foreground hover:border-primary/70 hover:text-primary-foreground transition-colors"
+            className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-primary/50 bg-primary/10 px-4 py-3 text-left text-primary hover:border-primary hover:bg-primary/20 transition-colors"
           >
             <Plus className="w-3.5 h-3.5 shrink-0" />
-            <span className="text-sm">Add block</span>
+            <span className="text-sm font-medium">Add block</span>
           </button>
         </div>
       )}
