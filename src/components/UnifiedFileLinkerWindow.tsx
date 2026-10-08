@@ -8,7 +8,7 @@ import {
   Link2,
   Paperclip,
   Check,
-  ChevronDown,
+  ArrowLeft,
   ListTree,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -391,8 +391,10 @@ export function UnifiedFileLinkerWindow({
                   )}
                 </>
               )}
+              </div>
             </div>
           </div>
+
 
           {/* Search + upload */}
           <div className="flex items-center gap-2 mb-2">
