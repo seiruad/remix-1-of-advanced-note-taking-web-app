@@ -26,6 +26,7 @@ interface ParagraphListProps {
   onOpenFile: (file: FileItem) => void;
   onActiveEditorChange: (editor: Editor | null) => void;
   onFileLinked: (file: FileItem) => void;
+  onTitleChange?: (title: string) => void;
 }
 
 export function ParagraphList({
@@ -38,6 +39,7 @@ export function ParagraphList({
   onOpenFile,
   onActiveEditorChange,
   onFileLinked,
+  onTitleChange,
 }: ParagraphListProps) {
   const {
     paragraphs,
@@ -131,7 +133,7 @@ export function ParagraphList({
 
       <div className="relative max-w-[var(--note-block-max-width)]">
         <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-border/60" />
-        <NoteHeaderBlock title={noteTitle} />
+        <NoteHeaderBlock title={noteTitle} canEdit={canEdit} onTitleChange={onTitleChange} />
       {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
         <ParagraphBlock
           key={paragraph.id}
