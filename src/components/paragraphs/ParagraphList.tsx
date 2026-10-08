@@ -172,11 +172,6 @@ export function ParagraphList({
                 </span>
                 <span className="text-sm font-semibold tracking-wide">Add block</span>
               </button>
-              <div aria-hidden="true" className="h-12">
-                <span aria-hidden="true" className="absolute left-5 bottom-0 -translate-x-1/2 translate-y-1/2 flex w-4 h-4 items-center justify-center rounded-[4px] border border-border/70 bg-surface">
-                  <span className="block w-1.5 h-1.5 rounded-[1px] bg-muted-foreground/60" />
-                </span>
-              </div>
             </div>
           )}
 
