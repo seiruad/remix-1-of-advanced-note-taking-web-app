@@ -236,10 +236,10 @@ export function UnifiedFileLinkerWindow({
               onClick={onEditParagraph ?? onClose}
               aria-label="Edit paragraph"
               title="Edit paragraph"
-              className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3 rounded-lg border border-slate-700/50 bg-slate-900/40 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
+              className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3.5 rounded-lg bg-slate-700/50 text-[13px] font-semibold text-slate-200 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-slate-700 hover:text-emerald-300 active:translate-y-px"
             >
-              <ChevronsLeft className="w-5 h-5 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
-              <span className="hidden sm:inline text-[13px] font-semibold text-slate-200 group-hover:text-emerald-100">Paragraph</span>
+              <ChevronsLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
+              <span className="hidden sm:inline truncate">Paragraph</span>
             </button>
 
             <button
@@ -247,10 +247,10 @@ export function UnifiedFileLinkerWindow({
               onClick={onEditAttachments ?? onClose}
               aria-label="Edit attachments"
               title="Edit attachments"
-              className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3 rounded-lg border border-slate-700/50 bg-slate-900/40 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
+              className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3.5 rounded-lg bg-slate-700/50 text-[13px] font-semibold text-slate-200 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-slate-700 hover:text-emerald-300 active:translate-y-px"
             >
-              <ArrowLeft className="w-4 h-4 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
-              <span className="hidden sm:inline text-[13px] font-semibold text-slate-200 group-hover:text-emerald-100">Attachments</span>
+              <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
+              <span className="hidden sm:inline truncate">Attachments</span>
             </button>
 
             <button
