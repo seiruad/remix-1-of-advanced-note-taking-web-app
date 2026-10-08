@@ -221,6 +221,8 @@ export function ParagraphList({
           newAttachParagraphId.current = null;
         }}
         noteId={noteId}
+        noteTitle={noteTitle}
+
         paragraphId={attachTarget === NEW_PARAGRAPH ? null : attachTarget}
         paragraphFileIds={(attachTarget && attachTarget !== NEW_PARAGRAPH
           ? filesByParagraph[attachTarget] ?? []
