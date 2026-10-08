@@ -229,65 +229,26 @@ export function UnifiedFileLinkerWindow({
           )}
 
 
-          {/* Two ways back: the block's text (two levels up) or its attachments (one level up) */}
-          <div className="mb-2 flex flex-col gap-2">
+          {/* One line: back to the block's text (double arrow), back to its files (single arrow), then upload */}
+          <div className="mb-2 flex items-center gap-2">
             <button
               type="button"
               onClick={onEditParagraph ?? onClose}
               aria-label="Edit paragraph"
-              className="group flex w-full items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-900/40 px-3 py-3 text-left transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
+              title="Edit paragraph"
+              className="group inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-700/50 bg-slate-900/40 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
             >
-              <ChevronsLeft className="w-5 h-5 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-slate-100 group-hover:text-emerald-100">
-                  Edit paragraph
-                </span>
-                <span className="block text-[11px] text-slate-500">Back to the block's text</span>
-              </span>
+              <ChevronsLeft className="w-5 h-5 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
             </button>
             <button
               type="button"
               onClick={onEditAttachments ?? onClose}
               aria-label="Edit attachments"
-              className="group flex w-full items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-900/40 px-3 py-3 text-left transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
+              title="Edit attachments"
+              className="group inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-700/50 bg-slate-900/40 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
             >
-              <ArrowLeft className="w-4 h-4 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-slate-100 group-hover:text-emerald-100">
-                  Edit attachments
-                </span>
-                <span className="block text-[11px] text-slate-500">
-                  Back to this block's files
-                </span>
-              </span>
+              <ArrowLeft className="w-4 h-4 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
             </button>
-          </div>
-
-
-
-          {/* Search + upload */}
-
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleUpload(file);
-            }}
-            className="hidden"
-          />
-          <div className="flex items-center gap-2 mb-2">
-            <div className="relative h-9 flex-1 min-w-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search files…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
-              />
-            </div>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
@@ -303,6 +264,34 @@ export function UnifiedFileLinkerWindow({
               <span className="sm:hidden">Upload</span>
             </button>
           </div>
+
+
+
+
+          {/* Search + upload */}
+
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleUpload(file);
+            }}
+            className="hidden"
+          />
+          {/* Search */}
+          <div className="relative h-9 mb-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search files…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+            />
+          </div>
+
 
 
 
