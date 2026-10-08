@@ -340,6 +340,7 @@ export function UnifiedFileLinkerWindow({
               aria-expanded={selectedExpanded}
               className="group w-8 self-stretch flex-shrink-0 rounded-lg border border-slate-700/50 bg-slate-800/60 flex flex-col items-center justify-center gap-1.5 py-1.5 text-slate-500 transition-all duration-200 enabled:hover:border-emerald-500/45 enabled:hover:bg-emerald-500/10 enabled:hover:text-emerald-300 enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-default"
             >
+              <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
               <ArrowLeft
                 className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
                   selectedExpanded ? 'rotate-180' : ''
@@ -347,6 +348,7 @@ export function UnifiedFileLinkerWindow({
               />
               <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
             </button>
+
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-1.5 px-0.5 h-6">
                 <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
