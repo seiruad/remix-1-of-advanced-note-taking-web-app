@@ -165,9 +165,11 @@ export function ParagraphList({
                 <Plus className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-sm font-medium">Add block</span>
               </button>
-              {/* End-of-note node: a distinct square that closes the line. */}
+              {/* End-of-note node: a framed square that closes the line. */}
               <div aria-hidden="true" className="h-5">
-                <span aria-hidden="true" className="absolute left-5 bottom-0 -translate-x-1/2 translate-y-1/2 w-4 h-4 rounded-[4px] border border-border/70 bg-surface/40 ring-4 ring-background" />
+                <span aria-hidden="true" className="absolute left-5 bottom-0 -translate-x-1/2 translate-y-1/2 flex w-4 h-4 items-center justify-center rounded-[4px] border border-border/70 bg-surface/40">
+                  <span className="block w-1.5 h-1.5 rounded-[1px] bg-muted-foreground/60" />
+                </span>
               </div>
             </div>
           )}
