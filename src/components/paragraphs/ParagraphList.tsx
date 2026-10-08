@@ -147,22 +147,32 @@ export function ParagraphList({
               onAttach={() => setAttachTarget(paragraph.id)}
             />
           ))}
+          {canEdit && (
+            <div className="relative pl-12 pr-2 sm:pr-3 pt-2.5 pb-1">
+              {/* End-of-line node: marks where the line stops. */}
+              <div
+                aria-hidden="true"
+                className="absolute left-5 top-[28px] -translate-x-1/2 -translate-y-1/2"
+              >
+                <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-background" />
+              </div>
+              <button
+                type="button"
+                aria-label="Add block at the end of the note"
+                onClick={() => setAddOpen(true)}
+                className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-primary/50 bg-primary/10 px-4 py-3 text-left text-primary hover:border-primary hover:bg-primary/20 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5 shrink-0" />
+                <span className="text-sm font-medium">Add block</span>
+              </button>
+              {/* Terminal node: a very small solid dot that closes the line under the panel. */}
+              <div aria-hidden="true" className="relative h-3">
+                <span className="absolute left-5 bottom-0 -translate-x-1/2 translate-y-1/2 block w-1.5 h-1.5 rounded-full bg-primary" />
+              </div>
+            </div>
+          )}
         </div>
-        {/* Structurally like the note header block: full column width, no line through it.
-            It sits flush under the rail so the line ends at its top edge with no gap. */}
-        {canEdit && (
-          <article aria-label="Add block" className="pr-2 sm:pr-3">
-            <button
-              type="button"
-              aria-label="Add block at the end of the note"
-              onClick={() => setAddOpen(true)}
-              className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-primary/50 bg-primary/10 px-4 py-3 text-left text-primary hover:border-primary hover:bg-primary/20 transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5 shrink-0" />
-              <span className="text-sm font-medium">Add block</span>
-            </button>
-          </article>
-        )}
+
       </div>
 
       <AddBlockWindow
