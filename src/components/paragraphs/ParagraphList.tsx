@@ -128,6 +128,8 @@ export function ParagraphList({
         </div>
       )}
 
+      <div className="relative space-y-4">
+        <div aria-hidden="true" className="absolute right-5 top-0 bottom-0 w-px bg-border/60" />
       {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph) => (
         <ParagraphBlock
           key={paragraph.id}
