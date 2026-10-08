@@ -130,7 +130,8 @@ export function UnifiedFileLinkerWindow({
     const ro = new ResizeObserver(measure);
     ro.observe(row);
     return () => ro.disconnect();
-  }, [selectedExpanded, selectedIds, files, middleVisibleCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedExpanded, selectedIds, files, middleVisibleCount, paragraphFileIds, existingFileIds]);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -238,7 +239,12 @@ export function UnifiedFileLinkerWindow({
   const selectedFiles = selectedIds
     .map((id) => files.find((f) => f.id === id))
     .filter((f): f is FileItem => Boolean(f));
-  const middleFiles = selectedFiles.slice(1, -1);
+  const linkedFiles = linkedIds
+    .map((id) => files.find((f) => f.id === id))
+    .filter((f): f is FileItem => Boolean(f));
+  // Already-attached files are shown first in the Selected block, then newly picked ones.
+  const displayFiles = [...linkedFiles, ...selectedFiles];
+  const middleFiles = displayFiles.slice(1, -1);
   const middleHiddenCount =
     middleVisibleCount === null ? 0 : Math.max(middleFiles.length - middleVisibleCount, 0);
   const visibleMiddleFiles =
@@ -246,23 +252,36 @@ export function UnifiedFileLinkerWindow({
       ? []
       : middleFiles.slice(-middleVisibleCount);
 
-  const renderChip = (file: FileItem) => (
+  const renderChip = (file: FileItem, linked = false) => (
     <span
       key={file.id}
       data-chip-id={file.id}
-      className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors text-[11px] font-medium text-slate-300 flex-shrink-0"
+      className={`inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full border transition-colors text-[11px] font-medium flex-shrink-0 ${
+        linked
+          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+          : 'bg-slate-700/40 border-slate-600/30 hover:bg-slate-700/60 text-slate-300'
+      }`}
     >
       <span className="truncate max-w-[140px]" title={file.filename}>
         {file.filename}
       </span>
-      <button
-        type="button"
-        onClick={() => toggle(file.id)}
-        aria-label={`Deselect ${file.filename}`}
-        className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
-      >
-        <X className="w-3 h-3" />
-      </button>
+      {linked ? (
+        <span
+          className="w-5 h-5 rounded-full flex items-center justify-center text-emerald-400"
+          title="Already attached"
+        >
+          <Link2 className="w-3 h-3" />
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => toggle(file.id)}
+          aria-label={`Deselect ${file.filename}`}
+          className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
     </span>
   );
 
