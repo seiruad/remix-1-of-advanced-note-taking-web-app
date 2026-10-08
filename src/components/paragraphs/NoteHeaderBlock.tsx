@@ -50,7 +50,16 @@ export function NoteHeaderBlock({
         <p className="pl-6 text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
           Note
         </p>
-        {editing ? (
+        {/* The title stays in the layout even while editing, so the panel
+            never changes size; the input is overlaid exactly on top of it. */}
+        <h2
+          className={`mt-2 text-2xl font-bold leading-tight break-words text-foreground ${
+            editing ? 'invisible' : ''
+          }`}
+        >
+          {title.trim() || 'Untitled'}
+        </h2>
+        {editing && (
           <input
             autoFocus
             value={draft}
@@ -68,12 +77,8 @@ export function NoteHeaderBlock({
             onBlur={commit}
             aria-label="Note title"
             placeholder="Untitled"
-            className="mt-2 w-full border-0 border-b border-transparent bg-transparent p-0 text-2xl font-bold leading-tight text-foreground outline-none focus:border-border/70"
+            className="absolute inset-x-4 bottom-3 h-[30px] border-0 bg-transparent p-0 text-2xl font-bold leading-tight text-foreground outline-none"
           />
-        ) : (
-          <h2 className="mt-2 text-2xl font-bold leading-tight break-words text-foreground">
-            {title.trim() || 'Untitled'}
-          </h2>
         )}
         {canEdit && !editing && (
           <button
