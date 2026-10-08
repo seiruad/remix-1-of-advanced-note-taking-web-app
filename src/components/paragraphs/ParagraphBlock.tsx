@@ -13,16 +13,17 @@ interface ParagraphBlockProps {
   onDelete: () => void;
   onOpenFile: (file: FileItem) => void;
   onAttach: () => void;
+  className?: string;
 }
 
-export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, onOpenFile, onAttach }: ParagraphBlockProps) {
+export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, onOpenFile, onAttach, className }: ParagraphBlockProps) {
   const items: UnifiedMenuItem[] = [
     { id: 'edit', label: 'Edit', icon: Pencil, onSelect: onEdit },
     { id: 'move', label: 'Move', icon: ArrowUpDown, disabled: true, onSelect: () => {} },
     { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
   ];
   const isHeader = paragraph.kind === 'header';
-  return <article aria-label={isHeader ? 'Header' : 'Paragraph'} className={`relative ${isHeader ? 'min-h-[48px] flex items-center' : 'min-h-[72px]'} pl-2 sm:pl-3 pr-12 py-2`}>
+  return <article aria-label={isHeader ? 'Header' : 'Paragraph'} className={`relative ${isHeader ? 'min-h-[48px] flex items-center' : 'min-h-[72px]'} pl-2 sm:pl-3 pr-12 py-2 ${className ?? ''}`}>
     {isHeader ? <h3 className="min-w-0 break-words text-base sm:text-lg font-bold leading-7 text-foreground">{paragraph.heading}</h3> :
     <div className="space-y-2 min-w-0 break-words">
       {!isDocEmpty(paragraph.content) && <div className="paragraph-reading [&_.ProseMirror]:leading-7">
