@@ -76,12 +76,15 @@ export function UnifiedFileLinkerWindow({
 
   // In collapsed mode the first and last chips are always pinned. Middle chips
   // are shown only while they fit; the rest collapse into a "•••" pill.
+  const linkedIds = paragraphFileIds ?? existingFileIds;
+
   useLayoutEffect(() => {
     if (selectedExpanded) {
       setMiddleVisibleCount(null);
       return;
     }
-    const selFiles = selectedIds
+    // Chips shown in the Selected block: already-attached files first, then newly picked ones.
+    const selFiles = [...linkedIds, ...selectedIds]
       .map((id) => files.find((f) => f.id === id))
       .filter((f): f is FileItem => Boolean(f));
     const mids = selFiles.slice(1, -1);
@@ -127,7 +130,8 @@ export function UnifiedFileLinkerWindow({
     const ro = new ResizeObserver(measure);
     ro.observe(row);
     return () => ro.disconnect();
-  }, [selectedExpanded, selectedIds, files, middleVisibleCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedExpanded, selectedIds, files, middleVisibleCount, paragraphFileIds, existingFileIds]);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -235,7 +239,12 @@ export function UnifiedFileLinkerWindow({
   const selectedFiles = selectedIds
     .map((id) => files.find((f) => f.id === id))
     .filter((f): f is FileItem => Boolean(f));
-  const middleFiles = selectedFiles.slice(1, -1);
+  const linkedFiles = linkedIds
+    .map((id) => files.find((f) => f.id === id))
+    .filter((f): f is FileItem => Boolean(f));
+  // Already-attached files are shown first in the Selected block, then newly picked ones.
+  const displayFiles = [...linkedFiles, ...selectedFiles];
+  const middleFiles = displayFiles.slice(1, -1);
   const middleHiddenCount =
     middleVisibleCount === null ? 0 : Math.max(middleFiles.length - middleVisibleCount, 0);
   const visibleMiddleFiles =
@@ -243,23 +252,36 @@ export function UnifiedFileLinkerWindow({
       ? []
       : middleFiles.slice(-middleVisibleCount);
 
-  const renderChip = (file: FileItem) => (
+  const renderChip = (file: FileItem, linked = false) => (
     <span
       key={file.id}
       data-chip-id={file.id}
-      className="inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors text-[11px] font-medium text-slate-300 flex-shrink-0"
+      className={`inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full border transition-colors text-[11px] font-medium flex-shrink-0 ${
+        linked
+          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+          : 'bg-slate-700/40 border-slate-600/30 hover:bg-slate-700/60 text-slate-300'
+      }`}
     >
       <span className="truncate max-w-[140px]" title={file.filename}>
         {file.filename}
       </span>
-      <button
-        type="button"
-        onClick={() => toggle(file.id)}
-        aria-label={`Deselect ${file.filename}`}
-        className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
-      >
-        <X className="w-3 h-3" />
-      </button>
+      {linked ? (
+        <span
+          className="w-5 h-5 rounded-full flex items-center justify-center text-emerald-400"
+          title="Already attached"
+        >
+          <Link2 className="w-3 h-3" />
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => toggle(file.id)}
+          aria-label={`Deselect ${file.filename}`}
+          className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
     </span>
   );
 
@@ -342,33 +364,33 @@ export function UnifiedFileLinkerWindow({
           {/* Selected files */}
           <div
             className={`mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex flex-col ${
-              selectedExpanded && selectedFiles.length > 0 ? 'flex-1 min-h-0' : ''
+              selectedExpanded && displayFiles.length > 0 ? 'flex-1 min-h-0' : ''
             }`}
           >
             <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5 h-4">
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
-                Selected · {selectedFiles.length}
+                Selected · {displayFiles.length}
               </p>
             </div>
             <div
               ref={chipsRowRef}
               className={`${
-                selectedExpanded && selectedFiles.length > 0
+                selectedExpanded && displayFiles.length > 0
                   ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
                   : 'flex items-center gap-1.5 overflow-hidden h-7'
               }`}
             >
-              {selectedFiles.length === 0 ? (
+              {displayFiles.length === 0 ? (
                 <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500 truncate">
                   No files selected yet — pick files below or upload a new one.
                 </span>
-              ) : selectedExpanded && selectedFiles.length > 0 ? (
-                selectedFiles.map(renderChip)
-              ) : selectedFiles.length === 1 ? (
-                renderChip(selectedFiles[0])
+              ) : selectedExpanded && displayFiles.length > 0 ? (
+                displayFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))
+              ) : displayFiles.length === 1 ? (
+                renderChip(displayFiles[0], linkedIds.includes(displayFiles[0].id))
               ) : (
                 <>
-                  {renderChip(selectedFiles[0])}
+                  {renderChip(displayFiles[0], linkedIds.includes(displayFiles[0].id))}
                   {middleFiles.length > 0 && (
                     <div
                       ref={chipsMiddleRef}
@@ -383,10 +405,13 @@ export function UnifiedFileLinkerWindow({
                           •••
                         </span>
                       )}
-                      {visibleMiddleFiles.map(renderChip)}
+                      {visibleMiddleFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))}
                     </div>
                   )}
-                  {renderChip(selectedFiles[selectedFiles.length - 1])}
+                  {renderChip(
+                    displayFiles[displayFiles.length - 1],
+                    linkedIds.includes(displayFiles[displayFiles.length - 1].id),
+                  )}
                 </>
               )}
             </div>
@@ -396,13 +421,13 @@ export function UnifiedFileLinkerWindow({
           <div className="mb-2 w-full h-6 flex items-center gap-2.5 flex-shrink-0">
             <div
               className={`flex-1 h-px transition-colors ${
-                selectedFiles.length > 0 ? 'bg-slate-700/50' : 'bg-transparent'
+                displayFiles.length > 0 ? 'bg-slate-700/50' : 'bg-transparent'
               }`}
             />
             <button
               type="button"
-              onClick={() => selectedFiles.length > 0 && setSelectedExpanded((v) => !v)}
-              disabled={selectedFiles.length === 0}
+              onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
+              disabled={displayFiles.length === 0}
               aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
               className="h-6 w-11 rounded-full flex items-center justify-center flex-shrink-0 border border-slate-700/50 bg-slate-800/60 text-emerald-400 shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-all duration-200 enabled:hover:border-emerald-500/50 enabled:hover:bg-emerald-500/15 enabled:hover:text-emerald-300 enabled:hover:shadow-[0_0_8px_rgba(16,185,129,0.25)] enabled:active:scale-95 disabled:text-slate-600 disabled:cursor-default"
             >
@@ -414,14 +439,15 @@ export function UnifiedFileLinkerWindow({
             </button>
             <div
               className={`flex-1 h-px transition-colors ${
-                selectedFiles.length > 0 ? 'bg-slate-700/50' : 'bg-transparent'
+                displayFiles.length > 0 ? 'bg-slate-700/50' : 'bg-transparent'
               }`}
             />
+
           </div>
 
 
           {/* Reminder: the file list is hidden while the Selected block is expanded */}
-          {selectedExpanded && selectedFiles.length > 0 && (
+          {selectedExpanded && displayFiles.length > 0 && (
             <div className="mb-2 flex-shrink-0 w-full h-16 rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 flex items-center gap-2.5 px-4 pointer-events-none">
               <ListTree className="w-5 h-5 text-slate-500 flex-shrink-0" aria-hidden="true" />
               <p className="text-[11px] text-slate-500">
@@ -431,7 +457,7 @@ export function UnifiedFileLinkerWindow({
           )}
 
           {/* Storage list */}
-          {selectedExpanded && selectedFiles.length > 0 ? null : (
+          {selectedExpanded && displayFiles.length > 0 ? null : (
 
 
             <div className="flex-1 min-h-0 overflow-y-auto space-y-1">
