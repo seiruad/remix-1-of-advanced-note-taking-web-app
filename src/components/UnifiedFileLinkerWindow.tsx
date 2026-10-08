@@ -305,6 +305,17 @@ export function UnifiedFileLinkerWindow({
         {/* Header */}
         <div className="h-14 flex items-center justify-between gap-2 px-4 sm:px-5 border-b border-slate-700/50 flex-shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
+            {/* Back to the paragraph edit window these files belong to */}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Edit Paragraph"
+              title="Edit Paragraph"
+              className="group inline-flex items-center gap-2 h-9 px-3 rounded-lg border border-slate-700/50 bg-slate-800/60 text-slate-400 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 hover:text-emerald-300 active:translate-y-px flex-shrink-0"
+            >
+              <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
+              <span className="text-[13px] font-medium whitespace-nowrap">Edit Paragraph</span>
+            </button>
             <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
               <Paperclip className="w-4 h-4 text-emerald-400" />
             </div>
@@ -344,19 +355,6 @@ export function UnifiedFileLinkerWindow({
             </div>
           )}
 
-
-          {/* Back to the paragraph edit window these files belong to */}
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Edit Paragraph"
-            title="Edit Paragraph"
-            className="group mb-2 w-full flex items-center gap-2 h-9 px-3 rounded-lg border border-slate-700/50 bg-slate-800/60 text-slate-400 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 hover:text-emerald-300 active:translate-y-px"
-          >
-            <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
-            <span className="text-[13px] font-medium">Edit Paragraph</span>
-            <span className="flex-1 h-px rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
-          </button>
 
           {/* Selected files */}
 
