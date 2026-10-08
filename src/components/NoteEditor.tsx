@@ -121,6 +121,11 @@ export function NoteEditor({
   }, [onUpdateNote]);
 
 
+  const handleTitleChange = (title: string) => {
+    setLocalTitle(title);
+    onUpdateNote({ title });
+  };
+
   const contentTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     return () => {
@@ -285,6 +290,7 @@ export function NoteEditor({
           canEdit={canEdit}
           initialContent={note.content}
           files={files}
+          onTitleChange={handleTitleChange}
           onOpenFile={(file) =>
             navigate(buildFileUrl(file.id, { kind: 'note', noteId: note.id }), {
               state: { background: location },
