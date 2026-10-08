@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Check, Pencil } from 'lucide-react';
 
 interface NoteHeaderBlockProps {
   title: string;
@@ -18,7 +18,8 @@ interface NoteHeaderBlockProps {
  *
  * The small slate edit button is absolutely positioned in the panel's bottom
  * left corner, level with the title, so it never changes the panel's size;
- * clicking it overlays an inline field exactly on top of the title.
+ * clicking it overlays an inline field exactly on top of the title and the
+ * button itself turns into a check (save) button of the same size.
  */
 export function NoteHeaderBlock({
   title,
@@ -81,15 +82,20 @@ export function NoteHeaderBlock({
             className="absolute right-4 bottom-3 left-11 h-[30px] border-0 bg-transparent p-0 text-2xl font-bold leading-tight text-foreground outline-none"
           />
         )}
-        {canEdit && !editing && (
+        {canEdit && (
           <button
             type="button"
-            onClick={startEditing}
-            aria-label="Edit note title"
-            title="Edit title"
+            onMouseDown={(e) => {
+              // While editing, keep focus on the field so the click commits
+              // instead of the field's blur firing first.
+              if (editing) e.preventDefault();
+            }}
+            onClick={editing ? commit : startEditing}
+            aria-label={editing ? 'Save note title' : 'Edit note title'}
+            title={editing ? 'Save title' : 'Edit title'}
             className="absolute left-2 bottom-[15px] flex h-6 w-6 items-center justify-center rounded-md border border-border/70 bg-surface/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground"
           >
-            <Pencil className="h-3 w-3" />
+            {editing ? <Check className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
           </button>
         )}
       </div>
