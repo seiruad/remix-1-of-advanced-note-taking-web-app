@@ -47,7 +47,7 @@ export function NoteHeaderBlock({
       {/* Opaque backing so scrolling content never shows through the panel. */}
       <div aria-hidden="true" className="absolute -top-6 -left-6 -right-6 bottom-0 bg-background" />
       <div className="relative rounded-xl border border-border/70 bg-surface/40 px-4 py-3">
-        <p className="text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
+        <p className="pl-6 text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
           Note
         </p>
         {editing ? (
@@ -81,7 +81,7 @@ export function NoteHeaderBlock({
             onClick={startEditing}
             aria-label="Edit note title"
             title="Edit title"
-            className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-md border border-border/70 bg-surface/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+            className="absolute left-2 top-1 flex h-6 w-6 items-center justify-center rounded-md border border-border/70 bg-surface/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground"
           >
             <Pencil className="h-3 w-3" />
           </button>
