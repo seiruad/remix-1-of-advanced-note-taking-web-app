@@ -447,7 +447,7 @@ export function UnifiedFileLinkerWindow({
 
 
           {/* Reminder: the file list is hidden while the Selected block is expanded */}
-          {selectedExpanded && selectedFiles.length > 0 && (
+          {selectedExpanded && displayFiles.length > 0 && (
             <div className="mb-2 flex-shrink-0 w-full h-16 rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 flex items-center gap-2.5 px-4 pointer-events-none">
               <ListTree className="w-5 h-5 text-slate-500 flex-shrink-0" aria-hidden="true" />
               <p className="text-[11px] text-slate-500">
@@ -457,7 +457,7 @@ export function UnifiedFileLinkerWindow({
           )}
 
           {/* Storage list */}
-          {selectedExpanded && selectedFiles.length > 0 ? null : (
+          {selectedExpanded && displayFiles.length > 0 ? null : (
 
 
             <div className="flex-1 min-h-0 overflow-y-auto space-y-1">
