@@ -25,7 +25,6 @@ interface UnifiedFileLinkerWindowProps {
   /** Title of the note this window is opened from; shown in the header. */
   noteTitle?: string;
   /** Name of the block the picked files land in; used for the back arrow's label. */
-  targetBlockLabel?: string;
 
 
 
@@ -62,7 +61,6 @@ export function UnifiedFileLinkerWindow({
   onClose,
   noteId,
   noteTitle,
-  targetBlockLabel,
 
 
 

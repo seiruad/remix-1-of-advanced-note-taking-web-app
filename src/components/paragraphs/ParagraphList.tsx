@@ -91,25 +91,7 @@ export function ParagraphList({
   };
 
   const editingParagraph = paragraphs.find(p => p.id === editTarget);
-  // Where the picked files will land: named briefly above the Selected block.
-  const clip = (s: string, n = 70) => (s.length > n ? `${s.slice(0, n).trimEnd()}…` : s);
-  const attachParagraph =
-    attachTarget && attachTarget !== NEW_PARAGRAPH
-      ? paragraphs.find((p) => p.id === attachTarget)
-      : undefined;
-  const attachTargetInfo = attachTarget
-    ? attachParagraph
-      ? attachParagraph.kind === 'header'
-        ? {
-            kind: 'header' as const,
-            label: clip(attachParagraph.heading?.trim() || 'Untitled header'),
-          }
-        : {
-            kind: 'paragraph' as const,
-            label: clip(docPlainText(attachParagraph.content) || 'Empty paragraph'),
-          }
-      : { kind: 'new' as const, label: 'New block at the end of the note' }
-    : null;
+
 
   const isBlockEmpty = (p: typeof paragraphs[number]) => p.kind === 'header'
     ? !p.heading?.trim()
@@ -242,7 +224,7 @@ export function ParagraphList({
         }}
         noteId={noteId}
         noteTitle={noteTitle}
-        targetBlockLabel={attachTargetInfo?.label}
+
 
 
 
