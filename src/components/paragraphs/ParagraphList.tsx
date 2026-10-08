@@ -167,8 +167,8 @@ export function ParagraphList({
               </button>
               {/* End-of-note node: a distinct square that closes the line. */}
               <div aria-hidden="true" className="h-5">
-                <span className="absolute left-5 bottom-0 -translate-x-1/2 translate-y-1/2 flex w-3 h-3 items-center justify-center rounded-[3px] border border-primary/70 bg-primary/15 ring-4 ring-background">
-                  <span className="block w-1.5 h-1.5 rounded-[1px] bg-primary" />
+                <span className="absolute left-5 bottom-0 -translate-x-1/2 translate-y-1/2 flex w-3 h-3 items-center justify-center rounded-[3px] border border-border/70 bg-surface/40 ring-4 ring-background">
+                  <span className="block w-1.5 h-1.5 rounded-[1px] bg-muted-foreground" />
                 </span>
               </div>
             </div>
