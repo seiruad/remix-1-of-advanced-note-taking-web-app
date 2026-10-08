@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Paragraph reading and editing are separate views; use ParagraphEditWindow for edits and reuse existing paragraph persistence to avoid parallel content models.
+- New paragraph UI uses the shared Button and semantic HSL tokens so interactive states remain consistent without recoloring existing pages.

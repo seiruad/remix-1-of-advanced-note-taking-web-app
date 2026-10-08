@@ -2,7 +2,20 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        background: 'hsl(var(--background) / <alpha-value>)',
+        foreground: 'hsl(var(--foreground) / <alpha-value>)',
+        surface: 'hsl(var(--surface) / <alpha-value>)',
+        muted: 'hsl(var(--muted) / <alpha-value>)',
+        'muted-foreground': 'hsl(var(--muted-foreground) / <alpha-value>)',
+        border: 'hsl(var(--border) / <alpha-value>)',
+        primary: 'hsl(var(--primary) / <alpha-value>)',
+        'primary-foreground': 'hsl(var(--primary-foreground) / <alpha-value>)',
+        destructive: 'hsl(var(--destructive) / <alpha-value>)',
+        overlay: 'hsl(var(--overlay) / <alpha-value>)',
+      },
+    },
   },
   plugins: [],
 };
