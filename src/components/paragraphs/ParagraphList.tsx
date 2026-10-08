@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { Loader2, Plus, X, Type, Paperclip, Heading } from 'lucide-react';
+import { Loader2, Plus, X } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { UnifiedFileLinkerWindow } from '../UnifiedFileLinkerWindow';
 import { UnifiedWarningWindow } from '../UnifiedWarningWindow';
@@ -7,7 +7,6 @@ import { ParagraphBlock } from './ParagraphBlock';
 import { NoteHeaderBlock } from './NoteHeaderBlock';
 import { AddBlockWindow } from './AddBlockWindow';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
-import { Button } from '../Button';
 import { createPortal } from 'react-dom';
 import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
@@ -70,7 +69,7 @@ export function ParagraphList({
     return map;
   }, [files, fileParagraph]);
 
-  const [pending, setPending] = useState(false);
+  const [, setPending] = useState(false);
 
   const last = paragraphs[paragraphs.length - 1];
   const lastIsEmpty =
