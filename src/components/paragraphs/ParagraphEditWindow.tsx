@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, Check, Paperclip, Unlink, X } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
@@ -12,6 +12,10 @@ interface Props {
   files: FileItem[];
   suspended: boolean;
   onClose: () => void;
+  /** Whether the attachments list (rather than the text) is the visible view. */
+  attachmentsOpen: boolean;
+  onAttachmentsOpenChange: (open: boolean) => void;
+
   onChange: (content: Record<string, unknown>) => void;
   onHeadingChange: (heading: string | null, immediate?: boolean) => void;
   onFocusEditor: (editor: unknown) => void;
@@ -20,9 +24,9 @@ interface Props {
   onOpenFile: (file: FileItem) => void;
 }
 
-export function ParagraphEditWindow({ paragraph, files, suspended, onClose, onChange, onHeadingChange, onFocusEditor, onAttach, onDetach, onOpenFile }: Props) {
+export function ParagraphEditWindow({ paragraph, files, suspended, onClose, attachmentsOpen, onAttachmentsOpenChange, onChange, onHeadingChange, onFocusEditor, onAttach, onDetach, onOpenFile }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
-  const [attachmentsOpen, setAttachmentsOpen] = useState(false);
+
   const isHeader = paragraph.kind === 'header';
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
@@ -55,7 +59,7 @@ export function ParagraphEditWindow({ paragraph, files, suspended, onClose, onCh
     <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={isHeader ? 'Edit header' : 'Edit paragraph'} className="flex flex-col w-full sm:max-w-2xl h-auto max-h-[90dvh] bg-background border border-border/50 rounded-t-lg sm:rounded-lg overflow-hidden">
       <header className="flex items-center justify-between px-4 sm:px-5 h-14 shrink-0 border-b border-border/40">
         <div className="flex items-center gap-2">
-          {attachmentsOpen && <Button className="h-8 w-8" aria-label="Back to text" onClick={() => setAttachmentsOpen(false)}><ArrowLeft className="h-4 w-4" /></Button>}
+          {attachmentsOpen && <Button className="h-8 w-8" aria-label="Back to text" onClick={() => onAttachmentsOpenChange(false)}><ArrowLeft className="h-4 w-4" /></Button>}
           <h2 className="text-base font-semibold text-foreground">{isHeader ? 'Edit header' : attachmentsOpen ? `Attachments · ${files.length}` : 'Edit paragraph'}</h2>
         </div>
         <Button className="h-9 w-9" aria-label="Close editor" onClick={onClose}><X className="h-4 w-4" /></Button>
@@ -88,7 +92,7 @@ export function ParagraphEditWindow({ paragraph, files, suspended, onClose, onCh
               <Button className="h-8 w-8 shrink-0 hover:text-destructive" aria-label={`Unlink ${file.filename}`} title="Unlink from paragraph" onClick={() => onDetach(file.id)}><Unlink className="h-3.5 w-3.5" /></Button>
             </li>)}
           </ul>}
-        </div> : <Button variant="subtle" className="w-full justify-between px-3 py-3" onClick={() => setAttachmentsOpen(true)} aria-label={`View attachments (${files.length})`}>
+        </div> : <Button variant="subtle" className="w-full justify-between px-3 py-3" onClick={() => onAttachmentsOpenChange(true)} aria-label={`View attachments (${files.length})`}>
           <span className="flex items-center gap-2"><Paperclip className="h-4 w-4" /><span>Attachments · {files.length}</span></span>
           <ArrowRight className="h-4 w-4 shrink-0" />
         </Button>}

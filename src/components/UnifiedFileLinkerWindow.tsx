@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   UploadCloud,
   File as FileIcon,
@@ -7,12 +7,10 @@ import {
   X,
   Link2,
   Check,
-  ArrowDown,
-  ListTree,
+  ChevronsLeft,
   ArrowLeft,
-
-
 } from 'lucide-react';
+
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
@@ -23,11 +21,12 @@ interface UnifiedFileLinkerWindowProps {
   noteId: string;
   /** Title of the note this window is opened from; shown in the header. */
   noteTitle?: string;
-  /** Name of the block the picked files land in; used for the back arrow's label. */
-
-
-
+  /** Jumps back to the paragraph's text editor (two levels up). */
+  onEditParagraph?: () => void;
+  /** Goes back to the paragraph's attachments list (one level up). */
+  onEditAttachments?: () => void;
   onFileLinked: (file: FileItem) => void | Promise<void>;
+
   existingFileIds: string[];
   /** When set, newly linked files are attached to this paragraph. */
   paragraphId?: string | null;
@@ -60,14 +59,14 @@ export function UnifiedFileLinkerWindow({
   onClose,
   noteId,
   noteTitle,
-
-
-
+  onEditParagraph,
+  onEditAttachments,
   onFileLinked,
   existingFileIds,
   paragraphId = null,
   paragraphFileIds,
 }: UnifiedFileLinkerWindowProps) {
+
   const { user } = useAuth();
   const [files, setFiles] = useState<FileItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,75 +74,11 @@ export function UnifiedFileLinkerWindow({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [selectedExpanded, setSelectedExpanded] = useState(false);
   const [linking, setLinking] = useState(false);
-  /** How many middle chips fit between the pinned first/last ones; null = not measured yet (show all). */
-  const [middleVisibleCount, setMiddleVisibleCount] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const chipsRowRef = useRef<HTMLDivElement>(null);
-  const chipsMiddleRef = useRef<HTMLDivElement>(null);
-  const ellipsisRef = useRef<HTMLSpanElement>(null);
-  const chipWidthsRef = useRef<Map<string, number>>(new Map());
 
-  // In collapsed mode the first and last chips are always pinned. Middle chips
-  // are shown only while they fit; the rest collapse into a "•••" pill.
-  const linkedIds = paragraphFileIds ?? existingFileIds;
 
-  useLayoutEffect(() => {
-    if (selectedExpanded) {
-      setMiddleVisibleCount(null);
-      return;
-    }
-    // Chips shown in the Selected block: already-attached files first, then newly picked ones.
-    const selFiles = [...linkedIds, ...selectedIds]
-      .map((id) => files.find((f) => f.id === id))
-      .filter((f): f is FileItem => Boolean(f));
-    const mids = selFiles.slice(1, -1);
-    if (mids.length === 0) {
-      setMiddleVisibleCount(null);
-      return;
-    }
-    const gap = 6; // gap-1.5
-    const widthOf = (f: FileItem) => chipWidthsRef.current.get(f.id) ?? 90;
-    const fitFromEnd = (budget: number) => {
-      let sum = 0;
-      let k = 0;
-      for (let i = mids.length - 1; i >= 0; i--) {
-        const need = widthOf(mids[i]) + (k > 0 ? gap : 0);
-        if (sum + need > budget) break;
-        sum += need;
-        k++;
-      }
-      return k;
-    };
-    const row = chipsRowRef.current;
-    if (!row) return;
-    const measure = () => {
-      // Cache the real rendered width of every chip currently in the row.
-      row.querySelectorAll<HTMLElement>('[data-chip-id]').forEach((el) => {
-        const id = el.dataset.chipId;
-        if (id) chipWidthsRef.current.set(id, el.offsetWidth);
-      });
-      const firstW = widthOf(selFiles[0]);
-      const lastW = widthOf(selFiles[selFiles.length - 1]);
-      // Space left for the middle chips once the pinned edge chips are placed.
-      const base = row.clientWidth - firstW - lastW - 2 * gap;
-      // Everything fits -> show all middle chips, no ••• pill.
-      if (fitFromEnd(base) >= mids.length) {
-        setMiddleVisibleCount(mids.length);
-        return;
-      }
-      // Not everything fits -> reserve room for the ••• pill.
-      const ellipsisW = ellipsisRef.current?.offsetWidth || 34;
-      setMiddleVisibleCount(Math.max(fitFromEnd(base - ellipsisW - gap), 0));
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(row);
-    return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedExpanded, selectedIds, files, middleVisibleCount, paragraphFileIds, existingFileIds]);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -161,9 +96,9 @@ export function UnifiedFileLinkerWindow({
     setError(null);
     setSearchQuery('');
     setSelectedIds([]);
-    setSelectedExpanded(false);
 
     loadFiles();
+
   }, [open, loadFiles]);
 
   const isLinked = (id: string) =>
@@ -248,55 +183,7 @@ export function UnifiedFileLinkerWindow({
   const filteredFiles = files.filter((f) =>
     f.filename.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  const selectedFiles = selectedIds
-    .map((id) => files.find((f) => f.id === id))
-    .filter((f): f is FileItem => Boolean(f));
-  const linkedFiles = linkedIds
-    .map((id) => files.find((f) => f.id === id))
-    .filter((f): f is FileItem => Boolean(f));
-  // Already-attached files are shown first in the Selected block, then newly picked ones.
-  const displayFiles = [...linkedFiles, ...selectedFiles];
-  const middleFiles = displayFiles.slice(1, -1);
-  const middleHiddenCount =
-    middleVisibleCount === null ? 0 : Math.max(middleFiles.length - middleVisibleCount, 0);
-  const visibleMiddleFiles =
-    middleVisibleCount === null || middleVisibleCount === 0
-      ? []
-      : middleFiles.slice(-middleVisibleCount);
 
-  const renderChip = (file: FileItem, linked = false) => (
-
-    <span
-      key={file.id}
-      data-chip-id={file.id}
-      className={`inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full border transition-colors text-[11px] font-medium flex-shrink-0 ${
-        linked
-          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
-          : 'bg-slate-700/40 border-slate-600/30 hover:bg-slate-700/60 text-slate-300'
-      }`}
-    >
-      <span className="truncate max-w-[140px]" title={file.filename}>
-        {file.filename}
-      </span>
-      {linked ? (
-        <span
-          className="w-5 h-5 rounded-full flex items-center justify-center text-emerald-400"
-          title="Already attached"
-        >
-          <Link2 className="w-3 h-3" />
-        </span>
-      ) : (
-        <button
-          type="button"
-          onClick={() => toggle(file.id)}
-          aria-label={`Deselect ${file.filename}`}
-          className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
-        >
-          <X className="w-3 h-3" />
-        </button>
-      )}
-    </span>
-  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -304,18 +191,8 @@ export function UnifiedFileLinkerWindow({
         {/* Header */}
         <div className="h-14 flex items-center justify-between gap-2 px-4 sm:px-5 border-b border-slate-700/50 flex-shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            {/* Back to the paragraph edit window these files belong to */}
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Edit Paragraph"
-              title="Edit Paragraph"
-              className="group inline-flex items-center gap-2 h-9 px-3 rounded-lg border border-slate-700/50 bg-slate-800/60 text-slate-400 transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 hover:text-emerald-300 active:translate-y-px flex-shrink-0"
-            >
-              <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
-              <span className="text-[13px] font-medium whitespace-nowrap">Edit Paragraph</span>
-            </button>
             <div className="min-w-0">
+
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">
                 Attach files
               </p>
@@ -352,87 +229,40 @@ export function UnifiedFileLinkerWindow({
           )}
 
 
-          {/* Selected files */}
-
-          <div
-
-
-            className={`mb-2 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex items-stretch gap-2 ${
-              selectedExpanded && displayFiles.length > 0 ? 'flex-1 min-h-0' : ''
-            }`}
-          >
-
-            <div className="flex flex-col min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-1.5 px-0.5 h-6">
-                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
-                  Selected · {displayFiles.length}
-                </p>
-              </div>
-
-            <div
-              ref={chipsRowRef}
-              className={`${
-                selectedExpanded && displayFiles.length > 0
-                  ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
-                  : 'flex items-center gap-1.5 overflow-hidden h-7'
-              }`}
-            >
-              {displayFiles.length === 0 ? (
-                <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500 truncate">
-                  No files selected yet — pick files below or upload a new one.
-                </span>
-              ) : selectedExpanded && displayFiles.length > 0 ? (
-                displayFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))
-              ) : displayFiles.length === 1 ? (
-                renderChip(displayFiles[0], linkedIds.includes(displayFiles[0].id))
-              ) : (
-                <>
-                  {renderChip(displayFiles[0], linkedIds.includes(displayFiles[0].id))}
-                  {middleFiles.length > 0 && (
-                    <div
-                      ref={chipsMiddleRef}
-                      className="flex items-center gap-1.5 overflow-hidden min-w-0 h-7"
-                    >
-                      {middleHiddenCount > 0 && (
-                        <span
-                          ref={ellipsisRef}
-                          title={`${middleHiddenCount} more file${middleHiddenCount === 1 ? '' : 's'} selected`}
-                          className="inline-flex items-center justify-center h-7 px-3 rounded-full bg-slate-700/40 border border-slate-600/30 text-[11px] font-medium text-slate-400 tracking-[2px] flex-shrink-0 select-none"
-                        >
-                          •••
-                        </span>
-                      )}
-                      {visibleMiddleFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))}
-                    </div>
-                  )}
-                  {renderChip(
-                    displayFiles[displayFiles.length - 1],
-                    linkedIds.includes(displayFiles[displayFiles.length - 1].id),
-                  )}
-                </>
-              )}
-              </div>
-            </div>
-
-            {/* Full-height right arrow rail: expands / collapses the selected files */}
+          {/* Two ways back: the block's text (two levels up) or its attachments (one level up) */}
+          <div className="mb-2 flex flex-col gap-2">
             <button
               type="button"
-              onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
-              disabled={displayFiles.length === 0}
-              aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
-              aria-expanded={selectedExpanded}
-              className="group w-8 self-stretch flex-shrink-0 rounded-lg border border-slate-700/50 bg-slate-800/60 flex flex-col items-center justify-center gap-1.5 py-1.5 text-slate-500 transition-all duration-200 enabled:hover:border-emerald-500/45 enabled:hover:bg-emerald-500/10 enabled:hover:text-emerald-300 enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-default"
+              onClick={onEditParagraph ?? onClose}
+              aria-label="Edit paragraph"
+              className="group flex w-full items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-900/40 px-3 py-3 text-left transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
             >
-              <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
-              <ArrowDown
-                className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
-                  selectedExpanded ? 'rotate-180' : ''
-                }`}
-              />
-
-              <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
+              <ChevronsLeft className="w-5 h-5 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-slate-100 group-hover:text-emerald-100">
+                  Edit paragraph
+                </span>
+                <span className="block text-[11px] text-slate-500">Back to the block's text</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={onEditAttachments ?? onClose}
+              aria-label="Edit attachments"
+              className="group flex w-full items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-900/40 px-3 py-3 text-left transition-all hover:border-emerald-500/45 hover:bg-emerald-500/10 active:translate-y-px"
+            >
+              <ArrowLeft className="w-4 h-4 flex-shrink-0 text-slate-400 transition-all group-hover:-translate-x-0.5 group-hover:text-emerald-300" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-slate-100 group-hover:text-emerald-100">
+                  Edit attachments
+                </span>
+                <span className="block text-[11px] text-slate-500">
+                  Back to this block's files
+                </span>
+              </span>
             </button>
           </div>
+
 
 
           {/* Search + upload */}
@@ -447,50 +277,39 @@ export function UnifiedFileLinkerWindow({
             }}
             className="hidden"
           />
-          {selectedExpanded && displayFiles.length > 0 ? null : (
-            <div className="flex items-center gap-2 mb-2">
-              <div className="relative h-9 flex-1 min-w-0">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search files…"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading || linking}
-                className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 border border-emerald-500/20 hover:bg-emerald-500/25 hover:border-emerald-500/40 transition-colors disabled:opacity-50 flex-shrink-0"
-              >
-                {uploading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <UploadCloud className="w-4 h-4" />
-                )}
-                <span className="hidden sm:inline">Upload New File</span>
-                <span className="sm:hidden">Upload</span>
-              </button>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="relative h-9 flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search files…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+              />
             </div>
-          )}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading || linking}
+              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 border border-emerald-500/20 hover:bg-emerald-500/25 hover:border-emerald-500/40 transition-colors disabled:opacity-50 flex-shrink-0"
+            >
+              {uploading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <UploadCloud className="w-4 h-4" />
+              )}
+              <span className="hidden sm:inline">Upload New File</span>
+              <span className="sm:hidden">Upload</span>
+            </button>
+          </div>
 
 
 
 
-          {/* Reminder: the file list is hidden while the Selected block is expanded */}
-          {selectedExpanded && displayFiles.length > 0 && (
-            <div className="mb-2 flex-shrink-0 w-full h-16 rounded-xl bg-slate-900/40 border border-dashed border-slate-700/50 flex items-center gap-2.5 px-4 pointer-events-none">
-              <ListTree className="w-5 h-5 text-slate-500 flex-shrink-0" aria-hidden="true" />
-              <p className="text-[11px] text-slate-500">
-                The file list lives here — collapse Selected to show it
-              </p>
-            </div>
-          )}
+
 
           {/* Storage list */}
-          {selectedExpanded && displayFiles.length > 0 ? null : (
 
 
             <div className="flex-1 min-h-0 overflow-y-auto space-y-1">
@@ -551,7 +370,6 @@ export function UnifiedFileLinkerWindow({
                 })
               )}
             </div>
-          )}
 
 
           <div className="mt-3 flex items-center gap-2 flex-shrink-0">
