@@ -79,7 +79,7 @@ export function NoteHeaderBlock({
             onBlur={commit}
             aria-label="Note title"
             placeholder="Untitled"
-            className="absolute right-4 bottom-3 left-11 border-0 bg-transparent p-0 text-2xl font-bold leading-tight text-foreground outline-none"
+            className="absolute right-4 bottom-[7px] left-11 h-10 border-0 bg-transparent p-0 text-2xl font-bold leading-normal text-foreground outline-none"
           />
         )}
         {canEdit && (
