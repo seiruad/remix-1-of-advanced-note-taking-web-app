@@ -58,7 +58,10 @@ export function ParagraphList({
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  /** Which view the paragraph editor shows once the attach window closes. */
+  const [attachmentsView, setAttachmentsView] = useState(false);
   const newAttachParagraphId = useRef<string | null>(null);
+
 
 
   const filesByParagraph = useMemo(() => {
@@ -101,9 +104,14 @@ export function ParagraphList({
     const index = last && lastIsEmpty ? paragraphs.length - 1 : paragraphs.length;
     const id = await insertAt(index, 'header');
     setPending(false);
-    if (id) setEditTarget(id);
+    if (id) openEditor(id);
+  };
+  const openEditor = (id: string) => {
+    setAttachmentsView(false);
+    setEditTarget(id);
   };
   const closeEditor = () => {
+
     if (editingParagraph && isBlockEmpty(editingParagraph)) {
       void removeParagraph(editingParagraph.id);
     }
@@ -145,7 +153,7 @@ export function ParagraphList({
                 paragraph={paragraph}
                 files={filesByParagraph[paragraph.id] ?? []}
                 canEdit={canEdit}
-                onEdit={() => setEditTarget(paragraph.id)}
+                onEdit={() => openEditor(paragraph.id)}
                 onDelete={() => setDeleteTarget(paragraph.id)}
                 onOpenFile={onOpenFile}
                 onAttach={() => setAttachTarget(paragraph.id)}
@@ -184,7 +192,7 @@ export function ParagraphList({
         noteTitle={noteTitle}
         onClose={() => setAddOpen(false)}
         onAddHeader={() => { setAddOpen(false); void createHeader(); }}
-        onAddParagraph={() => { setAddOpen(false); void createTrailing(id => setEditTarget(id)); }}
+        onAddParagraph={() => { setAddOpen(false); void createTrailing(id => openEditor(id)); }}
       />
 
 
@@ -208,6 +216,9 @@ export function ParagraphList({
         files={filesByParagraph[editingParagraph.id] ?? []}
         suspended={attachTarget !== null}
         onClose={closeEditor}
+        attachmentsOpen={attachmentsView}
+        onAttachmentsOpenChange={setAttachmentsView}
+
         onChange={content => setContent(editingParagraph.id, content)}
         onHeadingChange={(heading, immediate) => setHeading(editingParagraph.id, heading, immediate)}
         onFocusEditor={editor => onActiveEditorChange(editor as Editor | null)}
@@ -222,6 +233,17 @@ export function ParagraphList({
           setAttachTarget(null);
           newAttachParagraphId.current = null;
         }}
+        onEditParagraph={() => {
+          setAttachTarget(null);
+          setAttachmentsView(false);
+          if (attachTarget && attachTarget !== NEW_PARAGRAPH) setEditTarget(attachTarget);
+        }}
+        onEditAttachments={() => {
+          setAttachTarget(null);
+          setAttachmentsView(true);
+          if (attachTarget && attachTarget !== NEW_PARAGRAPH) setEditTarget(attachTarget);
+        }}
+
         noteId={noteId}
         noteTitle={noteTitle}
 
