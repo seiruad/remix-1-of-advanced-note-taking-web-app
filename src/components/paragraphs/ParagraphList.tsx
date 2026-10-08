@@ -146,14 +146,22 @@ export function ParagraphList({
         />
       ))}
       {canEdit && (
-        <div className="pl-2 pt-2.5">
+        <div className="relative pl-12 pr-2 sm:pr-3 pt-2.5 pb-1">
+          {/* End-of-line node: mirrors the note header's diamond, but muted. */}
+          <div
+            aria-hidden="true"
+            className="absolute left-5 top-[28px] -translate-x-1/2 -translate-y-1/2"
+          >
+            <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-border ring-4 ring-background" />
+          </div>
           <button
             type="button"
             aria-label="Add block at the end of the note"
             onClick={() => setAddOpen(true)}
-            className="relative flex w-6 h-6 items-center justify-center rounded-full border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground transition-colors"
+            className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-border/70 bg-surface/40 px-4 py-3 text-left text-muted-foreground hover:border-primary/70 hover:text-primary-foreground transition-colors"
           >
-            <Plus className="w-3 h-3" />
+            <Plus className="w-3.5 h-3.5 shrink-0" />
+            <span className="text-sm">Add block</span>
           </button>
         </div>
       )}
