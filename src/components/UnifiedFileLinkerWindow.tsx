@@ -331,10 +331,23 @@ export function UnifiedFileLinkerWindow({
               selectedExpanded && displayFiles.length > 0 ? 'flex-1 min-h-0' : ''
             }`}
           >
-            <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5 h-4">
+            <div className="flex items-center justify-between gap-2 mb-1.5 px-0.5 h-6">
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
                 Selected · {displayFiles.length}
               </p>
+              <button
+                type="button"
+                onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
+                disabled={displayFiles.length === 0}
+                aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
+                className="h-5 w-8 rounded-full flex items-center justify-center flex-shrink-0 border border-slate-700/50 bg-slate-800/60 text-emerald-400 shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-all duration-200 enabled:hover:border-emerald-500/50 enabled:hover:bg-emerald-500/15 enabled:hover:text-emerald-300 enabled:hover:shadow-[0_0_8px_rgba(16,185,129,0.25)] enabled:active:scale-95 disabled:text-slate-600 disabled:cursor-default"
+              >
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform duration-200 ${
+                    selectedExpanded ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
             </div>
             <div
               ref={chipsRowRef}
