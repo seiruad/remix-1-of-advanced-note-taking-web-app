@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from './Button';
@@ -21,6 +21,8 @@ interface UnifiedMenuProps {
   iconClassName?: string;
   /** Extra classes applied to the trigger while the menu is open. */
   openTriggerClassName?: string;
+  /** Custom trigger contents; replaces the default ⋯ icon when provided. */
+  triggerContent?: ReactNode;
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -38,6 +40,7 @@ export function UnifiedMenu({
   triggerClassName = '',
   iconClassName = 'w-5 h-5 sm:w-4 sm:h-4',
   openTriggerClassName = 'bg-slate-700/70 text-slate-100',
+  triggerContent,
   onOpenChange,
 }: UnifiedMenuProps) {
   const [open, setOpen] = useState(false);
@@ -116,7 +119,7 @@ export function UnifiedMenu({
           open ? openTriggerClassName : ''
         }`}
       >
-        <MoreHorizontal className={iconClassName} strokeWidth={2.25} />
+        {triggerContent ?? <MoreHorizontal className={iconClassName} strokeWidth={2.25} />}
       </Button>
 
       {open && createPortal(
