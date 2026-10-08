@@ -134,24 +134,27 @@ export function ParagraphList({
       <div className="max-w-[var(--note-block-max-width)]">
         <NoteHeaderBlock title={noteTitle} canEdit={canEdit} onTitleChange={onTitleChange} />
         {/* The line belongs to the blocks only — it starts below the note header. */}
-        <div className="relative pt-6">
-          <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-border/60" />
-          {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
-            <ParagraphBlock
-              key={paragraph.id}
-              className={index === 0 ? '' : visible[index - 1].kind === 'header' ? '-mt-2' : 'mt-4'}
-              paragraph={paragraph}
-              files={filesByParagraph[paragraph.id] ?? []}
-              canEdit={canEdit}
-              onEdit={() => setEditTarget(paragraph.id)}
-              onDelete={() => setDeleteTarget(paragraph.id)}
-              onOpenFile={onOpenFile}
-              onAttach={() => setAttachTarget(paragraph.id)}
-            />
-          ))}
+          <div className="relative pt-6">
+            <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-border/60" />
+            {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
+              <ParagraphBlock
+                key={paragraph.id}
+                className={index === 0 ? '' : visible[index - 1].kind === 'header' ? '-mt-2' : 'mt-4'}
+                paragraph={paragraph}
+                files={filesByParagraph[paragraph.id] ?? []}
+                canEdit={canEdit}
+                onEdit={() => setEditTarget(paragraph.id)}
+                onDelete={() => setDeleteTarget(paragraph.id)}
+                onOpenFile={onOpenFile}
+                onAttach={() => setAttachTarget(paragraph.id)}
+              />
+            ))}
+          </div>
           {canEdit && (
             <div className="relative pl-12 pr-2 sm:pr-3 pt-2.5 pb-1">
-              {/* End-of-line node: marks where the line stops. */}
+              {/* The line ends at the emerald diamond — this stub only bridges the gap down to it. */}
+              <div aria-hidden="true" className="absolute left-5 top-0 h-[35px] w-px bg-border/60" />
+              {/* End-of-line node: the diamond is now where the line stops. */}
               <div
                 aria-hidden="true"
                 className="absolute left-5 top-[35px] -translate-x-1/2 -translate-y-1/2"
@@ -169,7 +172,6 @@ export function ParagraphList({
                 </span>
                 <span className="text-sm font-semibold tracking-wide">Add block</span>
               </button>
-              {/* End-of-note node: a framed square that closes the line. */}
               <div aria-hidden="true" className="h-12">
                 <span aria-hidden="true" className="absolute left-5 bottom-0 -translate-x-1/2 translate-y-1/2 flex w-4 h-4 items-center justify-center rounded-[4px] border border-border/70 bg-surface">
                   <span className="block w-1.5 h-1.5 rounded-[1px] bg-muted-foreground/60" />
@@ -177,7 +179,6 @@ export function ParagraphList({
               </div>
             </div>
           )}
-        </div>
 
       </div>
 
