@@ -28,11 +28,14 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
       <h3 className="min-w-0 break-words text-base sm:text-lg font-bold leading-7 text-foreground">{paragraph.heading}</h3>
       {canEdit && <span className="shrink-0"><UnifiedMenu items={items} ariaLabel="Header options" triggerClassName="!rounded-md w-6 h-6 border border-border/50 bg-muted/20 text-muted-foreground hover:border-primary/60 hover:bg-muted/50 hover:text-primary-foreground" openTriggerClassName="!bg-surface !text-primary-foreground" triggerContent={<ChevronDown className="w-3.5 h-3.5" strokeWidth={2.5} />} /></span>}
     </div> :
-    <div className="space-y-2 min-w-0 break-words">
-      {!isDocEmpty(paragraph.content) && <div className="paragraph-reading [&_.ProseMirror]:leading-7">
-        <RichTextEditor content={paragraph.content} onChange={() => {}} editable={false} placeholder="" minHeightClassName="min-h-0" />
-      </div>}
-      {files.length > 0 && <ParagraphAttachments files={files} onOpenFile={onOpenFile} onAdd={canEdit ? onAttach : undefined} />}
+    <div className="flex items-start gap-2 min-w-0">
+      <div className="flex-1 min-w-0 space-y-2 break-words">
+        {!isDocEmpty(paragraph.content) && <div className="paragraph-reading [&_.ProseMirror]:leading-7">
+          <RichTextEditor content={paragraph.content} onChange={() => {}} editable={false} placeholder="" minHeightClassName="min-h-0" />
+        </div>}
+        {files.length > 0 && <ParagraphAttachments files={files} onOpenFile={onOpenFile} onAdd={canEdit ? onAttach : undefined} />}
+      </div>
+      {canEdit && <span className="shrink-0"><UnifiedMenu items={items} ariaLabel="Paragraph options" triggerClassName="!rounded-full w-6 h-6 border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground" iconClassName="w-3 h-3" openTriggerClassName="!bg-surface !text-primary-foreground" /></span>}
     </div>}
     {canEdit && !isHeader && <div className="absolute right-5 top-2 translate-x-1/2">
       <UnifiedMenu items={items} ariaLabel="Paragraph options" triggerClassName="!rounded-full w-6 h-6 border border-border/70 bg-background text-muted-foreground hover:border-primary/70 hover:text-primary-foreground" iconClassName="w-3 h-3" openTriggerClassName="!bg-surface !text-primary-foreground" />
