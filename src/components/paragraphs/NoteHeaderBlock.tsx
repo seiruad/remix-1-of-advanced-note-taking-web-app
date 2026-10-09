@@ -93,7 +93,7 @@ export function NoteHeaderBlock({
             onClick={editing ? commit : startEditing}
             aria-label={editing ? 'Save note title' : 'Edit note title'}
             title={editing ? 'Save title' : 'Edit title'}
-            className="absolute left-2 bottom-[15px] flex h-6 w-6 items-center justify-center rounded-md border border-note-border/80 bg-note-background/70 text-note-muted transition-colors hover:border-primary/60 hover:text-foreground"
+            className="absolute left-2 bottom-[15px] flex h-6 w-6 items-center justify-center rounded-md border border-note-border/80 bg-transparent text-note-muted transition-colors hover:border-primary/60 hover:text-foreground"
           >
             {editing ? <Check className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
           </button>
