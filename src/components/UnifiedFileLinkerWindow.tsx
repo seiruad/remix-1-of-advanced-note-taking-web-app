@@ -210,20 +210,15 @@ export function UnifiedFileLinkerWindow({
                 {noteTitle || 'Attach Files'}
               </h2>
             </div>
-
-          </div>
-          {/* Which paragraph is being edited — number only, placeholder for now */}
-          <div
-            className="flex items-center gap-1.5 rounded-lg border border-slate-600/60 bg-slate-700/70 px-2 py-1.5 flex-shrink-0"
-            title={`Paragraph ${paragraphNumber}`}
-          >
-            <Pilcrow className="w-3 h-3 text-emerald-300/80" />
-            <span className="hidden sm:inline text-[11px] font-medium text-slate-400 leading-none">
-              Paragraph
-            </span>
-            <span className="text-[12px] font-semibold text-slate-100 tabular-nums leading-none">
+            {/* Which paragraph is being edited — number only, placeholder for now */}
+            <span
+              className="flex items-center gap-1 flex-shrink-0 pl-2.5 border-l border-slate-700/60 text-[11px] font-medium text-slate-500 tabular-nums leading-none"
+              title={`Paragraph ${paragraphNumber}`}
+            >
+              <Pilcrow className="w-3 h-3" />
               {paragraphNumber}
             </span>
+
           </div>
           <button
             onClick={onClose}
