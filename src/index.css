@@ -14,7 +14,7 @@
   --destructive: 0 91% 71%;
   --overlay: 0 0% 0%;
   /* Note canvas: matches the solid UnifiedSidebar surface, with local contrast roles. */
-  --note-background: 217 33% 17%;
+  --note-background: 217 33% 17.5%;
   --note-surface: 215 25% 27%;
   --note-border: 215 19% 42%;
   --note-muted: 215 20% 72%;
