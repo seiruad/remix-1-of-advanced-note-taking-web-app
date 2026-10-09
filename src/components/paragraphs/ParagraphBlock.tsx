@@ -29,6 +29,12 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
     { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: onDelete },
   ];
   const isHeader = paragraph.kind === 'header';
+  const editorRef = useRef<Editor | null>(null);
+  // Focus the text whenever in-place editing switches on (the editor instance
+  // is already mounted, so onEditorReady alone would never refire).
+  useEffect(() => {
+    if (editing) editorRef.current?.commands.focus('end');
+  }, [editing]);
   return <article aria-label={isHeader ? 'Header' : 'Paragraph'} className={`relative ${isHeader ? 'min-h-[48px] flex items-center' : 'min-h-[72px]'} pl-12 pr-2 sm:pr-3 py-2 ${editing ? 'rounded-xl bg-note-surface/45 ring-1 ring-primary/60 shadow-[0_10px_28px_-16px_hsl(var(--primary)/0.5)]' : ''} ${className ?? ''}`}>
     {isHeader ? <div className="flex items-center gap-2 min-w-0">
       <h3 className="min-w-0 break-words text-base sm:text-lg font-bold leading-7 text-foreground">{paragraph.heading}</h3>
@@ -43,7 +49,7 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
             editable={editing}
             placeholder={editing ? 'Write text…' : ''}
             minHeightClassName="min-h-0"
-            onEditorReady={editing ? (editor) => { editor?.commands.focus('end'); } : undefined}
+            onEditorReady={(editor) => { editorRef.current = editor ?? null; if (editing) editor?.commands.focus('end'); }}
             onBlur={editing ? onEditingEnd : undefined}
           />
         </div>}
