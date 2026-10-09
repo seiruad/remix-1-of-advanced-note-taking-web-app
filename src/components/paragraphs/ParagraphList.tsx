@@ -125,7 +125,7 @@ export function ParagraphList({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
-        <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
+        <Loader2 className="w-5 h-5 text-note-muted animate-spin" />
       </div>
     );
   }
@@ -145,7 +145,7 @@ export function ParagraphList({
         <NoteHeaderBlock title={noteTitle} canEdit={canEdit} onTitleChange={onTitleChange} />
         {/* The line belongs to the blocks only — it starts below the note header. */}
           <div className="relative pt-6">
-            <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-border/60" />
+            <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-note-border/70" />
             {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
               <ParagraphBlock
                 key={paragraph.id}
@@ -163,13 +163,13 @@ export function ParagraphList({
           {canEdit && (
             <div className="relative pl-12 pr-2 sm:pr-3 pt-2.5 pb-1">
               {/* The line ends at the emerald diamond — this stub only bridges the gap down to it. */}
-              <div aria-hidden="true" className="absolute left-5 top-0 h-[35px] w-px bg-border/60" />
+              <div aria-hidden="true" className="absolute left-5 top-0 h-[35px] w-px bg-note-border/70" />
               {/* End-of-line node: the diamond is now where the line stops. */}
               <div
                 aria-hidden="true"
                 className="absolute left-5 top-[35px] -translate-x-1/2 -translate-y-1/2"
               >
-                <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-background" />
+                <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-note-background" />
               </div>
               <button
                 type="button"

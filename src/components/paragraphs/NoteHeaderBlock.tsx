@@ -46,9 +46,9 @@ export function NoteHeaderBlock({
       className="sticky top-0 z-20 pt-1 pr-2 sm:pr-3"
     >
       {/* Opaque backing so scrolling content never shows through the panel. */}
-      <div aria-hidden="true" className="absolute -top-6 -left-6 -right-6 bottom-0 bg-background" />
-      <div className="relative rounded-xl border border-border/70 bg-surface/40 px-4 py-3">
-        <p className="text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-muted-foreground/80">
+      <div aria-hidden="true" className="absolute -top-6 -left-6 -right-6 bottom-0 bg-note-background" />
+      <div className="relative rounded-xl border border-note-border/70 bg-note-surface/65 px-4 py-3 shadow-[0_10px_24px_-18px_hsl(var(--overlay)/0.8)]">
+        <p className="text-[10px] uppercase tracking-[0.18em] font-medium leading-none text-note-muted/80">
           Note
         </p>
         {/* The title stays in the layout even while editing, so the panel
@@ -93,7 +93,7 @@ export function NoteHeaderBlock({
             onClick={editing ? commit : startEditing}
             aria-label={editing ? 'Save note title' : 'Edit note title'}
             title={editing ? 'Save title' : 'Edit title'}
-            className="absolute left-2 bottom-[15px] flex h-6 w-6 items-center justify-center rounded-md border border-border/70 bg-surface/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+            className="absolute left-2 bottom-[15px] flex h-6 w-6 items-center justify-center rounded-md border border-note-border/80 bg-note-background/70 text-note-muted transition-colors hover:border-primary/60 hover:text-foreground"
           >
             {editing ? <Check className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
           </button>

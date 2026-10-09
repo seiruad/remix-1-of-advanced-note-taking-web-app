@@ -30,15 +30,15 @@ export function ParagraphAttachments({ files, onOpenFile, onDetach, onAdd }: {
       return (
         <span
           key={file.id}
-          className="inline-flex items-center gap-2 h-7 pl-2.5 pr-2.5 rounded-full bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60 transition-colors"
+          className="inline-flex items-center gap-2 h-7 pl-2.5 pr-2.5 rounded-full bg-note-surface/70 border border-note-border/55 hover:bg-note-surface transition-colors"
         >
           <button
             type="button"
             onClick={() => onOpenFile(file)}
-            className="inline-flex items-center gap-2 min-w-0 text-[11px] font-medium text-slate-300"
+            className="inline-flex items-center gap-2 min-w-0 text-[11px] font-medium text-foreground/85"
             title={file.filename}
           >
-            <Icon className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            <Icon className="w-4 h-4 text-note-muted flex-shrink-0" />
             <span className="truncate max-w-[120px]">{shortName(file.filename)}</span>
           </button>
           {onDetach && (
@@ -47,7 +47,7 @@ export function ParagraphAttachments({ files, onOpenFile, onDetach, onAdd }: {
               onClick={() => onDetach(file.id)}
               aria-label={`Unlink ${file.filename}`}
               title="Unlink from paragraph"
-              className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-note-muted/70 hover:text-destructive hover:bg-note-background/50 transition-colors"
             >
               <Unlink className="w-3.5 h-3.5" />
             </button>
@@ -58,7 +58,7 @@ export function ParagraphAttachments({ files, onOpenFile, onDetach, onAdd }: {
               onClick={onAdd}
               aria-label="Attach file"
               title="Attach file"
-              className="w-6 h-6 rounded-full flex items-center justify-center text-slate-500 hover:text-emerald-400 hover:bg-slate-600/40 transition-colors"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-note-muted/70 hover:text-primary hover:bg-note-background/50 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
