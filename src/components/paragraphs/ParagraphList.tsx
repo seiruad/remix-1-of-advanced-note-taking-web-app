@@ -57,6 +57,8 @@ export function ParagraphList({
   const [attachTarget, setAttachTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<string | null>(null);
+  /** Paragraph block currently edited in place (paragraphs only; headers use the overlay). */
+  const [inlineEditId, setInlineEditId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   /** Which view the paragraph editor shows once the attach window closes. */
   const [attachmentsView, setAttachmentsView] = useState(false);
@@ -151,10 +153,13 @@ export function ParagraphList({
                 paragraph={paragraph}
                 files={filesByParagraph[paragraph.id] ?? []}
                 canEdit={canEdit}
-                onEdit={() => openEditor(paragraph.id)}
+                onEdit={() => paragraph.kind === 'header' ? openEditor(paragraph.id) : setInlineEditId(paragraph.id)}
                 onDelete={() => setDeleteTarget(paragraph.id)}
                 onOpenFile={onOpenFile}
                 onAttach={() => setAttachTarget(paragraph.id)}
+                editing={inlineEditId === paragraph.id}
+                onContentChange={(content) => setContent(paragraph.id, content)}
+                onEditingEnd={() => setInlineEditId(null)}
               />
             ))}
           </div>
