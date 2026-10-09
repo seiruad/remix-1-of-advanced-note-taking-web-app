@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import type { Editor } from '@tiptap/react';
 import { ArrowUpDown, ChevronDown, Pencil, Trash2 } from 'lucide-react';
 import { RichTextEditor } from '../RichTextEditor';
 import { UnifiedMenu, type UnifiedMenuItem } from '../UnifiedMenu';
