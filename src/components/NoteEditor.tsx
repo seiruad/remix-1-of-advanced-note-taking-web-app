@@ -207,7 +207,7 @@ export function NoteEditor({
 
   if (!note) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-slate-900/60">
+      <div className="flex-1 flex items-center justify-center bg-note-background">
         <div className="text-center">
           <div className="flex items-center justify-center w-14 h-14 mx-auto mb-3 rounded-2xl bg-slate-700/30">
             <FileText className="w-7 h-7 text-slate-400" />
@@ -222,7 +222,7 @@ export function NoteEditor({
   const isNewNote = note.is_new ?? false;
 
   return (
-    <div className="flex flex-col h-full bg-slate-900/60 overflow-hidden relative">
+    <div className="note-canvas flex flex-col h-full bg-note-background overflow-hidden relative">
 
       {/* ===== FIXED SUPERBLOCK: context + title + toolbar ===== */}
       <div className="flex-shrink-0 bg-slate-800/95 backdrop-blur-md border-b border-slate-700/50 z-30">

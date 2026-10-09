@@ -13,11 +13,16 @@
   --primary-foreground: 152 81% 96%;
   --destructive: 0 91% 71%;
   --overlay: 0 0% 0%;
+  /* Note canvas: matches the solid UnifiedSidebar surface, with local contrast roles. */
+  --note-background: 217 33% 17.5%;
+  --note-surface: 215 25% 27%;
+  --note-border: 215 19% 42%;
+  --note-muted: 215 20% 72%;
   /* Reading column: every note block (and its right-hand rail) is capped here. */
   --note-block-max-width: 720px;
 }
 
-.paragraph-reading .ProseMirror { cursor: text; }
+.paragraph-reading .ProseMirror { cursor: text; color: hsl(var(--foreground)); }
 .paragraph-reading .ProseMirror p { margin: 0; }
 .paragraph-edit-body .ProseMirror { min-height: 0; overflow-wrap: anywhere; }
 .paragraph-edit-body .ProseMirror p { margin: 0; }
