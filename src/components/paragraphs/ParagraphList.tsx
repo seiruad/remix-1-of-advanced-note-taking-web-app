@@ -143,9 +143,7 @@ export function ParagraphList({
 
       <div className="max-w-[var(--note-block-max-width)]">
         <NoteHeaderBlock title={noteTitle} canEdit={canEdit} onTitleChange={onTitleChange} />
-        {/* The line belongs to the blocks only — it starts below the note header. */}
           <div className="relative pt-6">
-            <div aria-hidden="true" className="absolute left-5 top-0 bottom-0 w-px bg-note-border/70" />
             {paragraphs.filter(paragraph => !isBlockEmpty(paragraph)).map((paragraph, index, visible) => (
               <ParagraphBlock
                 key={paragraph.id}
@@ -162,9 +160,7 @@ export function ParagraphList({
           </div>
           {canEdit && (
             <div className="relative pl-12 pr-2 sm:pr-3 pt-2.5 pb-1">
-              {/* The line ends at the emerald diamond — this stub only bridges the gap down to it. */}
-              <div aria-hidden="true" className="absolute left-5 top-0 h-[35px] w-px bg-note-border/70" />
-              {/* End-of-line node: the diamond is now where the line stops. */}
+              {/* The emerald diamond marks the end of the note. */}
               <div
                 aria-hidden="true"
                 className="absolute left-5 top-[35px] -translate-x-1/2 -translate-y-1/2"
