@@ -57,8 +57,16 @@ export function ParagraphBlock({ paragraph, files, canEdit, onEdit, onDelete, on
         {files.length > 0 && <ParagraphAttachments files={files} onOpenFile={onOpenFile} onAdd={canEdit ? onAttach : undefined} />}
       </div>
     </div>}
-    {canEdit && !isHeader && !editing && <div className="absolute left-5 top-2 -translate-x-1/2">
-      <UnifiedMenu items={items} ariaLabel="Paragraph options" triggerClassName="!rounded-full w-6 h-6 border border-note-border/80 bg-note-surface text-note-muted shadow-sm hover:border-primary/70 hover:text-foreground" iconClassName="w-3 h-3" openTriggerClassName="!bg-note-surface !text-foreground" />
+    {canEdit && !isHeader && <div className="absolute left-5 top-2 -translate-x-1/2">
+      {editing ? <Button
+        type="button"
+        aria-label="Done editing"
+        title="Done"
+        onClick={(e) => { e.stopPropagation(); e.preventDefault(); onEditingEnd?.(); }}
+        className="!rounded-full w-6 h-6 border border-primary/70 bg-primary/15 text-primary shadow-sm hover:border-primary hover:bg-primary/25"
+      >
+        <Check className="w-3 h-3" strokeWidth={2.5} />
+      </Button> : <UnifiedMenu items={items} ariaLabel="Paragraph options" triggerClassName="!rounded-full w-6 h-6 border border-note-border/80 bg-note-surface text-note-muted shadow-sm hover:border-primary/70 hover:text-foreground" iconClassName="w-3 h-3" openTriggerClassName="!bg-note-surface !text-foreground" />}
     </div>}
   </article>;
 }
