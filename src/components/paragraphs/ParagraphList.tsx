@@ -170,7 +170,7 @@ export function ParagraphList({
                 aria-hidden="true"
                 className="absolute left-5 top-[35px] -translate-x-1/2 -translate-y-1/2"
               >
-                <span className="block w-2.5 h-2.5 rotate-45 rounded-[2px] bg-primary ring-4 ring-note-background" />
+                <span className="block w-6 h-6 rotate-45 rounded-[2px] border border-primary/30 bg-primary/15 ring-4 ring-note-background" />
               </div>
               <button
                 type="button"
