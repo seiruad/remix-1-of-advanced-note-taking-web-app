@@ -164,14 +164,7 @@ export function ParagraphList({
             ))}
           </div>
           {canEdit && (
-            <div className="relative pl-12 pr-2 sm:pr-3 pt-2.5 pb-1">
-              {/* The emerald diamond marks the end of the note. */}
-              <div
-                aria-hidden="true"
-                className="absolute left-5 top-[35px] -translate-x-1/2 -translate-y-1/2"
-              >
-                <span className="block w-6 h-6 rotate-45 rounded-[2px] border border-primary/30 bg-primary/15 ring-4 ring-note-background" />
-              </div>
+            <div className="relative pr-2 sm:pr-3 pt-2.5 pb-1">
               <button
                 type="button"
                 aria-label="Add block at the end of the note"
