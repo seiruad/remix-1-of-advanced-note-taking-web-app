@@ -9,6 +9,7 @@ import {
   Check,
   ChevronsLeft,
   ArrowLeft,
+  Pilcrow,
 } from 'lucide-react';
 
 import { supabase } from '../lib/supabase';
@@ -75,6 +76,11 @@ export function UnifiedFileLinkerWindow({
   const [error, setError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [linking, setLinking] = useState(false);
+  /**
+   * Paragraph number shown in the header. Placeholder for now: a random value
+   * is picked each time the window opens, purely for design purposes.
+   */
+  const [paragraphNumber, setParagraphNumber] = useState(1);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -96,10 +102,11 @@ export function UnifiedFileLinkerWindow({
     setError(null);
     setSearchQuery('');
     setSelectedIds([]);
+    setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
 
-  }, [open, loadFiles]);
+  }, [open, paragraphId, loadFiles]);
 
   const isLinked = (id: string) =>
     paragraphFileIds ? paragraphFileIds.includes(id) : existingFileIds.includes(id);
@@ -204,6 +211,19 @@ export function UnifiedFileLinkerWindow({
               </h2>
             </div>
 
+          </div>
+          {/* Which paragraph is being edited — number only, placeholder for now */}
+          <div
+            className="flex items-center gap-1.5 rounded-lg border border-slate-600/60 bg-slate-700/70 px-2 py-1.5 flex-shrink-0"
+            title={`Paragraph ${paragraphNumber}`}
+          >
+            <Pilcrow className="w-3 h-3 text-emerald-300/80" />
+            <span className="hidden sm:inline text-[11px] font-medium text-slate-400 leading-none">
+              Paragraph
+            </span>
+            <span className="text-[12px] font-semibold text-slate-100 tabular-nums leading-none">
+              {paragraphNumber}
+            </span>
           </div>
           <button
             onClick={onClose}
