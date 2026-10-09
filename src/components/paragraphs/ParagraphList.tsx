@@ -176,12 +176,12 @@ export function ParagraphList({
                 type="button"
                 aria-label="Add block at the end of the note"
                 onClick={() => setAddOpen(true)}
-                className="group flex w-full items-center gap-3 rounded-xl border border-primary/70 bg-primary/90 px-4 py-3 text-left text-primary-foreground shadow-[0_12px_30px_-14px_hsl(var(--primary)/0.55)] transition-all hover:border-primary hover:bg-primary hover:shadow-[0_16px_36px_-12px_hsl(var(--primary)/0.7)] active:translate-y-px"
+                className="group flex w-full items-center gap-3 rounded-xl border border-note-add-border bg-note-add-surface px-4 py-3 text-left text-note-add-foreground shadow-[inset_0_1px_0_hsl(var(--note-add-foreground)/0.08),0_10px_24px_-18px_hsl(0_0%_0%/0.8)] transition-all hover:border-primary/60 hover:bg-note-add-surface/80 hover:text-primary active:translate-y-px"
               >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-primary-foreground/30 bg-primary-foreground/15 transition-colors group-hover:bg-primary-foreground/25">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-note-add-border bg-note-background/40 text-note-add-foreground transition-colors group-hover:border-primary/60 group-hover:text-primary">
                   <Plus className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-sm font-semibold tracking-wide">Add block</span>
+                <span className="text-sm font-medium tracking-wide">Add block</span>
               </button>
             </div>
           )}

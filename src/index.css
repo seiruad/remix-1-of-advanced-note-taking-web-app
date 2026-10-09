@@ -18,6 +18,10 @@
   --note-surface: 217 33% 17%;
   --note-border: 215 19% 35%;
   --note-muted: 215 20% 65%;
+  /* End-of-note "Add block" panel: muted emerald, deliberately calmer than --primary. */
+  --note-add-surface: 160 30% 22%;
+  --note-add-border: 160 26% 33%;
+  --note-add-foreground: 158 35% 76%;
   /* Reading column: every note block (and its right-hand rail) is capped here. */
   --note-block-max-width: 720px;
 }
