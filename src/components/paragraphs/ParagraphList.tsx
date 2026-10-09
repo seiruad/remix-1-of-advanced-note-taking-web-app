@@ -176,9 +176,9 @@ export function ParagraphList({
                 type="button"
                 aria-label="Add block at the end of the note"
                 onClick={() => setAddOpen(true)}
-                className="group flex w-full items-center gap-3 rounded-xl border border-note-add-border bg-note-add-surface px-4 py-3 text-left text-note-add-foreground shadow-[inset_0_1px_0_hsl(var(--note-add-foreground)/0.08),0_10px_24px_-18px_hsl(0_0%_0%/0.8)] transition-all hover:border-primary/60 hover:bg-note-add-surface/80 hover:text-primary active:translate-y-px"
+                className="group flex w-full items-center gap-3 rounded-xl border border-primary/30 bg-primary/15 px-4 py-3 text-left text-primary/90 transition-all hover:border-primary/60 hover:bg-primary/25 hover:text-primary active:translate-y-px"
               >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-note-add-border bg-note-background/40 text-note-add-foreground transition-colors group-hover:border-primary/60 group-hover:text-primary">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary/90 transition-colors group-hover:border-primary/70 group-hover:bg-primary/20 group-hover:text-primary">
                   <Plus className="h-3.5 w-3.5" />
                 </span>
                 <span className="text-sm font-medium tracking-wide">Add block</span>
