@@ -101,11 +101,6 @@ export function ParagraphList({
   const editIndex = visibleBlocks.findIndex(p => p.id === editTarget);
   const prevLabel = editIndex > 0 ? blockLabel(visibleBlocks[editIndex - 1]) : null;
   const nextLabel = editIndex >= 0 && editIndex < visibleBlocks.length - 1 ? blockLabel(visibleBlocks[editIndex + 1]) : null;
-
-
-  const isBlockEmpty = (p: typeof paragraphs[number]) => p.kind === 'header'
-    ? !p.heading?.trim()
-    : isDocEmpty(p.content) && !(filesByParagraph[p.id]?.length);
   const createHeader = async () => {
     setPending(true);
     const index = last && lastIsEmpty ? paragraphs.length - 1 : paragraphs.length;
