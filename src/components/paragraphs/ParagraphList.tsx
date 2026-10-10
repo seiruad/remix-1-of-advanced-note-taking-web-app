@@ -8,7 +8,7 @@ import { NoteHeaderBlock } from './NoteHeaderBlock';
 import { AddBlockWindow } from './AddBlockWindow';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
 import { createPortal } from 'react-dom';
-import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
+import { useNoteParagraphs, isDocEmpty, docPlainText } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
 
 const NEW_PARAGRAPH = '__new__';
@@ -57,8 +57,6 @@ export function ParagraphList({
   const [attachTarget, setAttachTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<string | null>(null);
-  /** Paragraph block currently edited in place (paragraphs only; headers use the overlay). */
-  const [inlineEditId, setInlineEditId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   /** Which view the paragraph editor shows once the attach window closes. */
   const [attachmentsView, setAttachmentsView] = useState(false);
