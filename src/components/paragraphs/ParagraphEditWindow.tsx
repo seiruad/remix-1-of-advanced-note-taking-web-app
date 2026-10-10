@@ -11,6 +11,9 @@ interface Props {
   paragraph: NoteParagraph;
   files: FileItem[];
   suspended: boolean;
+  /** Small context previews of the surrounding blocks (plain text, may be null). */
+  prevLabel?: string | null;
+  nextLabel?: string | null;
   onClose: () => void;
   /** Whether the attachments list (rather than the text) is the visible view. */
   attachmentsOpen: boolean;
@@ -24,7 +27,7 @@ interface Props {
   onOpenFile: (file: FileItem) => void;
 }
 
-export function ParagraphEditWindow({ paragraph, files, suspended, onClose, attachmentsOpen, onAttachmentsOpenChange, onChange, onHeadingChange, onFocusEditor, onAttach, onDetach, onOpenFile }: Props) {
+export function ParagraphEditWindow({ paragraph, files, suspended, prevLabel, nextLabel, onClose, attachmentsOpen, onAttachmentsOpenChange, onChange, onHeadingChange, onFocusEditor, onAttach, onDetach, onOpenFile }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
   const isHeader = paragraph.kind === 'header';
@@ -56,7 +59,7 @@ export function ParagraphEditWindow({ paragraph, files, suspended, onClose, atta
   }, [suspended]);
 
   return createPortal(<div className="fixed inset-0 z-[9990] flex items-end sm:items-center justify-center bg-overlay/60 backdrop-blur-sm p-0 sm:p-4" onPointerDown={e => { if (e.target === e.currentTarget && !suspended) onClose(); }}>
-    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={isHeader ? 'Edit header' : 'Edit paragraph'} className="flex flex-col w-full sm:max-w-2xl h-auto max-h-[90dvh] bg-background border border-border/50 rounded-t-lg sm:rounded-lg overflow-hidden">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={isHeader ? 'Edit header' : 'Edit paragraph'} className="flex flex-col w-full sm:max-w-2xl h-[85dvh] sm:h-[80vh] bg-background border border-border/50 rounded-t-lg sm:rounded-lg overflow-hidden">
       <header className="flex items-center justify-between px-4 sm:px-5 h-14 shrink-0 border-b border-border/40">
         <div className="flex items-center gap-2">
           {attachmentsOpen && <Button className="h-8 w-8" aria-label="Back to text" onClick={() => onAttachmentsOpenChange(false)}><ArrowLeft className="h-4 w-4" /></Button>}
@@ -65,6 +68,9 @@ export function ParagraphEditWindow({ paragraph, files, suspended, onClose, atta
         <Button className="h-9 w-9" aria-label="Close editor" onClick={onClose}><X className="h-4 w-4" /></Button>
       </header>
       <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-5">
+        {!isHeader && !attachmentsOpen && prevLabel && (
+          <p aria-hidden="true" className="select-none truncate text-xs text-muted-foreground/50 blur-[0.6px]">↑ {prevLabel}</p>
+        )}
         {isHeader ? <div className="space-y-2">
           <label htmlFor={`heading-${paragraph.id}`} className="text-xs font-medium text-muted-foreground">Header</label>
           <input id={`heading-${paragraph.id}`} autoFocus value={paragraph.heading ?? ''} placeholder="Header" onChange={e => onHeadingChange(e.target.value)} onBlur={e => onHeadingChange(e.target.value.trim() ? e.target.value : null, true)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onClose(); } }} className="w-full rounded-lg border border-border/40 bg-surface/40 px-3 py-2.5 text-base font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60" />
@@ -97,6 +103,9 @@ export function ParagraphEditWindow({ paragraph, files, suspended, onClose, atta
           <ArrowRight className="h-4 w-4 shrink-0" />
         </Button>}
         </>}
+        {!isHeader && !attachmentsOpen && nextLabel && (
+          <p aria-hidden="true" className="select-none truncate text-xs text-muted-foreground/50 blur-[0.6px]">↓ {nextLabel}</p>
+        )}
       </div>
       <footer className="flex justify-end px-4 sm:px-5 py-3 shrink-0 border-t border-border/40">
         <Button variant="primary" className="h-10 px-5" onClick={onClose}><Check className="h-4 w-4" />Done</Button>

@@ -8,7 +8,7 @@ import { NoteHeaderBlock } from './NoteHeaderBlock';
 import { AddBlockWindow } from './AddBlockWindow';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
 import { createPortal } from 'react-dom';
-import { useNoteParagraphs, isDocEmpty } from './useNoteParagraphs';
+import { useNoteParagraphs, isDocEmpty, docPlainText } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
 
 const NEW_PARAGRAPH = '__new__';
@@ -57,8 +57,6 @@ export function ParagraphList({
   const [attachTarget, setAttachTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<string | null>(null);
-  /** Paragraph block currently edited in place (paragraphs only; headers use the overlay). */
-  const [inlineEditId, setInlineEditId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   /** Which view the paragraph editor shows once the attach window closes. */
   const [attachmentsView, setAttachmentsView] = useState(false);
@@ -95,12 +93,17 @@ export function ParagraphList({
     return id;
   };
 
-  const editingParagraph = paragraphs.find(p => p.id === editTarget);
-
-
   const isBlockEmpty = (p: typeof paragraphs[number]) => p.kind === 'header'
     ? !p.heading?.trim()
     : isDocEmpty(p.content) && !(filesByParagraph[p.id]?.length);
+  const editingParagraph = paragraphs.find(p => p.id === editTarget);
+  /** Small context labels for the blocks around the one being edited. */
+  const blockLabel = (p: typeof paragraphs[number]) =>
+    p.kind === 'header' ? (p.heading ?? '') : docPlainText(p.content);
+  const visibleBlocks = paragraphs.filter(p => !isBlockEmpty(p));
+  const editIndex = visibleBlocks.findIndex(p => p.id === editTarget);
+  const prevLabel = editIndex > 0 ? blockLabel(visibleBlocks[editIndex - 1]) : null;
+  const nextLabel = editIndex >= 0 && editIndex < visibleBlocks.length - 1 ? blockLabel(visibleBlocks[editIndex + 1]) : null;
   const createHeader = async () => {
     setPending(true);
     const index = last && lastIsEmpty ? paragraphs.length - 1 : paragraphs.length;
@@ -153,13 +156,10 @@ export function ParagraphList({
                 paragraph={paragraph}
                 files={filesByParagraph[paragraph.id] ?? []}
                 canEdit={canEdit}
-                onEdit={() => paragraph.kind === 'header' ? openEditor(paragraph.id) : setInlineEditId(paragraph.id)}
+                onEdit={() => openEditor(paragraph.id)}
                 onDelete={() => setDeleteTarget(paragraph.id)}
                 onOpenFile={onOpenFile}
                 onAttach={() => setAttachTarget(paragraph.id)}
-                editing={inlineEditId === paragraph.id}
-                onContentChange={(content) => setContent(paragraph.id, content)}
-                onEditingEnd={() => setInlineEditId(null)}
               />
             ))}
           </div>
@@ -209,6 +209,8 @@ export function ParagraphList({
         paragraph={editingParagraph}
         files={filesByParagraph[editingParagraph.id] ?? []}
         suspended={attachTarget !== null}
+        prevLabel={prevLabel}
+        nextLabel={nextLabel}
         onClose={closeEditor}
         attachmentsOpen={attachmentsView}
         onAttachmentsOpenChange={setAttachmentsView}
