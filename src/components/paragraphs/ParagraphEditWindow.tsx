@@ -27,7 +27,7 @@ interface Props {
   onOpenFile: (file: FileItem) => void;
 }
 
-export function ParagraphEditWindow({ paragraph, files, suspended, onClose, attachmentsOpen, onAttachmentsOpenChange, onChange, onHeadingChange, onFocusEditor, onAttach, onDetach, onOpenFile }: Props) {
+export function ParagraphEditWindow({ paragraph, files, suspended, prevLabel, nextLabel, onClose, attachmentsOpen, onAttachmentsOpenChange, onChange, onHeadingChange, onFocusEditor, onAttach, onDetach, onOpenFile }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
   const isHeader = paragraph.kind === 'header';
