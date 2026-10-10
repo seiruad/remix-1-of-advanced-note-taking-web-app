@@ -151,13 +151,10 @@ export function ParagraphList({
                 paragraph={paragraph}
                 files={filesByParagraph[paragraph.id] ?? []}
                 canEdit={canEdit}
-                onEdit={() => paragraph.kind === 'header' ? openEditor(paragraph.id) : setInlineEditId(paragraph.id)}
+                onEdit={() => openEditor(paragraph.id)}
                 onDelete={() => setDeleteTarget(paragraph.id)}
                 onOpenFile={onOpenFile}
                 onAttach={() => setAttachTarget(paragraph.id)}
-                editing={inlineEditId === paragraph.id}
-                onContentChange={(content) => setContent(paragraph.id, content)}
-                onEditingEnd={() => setInlineEditId(null)}
               />
             ))}
           </div>
