@@ -94,6 +94,13 @@ export function ParagraphList({
   };
 
   const editingParagraph = paragraphs.find(p => p.id === editTarget);
+  /** Small context labels for the blocks around the one being edited. */
+  const blockLabel = (p: typeof paragraphs[number]) =>
+    p.kind === 'header' ? (p.heading ?? '') : docPlainText(p.content);
+  const visibleBlocks = paragraphs.filter(p => !isBlockEmpty(p));
+  const editIndex = visibleBlocks.findIndex(p => p.id === editTarget);
+  const prevLabel = editIndex > 0 ? blockLabel(visibleBlocks[editIndex - 1]) : null;
+  const nextLabel = editIndex >= 0 && editIndex < visibleBlocks.length - 1 ? blockLabel(visibleBlocks[editIndex + 1]) : null;
 
 
   const isBlockEmpty = (p: typeof paragraphs[number]) => p.kind === 'header'
