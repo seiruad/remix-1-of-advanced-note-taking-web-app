@@ -103,6 +103,9 @@ export function ParagraphEditWindow({ paragraph, files, suspended, prevLabel, ne
           <ArrowRight className="h-4 w-4 shrink-0" />
         </Button>}
         </>}
+        {!isHeader && !attachmentsOpen && nextLabel && (
+          <p aria-hidden="true" className="select-none truncate text-xs text-muted-foreground/50 blur-[0.6px]">↓ {nextLabel}</p>
+        )}
       </div>
       <footer className="flex justify-end px-4 sm:px-5 py-3 shrink-0 border-t border-border/40">
         <Button variant="primary" className="h-10 px-5" onClick={onClose}><Check className="h-4 w-4" />Done</Button>
