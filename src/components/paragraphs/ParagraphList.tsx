@@ -93,6 +93,9 @@ export function ParagraphList({
     return id;
   };
 
+  const isBlockEmpty = (p: typeof paragraphs[number]) => p.kind === 'header'
+    ? !p.heading?.trim()
+    : isDocEmpty(p.content) && !(filesByParagraph[p.id]?.length);
   const editingParagraph = paragraphs.find(p => p.id === editTarget);
   /** Small context labels for the blocks around the one being edited. */
   const blockLabel = (p: typeof paragraphs[number]) =>
