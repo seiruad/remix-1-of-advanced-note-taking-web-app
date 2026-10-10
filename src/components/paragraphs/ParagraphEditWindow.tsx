@@ -68,6 +68,9 @@ export function ParagraphEditWindow({ paragraph, files, suspended, prevLabel, ne
         <Button className="h-9 w-9" aria-label="Close editor" onClick={onClose}><X className="h-4 w-4" /></Button>
       </header>
       <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-5">
+        {!isHeader && !attachmentsOpen && prevLabel && (
+          <p aria-hidden="true" className="select-none truncate text-xs text-muted-foreground/50 blur-[0.6px]">↑ {prevLabel}</p>
+        )}
         {isHeader ? <div className="space-y-2">
           <label htmlFor={`heading-${paragraph.id}`} className="text-xs font-medium text-muted-foreground">Header</label>
           <input id={`heading-${paragraph.id}`} autoFocus value={paragraph.heading ?? ''} placeholder="Header" onChange={e => onHeadingChange(e.target.value)} onBlur={e => onHeadingChange(e.target.value.trim() ? e.target.value : null, true)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onClose(); } }} className="w-full rounded-lg border border-border/40 bg-surface/40 px-3 py-2.5 text-base font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60" />
