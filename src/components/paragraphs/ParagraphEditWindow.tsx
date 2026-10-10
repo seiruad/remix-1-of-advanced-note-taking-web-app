@@ -11,6 +11,9 @@ interface Props {
   paragraph: NoteParagraph;
   files: FileItem[];
   suspended: boolean;
+  /** Small context previews of the surrounding blocks (plain text, may be null). */
+  prevLabel?: string | null;
+  nextLabel?: string | null;
   onClose: () => void;
   /** Whether the attachments list (rather than the text) is the visible view. */
   attachmentsOpen: boolean;
