@@ -209,6 +209,8 @@ export function ParagraphList({
         paragraph={editingParagraph}
         files={filesByParagraph[editingParagraph.id] ?? []}
         suspended={attachTarget !== null}
+        prevLabel={prevLabel}
+        nextLabel={nextLabel}
         onClose={closeEditor}
         attachmentsOpen={attachmentsView}
         onAttachmentsOpenChange={setAttachmentsView}
