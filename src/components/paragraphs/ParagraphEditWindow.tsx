@@ -98,7 +98,7 @@ export function ParagraphEditWindow({ paragraph, files, suspended, prevLabel, ne
               <Button className="h-8 w-8 shrink-0 hover:text-destructive" aria-label={`Unlink ${file.filename}`} title="Unlink from paragraph" onClick={() => onDetach(file.id)}><Unlink className="h-3.5 w-3.5" /></Button>
             </li>)}
           </ul>}
-        </div> : <Button variant="subtle" className="w-full justify-between px-3 py-3" onClick={() => onAttachmentsOpenChange(true)} aria-label={`View attachments (${files.length})`}>
+        </div> : <Button variant="subtle" className="w-full justify-between px-3 py-3" onClick={onAttach} aria-label={`View attachments (${files.length})`}>
           <span className="flex items-center gap-2"><Paperclip className="h-4 w-4" /><span>Attachments · {files.length}</span></span>
           <ArrowRight className="h-4 w-4 shrink-0" />
         </Button>}
