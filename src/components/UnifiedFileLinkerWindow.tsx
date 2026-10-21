@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import {
   UploadCloud,
   File as FileIcon,
@@ -7,6 +7,7 @@ import {
   X,
   Link2,
   Check,
+  ArrowDown,
   ChevronsLeft,
   ArrowLeft,
   Pilcrow,
@@ -53,7 +54,8 @@ function getFileIcon(type: string) {
 
 /**
  * Unified file linking window: storage list + multi-select + inline upload,
- * all on one screen, with an alternate list of attached and selected files.
+ * all on one screen. The Attachments control swaps the search/list area for
+ * the Selected block, where picked files show as chips.
  */
 export function UnifiedFileLinkerWindow({
   open,
@@ -66,7 +68,6 @@ export function UnifiedFileLinkerWindow({
   paragraphId = null,
   paragraphFileIds,
 }: UnifiedFileLinkerWindowProps) {
-
   const { user } = useAuth();
   const [files, setFiles] = useState<FileItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,16 +76,82 @@ export function UnifiedFileLinkerWindow({
   const [error, setError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [linking, setLinking] = useState(false);
+  /** True = the Selected block (chips) replaces search + storage list. */
   const [showAttached, setShowAttached] = useState(false);
+  /** True = the chips panel is expanded to fill the window body. */
+  const [selectedExpanded, setSelectedExpanded] = useState(false);
   /**
    * Paragraph number shown in the header. Placeholder for now: a random value
    * is picked each time the window opens, purely for design purposes.
    */
   const [paragraphNumber, setParagraphNumber] = useState(1);
+  /** How many middle chips fit between the pinned first/last ones; null = not measured yet (show all). */
+  const [middleVisibleCount, setMiddleVisibleCount] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chipsRowRef = useRef<HTMLDivElement>(null);
+  const chipsMiddleRef = useRef<HTMLDivElement>(null);
+  const ellipsisRef = useRef<HTMLSpanElement>(null);
+  const chipWidthsRef = useRef<Map<string, number>>(new Map());
 
+  const linkedIds = paragraphFileIds ?? existingFileIds;
 
+  // In collapsed mode the first and last chips are always pinned. Middle chips
+  // are shown only while they fit; the rest collapse into a "•••" pill.
+  useLayoutEffect(() => {
+    if (!showAttached || selectedExpanded) {
+      setMiddleVisibleCount(null);
+      return;
+    }
+    // Chips shown in the Selected block: already-attached files first, then newly picked ones.
+    const selFiles = [...linkedIds, ...selectedIds]
+      .map((id) => files.find((f) => f.id === id))
+      .filter((f): f is FileItem => Boolean(f));
+    const mids = selFiles.slice(1, -1);
+    if (mids.length === 0) {
+      setMiddleVisibleCount(null);
+      return;
+    }
+    const gap = 6; // gap-1.5
+    const widthOf = (f: FileItem) => chipWidthsRef.current.get(f.id) ?? 90;
+    const fitFromEnd = (budget: number) => {
+      let sum = 0;
+      let k = 0;
+      for (let i = mids.length - 1; i >= 0; i--) {
+        const need = widthOf(mids[i]) + (k > 0 ? gap : 0);
+        if (sum + need > budget) break;
+        sum += need;
+        k++;
+      }
+      return k;
+    };
+    const row = chipsRowRef.current;
+    if (!row) return;
+    const measure = () => {
+      // Cache the real rendered width of every chip currently in the row.
+      row.querySelectorAll<HTMLElement>('[data-chip-id]').forEach((el) => {
+        const id = el.dataset.chipId;
+        if (id) chipWidthsRef.current.set(id, el.offsetWidth);
+      });
+      const firstW = widthOf(selFiles[0]);
+      const lastW = widthOf(selFiles[selFiles.length - 1]);
+      // Space left for the middle chips once the pinned edge chips are placed.
+      const base = row.clientWidth - firstW - lastW - 2 * gap;
+      // Everything fits -> show all middle chips, no ••• pill.
+      if (fitFromEnd(base) >= mids.length) {
+        setMiddleVisibleCount(mids.length);
+        return;
+      }
+      // Not everything fits -> reserve room for the ••• pill.
+      const ellipsisW = ellipsisRef.current?.offsetWidth || 34;
+      setMiddleVisibleCount(Math.max(fitFromEnd(base - ellipsisW - gap), 0));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(row);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showAttached, selectedExpanded, selectedIds, files, middleVisibleCount, paragraphFileIds, existingFileIds]);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -103,10 +170,10 @@ export function UnifiedFileLinkerWindow({
     setSearchQuery('');
     setSelectedIds([]);
     setShowAttached(false);
+    setSelectedExpanded(false);
     setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
-
   }, [open, paragraphId, loadFiles]);
 
   const isLinked = (id: string) =>
@@ -188,10 +255,57 @@ export function UnifiedFileLinkerWindow({
 
   if (!open) return null;
 
-  const filteredFiles = files.filter((file) => showAttached
-    ? isLinked(file.id) || selectedIds.includes(file.id)
-    : file.filename.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredFiles = files.filter((file) =>
+    file.filename.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+  const selectedFiles = selectedIds
+    .map((id) => files.find((f) => f.id === id))
+    .filter((f): f is FileItem => Boolean(f));
+  const linkedFiles = linkedIds
+    .map((id) => files.find((f) => f.id === id))
+    .filter((f): f is FileItem => Boolean(f));
+  // Already-attached files are shown first in the Selected block, then newly picked ones.
+  const displayFiles = [...linkedFiles, ...selectedFiles];
+  const middleFiles = displayFiles.slice(1, -1);
+  const middleHiddenCount =
+    middleVisibleCount === null ? 0 : Math.max(middleFiles.length - middleVisibleCount, 0);
+  const visibleMiddleFiles =
+    middleVisibleCount === null || middleVisibleCount === 0
+      ? []
+      : middleFiles.slice(-middleVisibleCount);
 
+  const renderChip = (file: FileItem, linked = false) => (
+    <span
+      key={file.id}
+      data-chip-id={file.id}
+      className={`inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full border transition-colors text-[11px] font-medium flex-shrink-0 ${
+        linked
+          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+          : 'bg-slate-700/40 border-slate-600/30 hover:bg-slate-700/60 text-slate-300'
+      }`}
+    >
+      <span className="truncate max-w-[140px]" title={file.filename}>
+        {file.filename}
+      </span>
+      {linked ? (
+        <span
+          className="w-5 h-5 rounded-full flex items-center justify-center text-emerald-400"
+          title="Already attached"
+        >
+          <Link2 className="w-3 h-3" />
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => toggle(file.id)}
+          aria-label={`Deselect ${file.filename}`}
+          className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
+    </span>
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -200,7 +314,6 @@ export function UnifiedFileLinkerWindow({
         <div className="h-14 flex items-center justify-between gap-2 px-4 sm:px-5 border-b border-slate-700/50 flex-shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="min-w-0">
-
               <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium leading-tight">
                 Attach files
               </p>
@@ -219,7 +332,6 @@ export function UnifiedFileLinkerWindow({
               <Pilcrow className="w-3 h-3" />
               {paragraphNumber}
             </span>
-
           </div>
           <button
             onClick={onClose}
@@ -244,7 +356,6 @@ export function UnifiedFileLinkerWindow({
             </div>
           )}
 
-
           {/* One line: back to the block's text (double arrow), back to its files (single arrow), then upload */}
           <div className="mb-2 flex items-center gap-2">
             <button
@@ -260,7 +371,7 @@ export function UnifiedFileLinkerWindow({
 
             <button
               type="button"
-              onClick={() => setShowAttached(value => !value)}
+              onClick={() => setShowAttached((value) => !value)}
               aria-pressed={showAttached}
               aria-label="Edit attachments"
               title="Edit attachments"
@@ -286,12 +397,6 @@ export function UnifiedFileLinkerWindow({
             </button>
           </div>
 
-
-
-
-          {/* Search + upload */}
-
-
           <input
             type="file"
             ref={fileInputRef}
@@ -301,86 +406,159 @@ export function UnifiedFileLinkerWindow({
             }}
             className="hidden"
           />
-          {/* Search */}
-          {!showAttached && <div className="relative h-9 mb-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search files…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
-            />
-          </div>}
 
-
-
-
-
-
-
-          {/* Storage list */}
-
-
-            <div className="flex-1 min-h-0 overflow-y-auto space-y-1">
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+          {showAttached ? (
+            /* Selected files — chips panel (search and storage list are hidden here) */
+            <div
+              className={`rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex items-stretch gap-2 ${
+                selectedExpanded && displayFiles.length > 0 ? 'flex-1 min-h-0' : ''
+              }`}
+            >
+              <div className="flex flex-col min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1.5 px-0.5 h-6">
+                  <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
+                    Selected · {displayFiles.length}
+                  </p>
                 </div>
-              ) : filteredFiles.length === 0 ? (
-                <div className="text-center py-10">
-                  <FileIcon className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                  <p className="text-sm text-slate-500">{showAttached ? 'No selected attachments' : 'No files found'}</p>
-                </div>
-              ) : (
-                filteredFiles.map((file) => {
-                  const linked = isLinked(file.id);
-                  const isSelected = selectedIds.includes(file.id);
-                  return (
-                    <button
-                      key={file.id}
-                      onClick={() => !linked && toggle(file.id)}
-                      disabled={linked || linking}
-                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors text-left ${
-                        linked
-                          ? 'bg-emerald-500/10 cursor-not-allowed'
-                          : isSelected
-                            ? 'bg-emerald-500/15'
-                            : 'hover:bg-slate-700/40 active:bg-slate-700/60'
-                      }`}
-                    >
-                      {linked ? (
-                        <Link2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                      ) : (
-                        <span
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
-                            isSelected ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
-                          }`}
+
+                <div
+                  ref={chipsRowRef}
+                  className={`${
+                    selectedExpanded && displayFiles.length > 0
+                      ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
+                      : 'flex items-center gap-1.5 overflow-hidden h-7'
+                  }`}
+                >
+                  {displayFiles.length === 0 ? (
+                    <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500 truncate">
+                      No files selected yet — pick files below or upload a new one.
+                    </span>
+                  ) : selectedExpanded && displayFiles.length > 0 ? (
+                    displayFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))
+                  ) : displayFiles.length === 1 ? (
+                    renderChip(displayFiles[0], linkedIds.includes(displayFiles[0].id))
+                  ) : (
+                    <>
+                      {renderChip(displayFiles[0], linkedIds.includes(displayFiles[0].id))}
+                      {middleFiles.length > 0 && (
+                        <div
+                          ref={chipsMiddleRef}
+                          className="flex items-center gap-1.5 overflow-hidden min-w-0 h-7"
                         >
-                          {isSelected && <Check className="w-3.5 h-3.5 text-slate-900" />}
-                        </span>
+                          {middleHiddenCount > 0 && (
+                            <span
+                              ref={ellipsisRef}
+                              title={`${middleHiddenCount} more file${middleHiddenCount === 1 ? '' : 's'} selected`}
+                              className="inline-flex items-center justify-center h-7 px-3 rounded-full bg-slate-700/40 border border-slate-600/30 text-[11px] font-medium text-slate-400 tracking-[2px] flex-shrink-0 select-none"
+                            >
+                              •••
+                            </span>
+                          )}
+                          {visibleMiddleFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))}
+                        </div>
                       )}
-                      <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
-                        {getFileIcon(file.file_type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className={`text-sm font-semibold truncate leading-snug ${
-                            linked || isSelected ? 'text-emerald-100' : 'text-slate-100'
-                          }`}
-                        >
-                          {file.filename}
-                        </p>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          {formatFileSize(file.file_size)}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })
-              )}
-            </div>
+                      {renderChip(
+                        displayFiles[displayFiles.length - 1],
+                        linkedIds.includes(displayFiles[displayFiles.length - 1].id),
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
 
+              {/* Full-height right arrow rail: expands / collapses the selected files */}
+              <button
+                type="button"
+                onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
+                disabled={displayFiles.length === 0}
+                aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
+                aria-expanded={selectedExpanded}
+                className="group w-8 self-stretch flex-shrink-0 rounded-lg border border-slate-700/50 bg-slate-800/60 flex flex-col items-center justify-center gap-1.5 py-1.5 text-slate-500 transition-all duration-200 enabled:hover:border-emerald-500/45 enabled:hover:bg-emerald-500/10 enabled:hover:text-emerald-300 enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-default"
+              >
+                <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
+                <ArrowDown
+                  className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
+                    selectedExpanded ? 'rotate-180' : ''
+                  }`}
+                />
+                <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Search */}
+              <div className="relative h-9 mb-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search files…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
+                />
+              </div>
+
+              {/* Storage list */}
+              <div className="flex-1 min-h-0 overflow-y-auto space-y-1">
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+                  </div>
+                ) : filteredFiles.length === 0 ? (
+                  <div className="text-center py-10">
+                    <FileIcon className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500">No files found</p>
+                  </div>
+                ) : (
+                  filteredFiles.map((file) => {
+                    const linked = isLinked(file.id);
+                    const isSelected = selectedIds.includes(file.id);
+                    return (
+                      <button
+                        key={file.id}
+                        onClick={() => !linked && toggle(file.id)}
+                        disabled={linked || linking}
+                        className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors text-left ${
+                          linked
+                            ? 'bg-emerald-500/10 cursor-not-allowed'
+                            : isSelected
+                              ? 'bg-emerald-500/15'
+                              : 'hover:bg-slate-700/40 active:bg-slate-700/60'
+                        }`}
+                      >
+                        {linked ? (
+                          <Link2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                        ) : (
+                          <span
+                            className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
+                              isSelected ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
+                            }`}
+                          >
+                            {isSelected && <Check className="w-3.5 h-3.5 text-slate-900" />}
+                          </span>
+                        )}
+                        <div className="w-9 h-9 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0 text-base">
+                          {getFileIcon(file.file_type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className={`text-sm font-semibold truncate leading-snug ${
+                              linked || isSelected ? 'text-emerald-100' : 'text-slate-100'
+                            }`}
+                          >
+                            {file.filename}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            {formatFileSize(file.file_size)}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          )}
 
           <div className="mt-3 flex items-center gap-2 flex-shrink-0">
             <button
