@@ -24,7 +24,7 @@ interface UnifiedFileLinkerWindowProps {
   noteTitle?: string;
   /** Jumps back to the paragraph's text editor (two levels up). */
   onEditParagraph?: () => void;
-  /** Goes back to the paragraph's attachments list (one level up). */
+  /** Legacy callback; the Attachments control now switches views within this window. */
   onEditAttachments?: () => void;
   onFileLinked: (file: FileItem) => void | Promise<void>;
 
@@ -53,7 +53,7 @@ function getFileIcon(type: string) {
 
 /**
  * Unified file linking window: storage list + multi-select + inline upload,
- * all on one screen. Selected files are shown as chips above the list.
+ * all on one screen, with an alternate list of attached and selected files.
  */
 export function UnifiedFileLinkerWindow({
   open,
@@ -61,7 +61,6 @@ export function UnifiedFileLinkerWindow({
   noteId,
   noteTitle,
   onEditParagraph,
-  onEditAttachments,
   onFileLinked,
   existingFileIds,
   paragraphId = null,
@@ -76,6 +75,7 @@ export function UnifiedFileLinkerWindow({
   const [error, setError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [linking, setLinking] = useState(false);
+  const [showAttached, setShowAttached] = useState(false);
   /**
    * Paragraph number shown in the header. Placeholder for now: a random value
    * is picked each time the window opens, purely for design purposes.
@@ -102,6 +102,7 @@ export function UnifiedFileLinkerWindow({
     setError(null);
     setSearchQuery('');
     setSelectedIds([]);
+    setShowAttached(false);
     setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
@@ -161,7 +162,7 @@ export function UnifiedFileLinkerWindow({
       const { error: linkError } = await supabase.from('note_files').insert({
         note_id: noteId,
         file_id: file.id,
-        user_id: user!.id,
+        user_id: user?.id,
         paragraph_id: paragraphId,
       });
       if (linkError) throw linkError;
@@ -187,9 +188,9 @@ export function UnifiedFileLinkerWindow({
 
   if (!open) return null;
 
-  const filteredFiles = files.filter((f) =>
-    f.filename.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredFiles = files.filter((file) => showAttached
+    ? isLinked(file.id) || selectedIds.includes(file.id)
+    : file.filename.toLowerCase().includes(searchQuery.toLowerCase()));
 
 
   return (
@@ -259,7 +260,8 @@ export function UnifiedFileLinkerWindow({
 
             <button
               type="button"
-              onClick={onEditAttachments ?? onClose}
+              onClick={() => setShowAttached(value => !value)}
+              aria-pressed={showAttached}
               aria-label="Edit attachments"
               title="Edit attachments"
               className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3.5 rounded-lg border border-slate-500/50 bg-slate-700 text-[13px] font-semibold text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-slate-600 hover:border-emerald-400/40 hover:text-emerald-200 active:translate-y-px"
@@ -300,7 +302,7 @@ export function UnifiedFileLinkerWindow({
             className="hidden"
           />
           {/* Search */}
-          <div className="relative h-9 mb-2">
+          {!showAttached && <div className="relative h-9 mb-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
             <input
               type="text"
@@ -309,7 +311,7 @@ export function UnifiedFileLinkerWindow({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-9 bg-slate-900/60 border border-transparent rounded-lg pl-9 pr-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/30 text-[13px]"
             />
-          </div>
+          </div>}
 
 
 
@@ -328,7 +330,7 @@ export function UnifiedFileLinkerWindow({
               ) : filteredFiles.length === 0 ? (
                 <div className="text-center py-10">
                   <FileIcon className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                  <p className="text-sm text-slate-500">No files found</p>
+                  <p className="text-sm text-slate-500">{showAttached ? 'No selected attachments' : 'No files found'}</p>
                 </div>
               ) : (
                 filteredFiles.map((file) => {
