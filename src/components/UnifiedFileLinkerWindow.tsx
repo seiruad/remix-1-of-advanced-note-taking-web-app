@@ -414,7 +414,6 @@ export function UnifiedFileLinkerWindow({
               </div>
             </div>
           ) : (
-          ) : (
             <>
               {/* Search */}
               <div className="relative h-9 mb-2">
