@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   UploadCloud,
   File as FileIcon,
@@ -7,7 +7,8 @@ import {
   X,
   Link2,
   Check,
-  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronsLeft,
   ArrowLeft,
   Pilcrow,
@@ -78,80 +79,19 @@ export function UnifiedFileLinkerWindow({
   const [linking, setLinking] = useState(false);
   /** True = the Selected block (chips) replaces search + storage list. */
   const [showAttached, setShowAttached] = useState(false);
-  /** True = the chips panel is expanded to fill the window body. */
-  const [selectedExpanded, setSelectedExpanded] = useState(false);
   /**
    * Paragraph number shown in the header. Placeholder for now: a random value
    * is picked each time the window opens, purely for design purposes.
    */
   const [paragraphNumber, setParagraphNumber] = useState(1);
-  /** How many middle chips fit between the pinned first/last ones; null = not measured yet (show all). */
-  const [middleVisibleCount, setMiddleVisibleCount] = useState<number | null>(null);
+  /** Chip order chosen by the user, chips kept but switched off, and chips removed from the list. */
+  const [chipOrder, setChipOrder] = useState<string[]>([]);
+  const [deselected, setDeselected] = useState<string[]>([]);
+  const [removedIds, setRemovedIds] = useState<string[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const chipsRowRef = useRef<HTMLDivElement>(null);
-  const chipsMiddleRef = useRef<HTMLDivElement>(null);
-  const ellipsisRef = useRef<HTMLSpanElement>(null);
-  const chipWidthsRef = useRef<Map<string, number>>(new Map());
 
   const linkedIds = paragraphFileIds ?? existingFileIds;
-
-  // In collapsed mode the first and last chips are always pinned. Middle chips
-  // are shown only while they fit; the rest collapse into a "•••" pill.
-  useLayoutEffect(() => {
-    if (!showAttached || selectedExpanded) {
-      setMiddleVisibleCount(null);
-      return;
-    }
-    // Chips shown in the Selected block: already-attached files first, then newly picked ones.
-    const selFiles = [...linkedIds, ...selectedIds]
-      .map((id) => files.find((f) => f.id === id))
-      .filter((f): f is FileItem => Boolean(f));
-    const mids = selFiles.slice(1, -1);
-    if (mids.length === 0) {
-      setMiddleVisibleCount(null);
-      return;
-    }
-    const gap = 6; // gap-1.5
-    const widthOf = (f: FileItem) => chipWidthsRef.current.get(f.id) ?? 90;
-    const fitFromEnd = (budget: number) => {
-      let sum = 0;
-      let k = 0;
-      for (let i = mids.length - 1; i >= 0; i--) {
-        const need = widthOf(mids[i]) + (k > 0 ? gap : 0);
-        if (sum + need > budget) break;
-        sum += need;
-        k++;
-      }
-      return k;
-    };
-    const row = chipsRowRef.current;
-    if (!row) return;
-    const measure = () => {
-      // Cache the real rendered width of every chip currently in the row.
-      row.querySelectorAll<HTMLElement>('[data-chip-id]').forEach((el) => {
-        const id = el.dataset.chipId;
-        if (id) chipWidthsRef.current.set(id, el.offsetWidth);
-      });
-      const firstW = widthOf(selFiles[0]);
-      const lastW = widthOf(selFiles[selFiles.length - 1]);
-      // Space left for the middle chips once the pinned edge chips are placed.
-      const base = row.clientWidth - firstW - lastW - 2 * gap;
-      // Everything fits -> show all middle chips, no ••• pill.
-      if (fitFromEnd(base) >= mids.length) {
-        setMiddleVisibleCount(mids.length);
-        return;
-      }
-      // Not everything fits -> reserve room for the ••• pill.
-      const ellipsisW = ellipsisRef.current?.offsetWidth || 34;
-      setMiddleVisibleCount(Math.max(fitFromEnd(base - ellipsisW - gap), 0));
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(row);
-    return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAttached, selectedExpanded, selectedIds, files, middleVisibleCount, paragraphFileIds, existingFileIds]);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -170,7 +110,9 @@ export function UnifiedFileLinkerWindow({
     setSearchQuery('');
     setSelectedIds([]);
     setShowAttached(false);
-    setSelectedExpanded(false);
+    setChipOrder([]);
+    setDeselected([]);
+    setRemovedIds([]);
     setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
@@ -241,7 +183,7 @@ export function UnifiedFileLinkerWindow({
     setError(null);
     setLinking(true);
     try {
-      for (const id of selectedIds) {
+      for (const id of selectedIds.filter((x) => !deselected.includes(x))) {
         const file = files.find((f) => f.id === id);
         if (file) await linkOne(file);
       }
