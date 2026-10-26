@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   UploadCloud,
   File as FileIcon,
@@ -7,7 +7,8 @@ import {
   X,
   Link2,
   Check,
-  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronsLeft,
   ArrowLeft,
   Pilcrow,
@@ -78,80 +79,19 @@ export function UnifiedFileLinkerWindow({
   const [linking, setLinking] = useState(false);
   /** True = the Selected block (chips) replaces search + storage list. */
   const [showAttached, setShowAttached] = useState(false);
-  /** True = the chips panel is expanded to fill the window body. */
-  const [selectedExpanded, setSelectedExpanded] = useState(false);
   /**
    * Paragraph number shown in the header. Placeholder for now: a random value
    * is picked each time the window opens, purely for design purposes.
    */
   const [paragraphNumber, setParagraphNumber] = useState(1);
-  /** How many middle chips fit between the pinned first/last ones; null = not measured yet (show all). */
-  const [middleVisibleCount, setMiddleVisibleCount] = useState<number | null>(null);
+  /** Chip order chosen by the user, chips kept but switched off, and chips removed from the list. */
+  const [chipOrder, setChipOrder] = useState<string[]>([]);
+  const [deselected, setDeselected] = useState<string[]>([]);
+  const [removedIds, setRemovedIds] = useState<string[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const chipsRowRef = useRef<HTMLDivElement>(null);
-  const chipsMiddleRef = useRef<HTMLDivElement>(null);
-  const ellipsisRef = useRef<HTMLSpanElement>(null);
-  const chipWidthsRef = useRef<Map<string, number>>(new Map());
 
   const linkedIds = paragraphFileIds ?? existingFileIds;
-
-  // In collapsed mode the first and last chips are always pinned. Middle chips
-  // are shown only while they fit; the rest collapse into a "•••" pill.
-  useLayoutEffect(() => {
-    if (!showAttached || selectedExpanded) {
-      setMiddleVisibleCount(null);
-      return;
-    }
-    // Chips shown in the Selected block: already-attached files first, then newly picked ones.
-    const selFiles = [...linkedIds, ...selectedIds]
-      .map((id) => files.find((f) => f.id === id))
-      .filter((f): f is FileItem => Boolean(f));
-    const mids = selFiles.slice(1, -1);
-    if (mids.length === 0) {
-      setMiddleVisibleCount(null);
-      return;
-    }
-    const gap = 6; // gap-1.5
-    const widthOf = (f: FileItem) => chipWidthsRef.current.get(f.id) ?? 90;
-    const fitFromEnd = (budget: number) => {
-      let sum = 0;
-      let k = 0;
-      for (let i = mids.length - 1; i >= 0; i--) {
-        const need = widthOf(mids[i]) + (k > 0 ? gap : 0);
-        if (sum + need > budget) break;
-        sum += need;
-        k++;
-      }
-      return k;
-    };
-    const row = chipsRowRef.current;
-    if (!row) return;
-    const measure = () => {
-      // Cache the real rendered width of every chip currently in the row.
-      row.querySelectorAll<HTMLElement>('[data-chip-id]').forEach((el) => {
-        const id = el.dataset.chipId;
-        if (id) chipWidthsRef.current.set(id, el.offsetWidth);
-      });
-      const firstW = widthOf(selFiles[0]);
-      const lastW = widthOf(selFiles[selFiles.length - 1]);
-      // Space left for the middle chips once the pinned edge chips are placed.
-      const base = row.clientWidth - firstW - lastW - 2 * gap;
-      // Everything fits -> show all middle chips, no ••• pill.
-      if (fitFromEnd(base) >= mids.length) {
-        setMiddleVisibleCount(mids.length);
-        return;
-      }
-      // Not everything fits -> reserve room for the ••• pill.
-      const ellipsisW = ellipsisRef.current?.offsetWidth || 34;
-      setMiddleVisibleCount(Math.max(fitFromEnd(base - ellipsisW - gap), 0));
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(row);
-    return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAttached, selectedExpanded, selectedIds, files, middleVisibleCount, paragraphFileIds, existingFileIds]);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -170,7 +110,9 @@ export function UnifiedFileLinkerWindow({
     setSearchQuery('');
     setSelectedIds([]);
     setShowAttached(false);
-    setSelectedExpanded(false);
+    setChipOrder([]);
+    setDeselected([]);
+    setRemovedIds([]);
     setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
@@ -241,7 +183,7 @@ export function UnifiedFileLinkerWindow({
     setError(null);
     setLinking(true);
     try {
-      for (const id of selectedIds) {
+      for (const id of selectedIds.filter((x) => !deselected.includes(x))) {
         const file = files.find((f) => f.id === id);
         if (file) await linkOne(file);
       }
@@ -258,54 +200,100 @@ export function UnifiedFileLinkerWindow({
   const filteredFiles = files.filter((file) =>
     file.filename.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  const selectedFiles = selectedIds
+  // Already-attached files first, then newly picked ones; user can reorder, deselect or remove chips.
+  const baseIds = [...linkedIds, ...selectedIds].filter((id) => !removedIds.includes(id));
+  const orderedIds = [
+    ...chipOrder.filter((id) => baseIds.includes(id)),
+    ...baseIds.filter((id) => !chipOrder.includes(id)),
+  ];
+  const displayFiles = orderedIds
     .map((id) => files.find((f) => f.id === id))
     .filter((f): f is FileItem => Boolean(f));
-  const linkedFiles = linkedIds
-    .map((id) => files.find((f) => f.id === id))
-    .filter((f): f is FileItem => Boolean(f));
-  // Already-attached files are shown first in the Selected block, then newly picked ones.
-  const displayFiles = [...linkedFiles, ...selectedFiles];
-  const middleFiles = displayFiles.slice(1, -1);
-  const middleHiddenCount =
-    middleVisibleCount === null ? 0 : Math.max(middleFiles.length - middleVisibleCount, 0);
-  const visibleMiddleFiles =
-    middleVisibleCount === null || middleVisibleCount === 0
-      ? []
-      : middleFiles.slice(-middleVisibleCount);
 
-  const renderChip = (file: FileItem, linked = false) => (
-    <span
-      key={file.id}
-      data-chip-id={file.id}
-      className={`inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full border transition-colors text-[11px] font-medium flex-shrink-0 ${
-        linked
-          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
-          : 'bg-slate-700/40 border-slate-600/30 hover:bg-slate-700/60 text-slate-300'
-      }`}
-    >
-      <span className="truncate max-w-[140px]" title={file.filename}>
-        {file.filename}
-      </span>
-      {linked ? (
-        <span
-          className="w-5 h-5 rounded-full flex items-center justify-center text-emerald-400"
-          title="Already attached"
-        >
-          <Link2 className="w-3 h-3" />
-        </span>
-      ) : (
+  const moveChip = (id: string, dir: -1 | 1) => {
+    const ids = [...orderedIds];
+    const i = ids.indexOf(id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= ids.length) return;
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+    setChipOrder(ids);
+  };
+  const toggleDeselect = (id: string) =>
+    setDeselected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const removeChip = (id: string) => {
+    if (selectedIds.includes(id)) toggle(id);
+    else setRemovedIds((prev) => [...prev, id]);
+    setDeselected((prev) => prev.filter((x) => x !== id));
+  };
+
+  const chipBtn =
+    'w-6 h-6 rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none';
+
+  const renderChip = (file: FileItem, linked: boolean, index: number, total: number) => {
+    const off = deselected.includes(file.id);
+    return (
+      <span
+        key={file.id}
+        className={`inline-flex items-center gap-0.5 h-8 pl-1 pr-1 rounded-full border transition-colors text-[11px] font-medium max-w-full ${
+          off
+            ? 'bg-transparent border-dashed border-slate-600/50 text-slate-500'
+            : linked
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+              : 'bg-slate-700/40 border-slate-600/30 text-slate-300'
+        }`}
+      >
         <button
           type="button"
-          onClick={() => toggle(file.id)}
-          aria-label={`Deselect ${file.filename}`}
-          className="w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-600/40 transition-colors"
+          onClick={() => toggleDeselect(file.id)}
+          aria-label={off ? `Select ${file.filename}` : `Deselect ${file.filename}`}
+          aria-pressed={!off}
+          title={off ? 'Select' : 'Deselect'}
+          className={`${chipBtn} hover:bg-slate-600/40`}
         >
-          <X className="w-3 h-3" />
+          <span
+            className={`w-3.5 h-3.5 rounded border flex items-center justify-center ${
+              off ? 'border-slate-500' : 'bg-emerald-500 border-emerald-500'
+            }`}
+          >
+            {!off && <Check className="w-2.5 h-2.5 text-slate-900" />}
+          </span>
         </button>
-      )}
-    </span>
-  );
+        <span className={`truncate max-w-[160px] px-1 ${off ? 'line-through' : ''}`} title={file.filename}>
+          {file.filename}
+        </span>
+        <button
+          type="button"
+          onClick={() => moveChip(file.id, -1)}
+          disabled={index === 0}
+          aria-label={`Move ${file.filename} left`}
+          title="Move left"
+          className={`${chipBtn} text-slate-400 hover:text-slate-100 hover:bg-slate-600/40`}
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => moveChip(file.id, 1)}
+          disabled={index === total - 1}
+          aria-label={`Move ${file.filename} right`}
+          title="Move right"
+          className={`${chipBtn} text-slate-400 hover:text-slate-100 hover:bg-slate-600/40`}
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => removeChip(file.id)}
+          aria-label={`Remove ${file.filename} chip`}
+          title="Remove chip"
+          className={`${chipBtn} text-slate-500 hover:text-red-400 hover:bg-slate-600/40`}
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </span>
+    );
+  };
+  const activeSelected = selectedIds.filter((id) => !deselected.includes(id));
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -408,81 +396,22 @@ export function UnifiedFileLinkerWindow({
           />
 
           {showAttached ? (
-            /* Selected files — chips panel (search and storage list are hidden here) */
-            <div
-              className={`rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex items-stretch gap-2 ${
-                selectedExpanded && displayFiles.length > 0 ? 'flex-1 min-h-0' : ''
-              }`}
-            >
-              <div className="flex flex-col min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1.5 px-0.5 h-6">
-                  <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
-                    Selected · {displayFiles.length}
-                  </p>
-                </div>
-
-                <div
-                  ref={chipsRowRef}
-                  className={`${
-                    selectedExpanded && displayFiles.length > 0
-                      ? 'flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0'
-                      : 'flex items-center gap-1.5 overflow-hidden h-7'
-                  }`}
-                >
-                  {displayFiles.length === 0 ? (
-                    <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500 truncate">
-                      No files selected yet — pick files below or upload a new one.
-                    </span>
-                  ) : selectedExpanded && displayFiles.length > 0 ? (
-                    displayFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))
-                  ) : displayFiles.length === 1 ? (
-                    renderChip(displayFiles[0], linkedIds.includes(displayFiles[0].id))
-                  ) : (
-                    <>
-                      {renderChip(displayFiles[0], linkedIds.includes(displayFiles[0].id))}
-                      {middleFiles.length > 0 && (
-                        <div
-                          ref={chipsMiddleRef}
-                          className="flex items-center gap-1.5 overflow-hidden min-w-0 h-7"
-                        >
-                          {middleHiddenCount > 0 && (
-                            <span
-                              ref={ellipsisRef}
-                              title={`${middleHiddenCount} more file${middleHiddenCount === 1 ? '' : 's'} selected`}
-                              className="inline-flex items-center justify-center h-7 px-3 rounded-full bg-slate-700/40 border border-slate-600/30 text-[11px] font-medium text-slate-400 tracking-[2px] flex-shrink-0 select-none"
-                            >
-                              •••
-                            </span>
-                          )}
-                          {visibleMiddleFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))}
-                        </div>
-                      )}
-                      {renderChip(
-                        displayFiles[displayFiles.length - 1],
-                        linkedIds.includes(displayFiles[displayFiles.length - 1].id),
-                      )}
-                    </>
-                  )}
-                </div>
+            /* Selected files — every chip visible; fills all available height */
+            <div className="flex-1 min-h-0 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex flex-col">
+              <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium mb-1.5 px-0.5 h-6 flex items-center">
+                Selected · {displayFiles.length - deselected.filter((id) => displayFiles.some((f) => f.id === id)).length}
+                {' / '}
+                {displayFiles.length}
+              </p>
+              <div className="flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0">
+                {displayFiles.length === 0 ? (
+                  <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500">
+                    No files selected yet — pick files in the list or upload a new one.
+                  </span>
+                ) : (
+                  displayFiles.map((f, i) => renderChip(f, linkedIds.includes(f.id), i, displayFiles.length))
+                )}
               </div>
-
-              {/* Full-height right arrow rail: expands / collapses the selected files */}
-              <button
-                type="button"
-                onClick={() => displayFiles.length > 0 && setSelectedExpanded((v) => !v)}
-                disabled={displayFiles.length === 0}
-                aria-label={selectedExpanded ? 'Collapse selected files' : 'Expand selected files'}
-                aria-expanded={selectedExpanded}
-                className="group w-8 self-stretch flex-shrink-0 rounded-lg border border-slate-700/50 bg-slate-800/60 flex flex-col items-center justify-center gap-1.5 py-1.5 text-slate-500 transition-all duration-200 enabled:hover:border-emerald-500/45 enabled:hover:bg-emerald-500/10 enabled:hover:text-emerald-300 enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-default"
-              >
-                <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
-                <ArrowDown
-                  className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${
-                    selectedExpanded ? 'rotate-180' : ''
-                  }`}
-                />
-                <span className="w-px flex-1 rounded-full bg-slate-700/60 group-hover:bg-emerald-500/35" />
-              </button>
             </div>
           ) : (
             <>
@@ -560,6 +489,7 @@ export function UnifiedFileLinkerWindow({
             </>
           )}
 
+          {!showAttached && (
           <div className="mt-3 flex items-center gap-2 flex-shrink-0">
             <button
               onClick={onClose}
@@ -570,14 +500,15 @@ export function UnifiedFileLinkerWindow({
             </button>
             <button
               onClick={handleAttachSelected}
-              disabled={selectedIds.length === 0 || linking}
+              disabled={activeSelected.length === 0 || linking}
               className="ml-auto inline-flex items-center gap-2 h-9 px-3.5 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 transition-colors disabled:opacity-40 disabled:hover:bg-emerald-500/15"
             >
               {linking && <Loader2 className="w-4 h-4 animate-spin" />}
-              Attach{selectedIds.length > 0 ? ` ${selectedIds.length}` : ''}
-              {selectedIds.length === 1 ? ' file' : ' files'}
+              Attach{activeSelected.length > 0 ? ` ${activeSelected.length}` : ''}
+              {activeSelected.length === 1 ? ' file' : ' files'}
             </button>
           </div>
+          )}
         </div>
       </div>
     </div>
