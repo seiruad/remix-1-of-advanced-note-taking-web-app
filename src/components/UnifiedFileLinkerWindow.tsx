@@ -345,7 +345,20 @@ export function UnifiedFileLinkerWindow({
           )}
 
           {/* One line: back to the block's text (double arrow), back to its files (single arrow), then upload */}
+          {showAttached ? (
+            <div className="mb-2 flex items-center">
+              <button
+                type="button"
+                onClick={() => setShowAttached(false)}
+                className="inline-flex items-center justify-center gap-1.5 h-9 px-3 flex-1 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 border border-emerald-500/20 hover:bg-emerald-500/25 hover:border-emerald-500/40 transition-colors"
+              >
+                <Search className="w-4 h-4" />
+                Choose from existing files
+              </button>
+            </div>
+          ) : (
           <div className="mb-2 flex items-center gap-2">
+
             <button
               type="button"
               onClick={onEditParagraph ?? onClose}
