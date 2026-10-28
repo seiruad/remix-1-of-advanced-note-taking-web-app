@@ -226,9 +226,13 @@ export function UnifiedFileLinkerWindow({
     setDeselected((prev) => prev.filter((x) => x !== id));
   };
 
-  /** Shared look for every button in the top nav row — the emerald upload tile. */
+  /** Emerald tile — the attached-only (chips) view's nav buttons. */
   const navBtn =
     'group inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/15 text-[13px] font-semibold text-emerald-100 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-emerald-500/25 hover:border-emerald-500/45 hover:text-emerald-50 active:translate-y-px';
+
+  /** Raised slate tile — the all-files view's Paragraph / Attachments buttons. */
+  const slateBtn =
+    'group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3.5 rounded-lg border border-slate-500/50 bg-slate-700 text-[13px] font-semibold text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-slate-600 hover:border-emerald-400/40 hover:text-emerald-200 active:translate-y-px';
 
   const chipBtn =
     'w-6 h-6 rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none';
