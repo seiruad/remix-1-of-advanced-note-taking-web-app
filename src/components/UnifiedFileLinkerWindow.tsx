@@ -426,6 +426,33 @@ export function UnifiedFileLinkerWindow({
               </button>
             )}
           </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleUpload(file);
+            }}
+            className="hidden"
+          />
+
+          {showAttached ? (
+            /* Selected files — every chip visible; fills all available height */
+            <div className="flex-1 min-h-0 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex flex-col">
+              <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium mb-1.5 px-0.5 h-6 flex items-center">
+                Selected · {displayFiles.length - deselected.filter((id) => displayFiles.some((f) => f.id === id)).length}
+                {' / '}
+                {displayFiles.length}
+              </p>
+              <div className="flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0">
+                {displayFiles.length === 0 ? (
+                  <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500">
+                    No files selected yet — pick files in the list or upload a new one.
+                  </span>
+                ) : (
+                  displayFiles.map((f, i) => renderChip(f, linkedIds.includes(f.id), i, displayFiles.length))
+                )}
+              </div>
             </div>
           ) : (
             <>
