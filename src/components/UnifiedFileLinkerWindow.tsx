@@ -397,6 +397,7 @@ export function UnifiedFileLinkerWindow({
               <span className="sm:hidden">Upload</span>
             </button>
           </div>
+          )}
 
           <input
             type="file"
