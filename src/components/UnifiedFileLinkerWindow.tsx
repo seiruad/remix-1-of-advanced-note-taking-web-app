@@ -226,6 +226,10 @@ export function UnifiedFileLinkerWindow({
     setDeselected((prev) => prev.filter((x) => x !== id));
   };
 
+  /** Shared look for every button in the top nav row — the emerald upload tile. */
+  const navBtn =
+    'group inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/15 text-[13px] font-semibold text-emerald-100 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-emerald-500/25 hover:border-emerald-500/45 hover:text-emerald-50 active:translate-y-px';
+
   const chipBtn =
     'w-6 h-6 rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none';
 
@@ -344,15 +348,14 @@ export function UnifiedFileLinkerWindow({
             </div>
           )}
 
-          {/* One line: back to the block's text (double arrow), back to its files (single arrow), then upload */}
+          {/* One line: back to the block's text (double arrow), the main action, then upload */}
           <div className="mb-2 flex items-center gap-2">
-
             <button
               type="button"
               onClick={onEditParagraph ?? onClose}
               aria-label="Edit paragraph"
               title="Edit paragraph"
-              className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3.5 rounded-lg border border-slate-500/50 bg-slate-700 text-[13px] font-semibold text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-slate-600 hover:border-emerald-400/40 hover:text-emerald-200 active:translate-y-px"
+              className={`${navBtn} w-9 flex-shrink-0 sm:w-auto sm:px-3.5`}
             >
               <ChevronsLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
               <span className="hidden sm:inline truncate">Paragraph</span>
@@ -364,38 +367,38 @@ export function UnifiedFileLinkerWindow({
                 onClick={() => setShowAttached(false)}
                 aria-label="Choose from existing files"
                 title="Choose from existing files"
-                className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3.5 rounded-lg border border-dashed border-emerald-400/50 bg-emerald-500/10 text-[13px] font-semibold text-emerald-200 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-emerald-500/20 hover:border-emerald-300/70 hover:text-emerald-100 active:translate-y-px"
+                className={`${navBtn} min-w-0 flex-1 px-3.5`}
               >
                 <Search className="w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110" />
-                <span className="hidden sm:inline truncate">Choose existing</span>
+                <span className="truncate">Choose existing</span>
               </button>
             ) : (
-            <button
-              type="button"
-              onClick={() => setShowAttached((value) => !value)}
-              aria-pressed={showAttached}
-              aria-label="Edit attachments"
-              title="Edit attachments"
-              className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3.5 rounded-lg border border-slate-500/50 bg-slate-700 text-[13px] font-semibold text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-slate-600 hover:border-emerald-400/40 hover:text-emerald-200 active:translate-y-px"
-            >
-              <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
-              <span className="hidden sm:inline truncate">Attachments</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setShowAttached((value) => !value)}
+                aria-pressed={showAttached}
+                aria-label="Edit attachments"
+                title="Edit attachments"
+                className={`${navBtn} min-w-0 flex-1 px-3.5`}
+              >
+                <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
+                <span className="hidden sm:inline truncate">Attachments</span>
+              </button>
             )}
 
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading || linking}
-              className="inline-flex items-center justify-center gap-1.5 h-9 px-3 min-w-0 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 border border-emerald-500/20 hover:bg-emerald-500/25 hover:border-emerald-500/40 transition-colors disabled:opacity-50 flex-1"
+              aria-label="Upload new file"
+              title="Upload new file"
+              className={`${navBtn} w-9 flex-shrink-0 disabled:opacity-50`}
             >
               {uploading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <UploadCloud className="w-4 h-4" />
               )}
-              <span className="hidden sm:inline">Upload New File</span>
-              <span className="sm:hidden">Upload</span>
             </button>
           </div>
 
