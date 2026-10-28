@@ -348,14 +348,20 @@ export function UnifiedFileLinkerWindow({
             </div>
           )}
 
-          {/* One line: back to the block's text (double arrow), the main action, then upload */}
+          {/* One line: back to the block's text (double arrow), the main action, then upload.
+              The all-files view keeps its original button design; only the
+              attached-only (chips) view uses the emerald tile row. */}
           <div className="mb-2 flex items-center gap-2">
             <button
               type="button"
               onClick={onEditParagraph ?? onClose}
               aria-label="Edit paragraph"
               title="Edit paragraph"
-              className={`${navBtn} w-9 flex-shrink-0 sm:w-auto sm:px-3.5`}
+              className={
+                showAttached
+                  ? `${navBtn} w-9 flex-shrink-0 sm:w-auto sm:px-3.5`
+                  : slateBtn
+              }
             >
               <ChevronsLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
               <span className="hidden sm:inline truncate">Paragraph</span>
@@ -379,56 +385,47 @@ export function UnifiedFileLinkerWindow({
                 aria-pressed={showAttached}
                 aria-label="Edit attachments"
                 title="Edit attachments"
-                className={`${navBtn} min-w-0 flex-1 px-3.5`}
+                className={slateBtn}
               >
                 <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
                 <span className="hidden sm:inline truncate">Attachments</span>
               </button>
             )}
 
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading || linking}
-              aria-label="Upload new file"
-              title="Upload new file"
-              className={`${navBtn} w-9 flex-shrink-0 disabled:opacity-50`}
-            >
-              {uploading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <UploadCloud className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleUpload(file);
-            }}
-            className="hidden"
-          />
-
-          {showAttached ? (
-            /* Selected files — every chip visible; fills all available height */
-            <div className="flex-1 min-h-0 rounded-xl bg-slate-900/40 border border-slate-700/40 p-2 flex flex-col">
-              <p className="text-[10px] uppercase tracking-wider text-slate-500 font-medium mb-1.5 px-0.5 h-6 flex items-center">
-                Selected · {displayFiles.length - deselected.filter((id) => displayFiles.some((f) => f.id === id)).length}
-                {' / '}
-                {displayFiles.length}
-              </p>
-              <div className="flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0">
-                {displayFiles.length === 0 ? (
-                  <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500">
-                    No files selected yet — pick files in the list or upload a new one.
-                  </span>
+            {showAttached ? (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || linking}
+                aria-label="Upload new file"
+                title="Upload new file"
+                className={`${navBtn} w-9 flex-shrink-0 disabled:opacity-50`}
+              >
+                {uploading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  displayFiles.map((f, i) => renderChip(f, linkedIds.includes(f.id), i, displayFiles.length))
+                  <UploadCloud className="w-4 h-4" />
                 )}
-              </div>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || linking}
+                aria-label="Upload new file"
+                title="Upload new file"
+                className="inline-flex items-center justify-center gap-1.5 h-9 px-3 min-w-0 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 border border-emerald-500/20 hover:bg-emerald-500/25 hover:border-emerald-500/40 transition-colors disabled:opacity-50 flex-1"
+              >
+                {uploading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <UploadCloud className="w-4 h-4" />
+                )}
+                <span className="hidden sm:inline">Upload New File</span>
+                <span className="sm:hidden">Upload</span>
+              </button>
+            )}
+          </div>
             </div>
           ) : (
             <>
