@@ -345,18 +345,6 @@ export function UnifiedFileLinkerWindow({
           )}
 
           {/* One line: back to the block's text (double arrow), back to its files (single arrow), then upload */}
-          {showAttached ? (
-            <div className="mb-2 flex items-center">
-              <button
-                type="button"
-                onClick={() => setShowAttached(false)}
-                className="inline-flex items-center justify-center gap-1.5 h-9 px-3 flex-1 rounded-lg text-[13px] font-semibold bg-emerald-500/15 text-emerald-100 border border-emerald-500/20 hover:bg-emerald-500/25 hover:border-emerald-500/40 transition-colors"
-              >
-                <Search className="w-4 h-4" />
-                Choose from existing files
-              </button>
-            </div>
-          ) : (
           <div className="mb-2 flex items-center gap-2">
 
             <button
@@ -370,6 +358,18 @@ export function UnifiedFileLinkerWindow({
               <span className="hidden sm:inline truncate">Paragraph</span>
             </button>
 
+            {showAttached ? (
+              <button
+                type="button"
+                onClick={() => setShowAttached(false)}
+                aria-label="Choose from existing files"
+                title="Choose from existing files"
+                className="group inline-flex h-9 w-9 sm:w-auto flex-shrink-0 items-center justify-center gap-1.5 sm:px-3.5 rounded-lg border border-dashed border-emerald-400/50 bg-emerald-500/10 text-[13px] font-semibold text-emerald-200 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 transition-colors duration-200 hover:bg-emerald-500/20 hover:border-emerald-300/70 hover:text-emerald-100 active:translate-y-px"
+              >
+                <Search className="w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110" />
+                <span className="hidden sm:inline truncate">Choose existing</span>
+              </button>
+            ) : (
             <button
               type="button"
               onClick={() => setShowAttached((value) => !value)}
@@ -381,6 +381,7 @@ export function UnifiedFileLinkerWindow({
               <ArrowLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
               <span className="hidden sm:inline truncate">Attachments</span>
             </button>
+            )}
 
             <button
               type="button"
@@ -397,7 +398,6 @@ export function UnifiedFileLinkerWindow({
               <span className="sm:hidden">Upload</span>
             </button>
           </div>
-          )}
 
           <input
             type="file"
