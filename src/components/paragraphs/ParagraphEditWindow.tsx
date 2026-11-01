@@ -111,14 +111,14 @@ export function ParagraphEditWindow({ paragraph, files, suspended, prevContext, 
           <label htmlFor={`heading-${paragraph.id}`} className="text-xs font-medium text-slate-400">Header</label>
           <input id={`heading-${paragraph.id}`} autoFocus value={paragraph.heading ?? ''} placeholder="Header" onChange={e => onHeadingChange(e.target.value)} onBlur={e => onHeadingChange(e.target.value.trim() ? e.target.value : null, true)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onClose(); } }} className="w-full rounded-lg border border-slate-700/60 bg-slate-900/50 px-3 py-2.5 text-base font-semibold text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60" />
         </div> : <>
-        {!attachmentsOpen && (prevContext ? ctxCard('prev', prevContext) : <div className="h-[62px] shrink-0" />)}
+        {!attachmentsOpen && (prevContext ? ctxCard('prev', prevContext) : <div className="h-[54px] shrink-0" />)}
         <div className={attachmentsOpen ? 'hidden' : 'paragraph-edit-body flex-1 min-h-0 overflow-y-auto rounded-xl border border-slate-700/60 bg-slate-900/50 px-4 py-3 focus-within:border-emerald-500/50'}>
             <RichTextEditor content={paragraph.content} onChange={onChange} placeholder="" minHeightClassName="min-h-0" onEditorReady={editor => {
               onFocusEditor(editor);
               requestAnimationFrame(() => { const ready = editor as Editor | null; if (ready && !ready.isDestroyed) ready.commands.focus('end'); });
             }} />
         </div>
-        {!attachmentsOpen && (nextContext ? ctxCard('next', nextContext) : <div className="h-[62px] shrink-0" />)}
+        {!attachmentsOpen && (nextContext ? ctxCard('next', nextContext) : <div className="h-[54px] shrink-0" />)}
         {attachmentsOpen && <div className="flex-1 min-h-0 overflow-y-auto space-y-3">
           <div className="flex justify-end">
             <Button variant="primary" className="h-8 px-2.5 text-xs" onClick={onAttach}><Paperclip className="h-3.5 w-3.5" />Attach file</Button>
