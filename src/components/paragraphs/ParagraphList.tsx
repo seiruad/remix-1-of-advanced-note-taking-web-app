@@ -7,6 +7,7 @@ import { ParagraphBlock } from './ParagraphBlock';
 import { NoteHeaderBlock } from './NoteHeaderBlock';
 import { AddBlockWindow } from './AddBlockWindow';
 import { ParagraphEditWindow } from './ParagraphEditWindow';
+import type { BlockContext } from './ParagraphEditWindow';
 import { createPortal } from 'react-dom';
 import { useNoteParagraphs, isDocEmpty, docPlainText } from './useNoteParagraphs';
 import type { FileItem } from '../../types/database';
@@ -97,13 +98,18 @@ export function ParagraphList({
     ? !p.heading?.trim()
     : isDocEmpty(p.content) && !(filesByParagraph[p.id]?.length);
   const editingParagraph = paragraphs.find(p => p.id === editTarget);
-  /** Small context labels for the blocks around the one being edited. */
-  const blockLabel = (p: typeof paragraphs[number]) =>
-    p.kind === 'header' ? (p.heading ?? '') : docPlainText(p.content);
   const visibleBlocks = paragraphs.filter(p => !isBlockEmpty(p));
   const editIndex = visibleBlocks.findIndex(p => p.id === editTarget);
-  const prevLabel = editIndex > 0 ? blockLabel(visibleBlocks[editIndex - 1]) : null;
-  const nextLabel = editIndex >= 0 && editIndex < visibleBlocks.length - 1 ? blockLabel(visibleBlocks[editIndex + 1]) : null;
+  /** Richer context shown about the blocks around the one being edited. */
+  const blockContext = (p: typeof paragraphs[number], index: number): BlockContext => ({
+    kind: p.kind === 'header' ? 'header' : 'paragraph',
+    text: p.kind === 'header' ? (p.heading ?? '') : docPlainText(p.content),
+    fileCount: (filesByParagraph[p.id] ?? []).length,
+    position: index + 1,
+    total: visibleBlocks.length,
+  });
+  const prevContext = editIndex > 0 ? blockContext(visibleBlocks[editIndex - 1], editIndex - 1) : null;
+  const nextContext = editIndex >= 0 && editIndex < visibleBlocks.length - 1 ? blockContext(visibleBlocks[editIndex + 1], editIndex + 1) : null;
   const createHeader = async () => {
     setPending(true);
     const index = last && lastIsEmpty ? paragraphs.length - 1 : paragraphs.length;
@@ -209,8 +215,8 @@ export function ParagraphList({
         paragraph={editingParagraph}
         files={filesByParagraph[editingParagraph.id] ?? []}
         suspended={attachTarget !== null}
-        prevLabel={prevLabel}
-        nextLabel={nextLabel}
+        prevContext={prevContext}
+        nextContext={nextContext}
         onClose={closeEditor}
         attachmentsOpen={attachmentsView}
         onAttachmentsOpenChange={setAttachmentsView}

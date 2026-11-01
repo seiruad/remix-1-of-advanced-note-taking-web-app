@@ -7,13 +7,24 @@ import { RichTextEditor } from '../RichTextEditor';
 import type { FileItem } from '../../types/database';
 import type { NoteParagraph } from './useNoteParagraphs';
 
+/** What the edit window shows about the block before / after the one being edited. */
+export interface BlockContext {
+  kind: 'header' | 'paragraph';
+  /** Plain text of the block (for a header, its heading). */
+  text: string;
+  fileCount: number;
+  /** 1-based position among the note's non-empty blocks. */
+  position: number;
+  total: number;
+}
+
 interface Props {
   paragraph: NoteParagraph;
   files: FileItem[];
   suspended: boolean;
-  /** Small context previews of the surrounding blocks (plain text, may be null). */
-  prevLabel?: string | null;
-  nextLabel?: string | null;
+  /** Small context previews of the surrounding blocks (may be null). */
+  prevContext?: BlockContext | null;
+  nextContext?: BlockContext | null;
   onClose: () => void;
   /** Whether the attachments list (rather than the text) is the visible view. */
   attachmentsOpen: boolean;
@@ -27,7 +38,7 @@ interface Props {
   onOpenFile: (file: FileItem) => void;
 }
 
-export function ParagraphEditWindow({ paragraph, files, suspended, prevLabel, nextLabel, onClose, attachmentsOpen, onAttachmentsOpenChange, onChange, onHeadingChange, onFocusEditor, onAttach, onDetach, onOpenFile }: Props) {
+export function ParagraphEditWindow({ paragraph, files, suspended, prevContext, nextContext, onClose, attachmentsOpen, onAttachmentsOpenChange, onChange, onHeadingChange, onFocusEditor, onAttach, onDetach, onOpenFile }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
   const isHeader = paragraph.kind === 'header';
@@ -58,11 +69,21 @@ export function ParagraphEditWindow({ paragraph, files, suspended, prevLabel, ne
     return () => document.removeEventListener('keydown', onKey);
   }, [suspended]);
 
-  const ctxCard = (dir: 'prev' | 'next', label: string) => (
-    <div aria-hidden="true" className="flex shrink-0 select-none items-center gap-2.5 rounded-lg border border-slate-700/50 bg-slate-900/40 px-3 py-2 opacity-60">
-      {dir === 'prev' ? <ArrowUp className="h-3.5 w-3.5 shrink-0 text-slate-500" /> : <ArrowDown className="h-3.5 w-3.5 shrink-0 text-slate-500" />}
-      <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-slate-500">{dir === 'prev' ? 'Previous' : 'Next'}</span>
-      <span className="min-w-0 flex-1 truncate text-xs text-slate-400 blur-[0.5px]">{label}</span>
+  const ctxCard = (dir: 'prev' | 'next', ctx: BlockContext) => (
+    <div aria-hidden="true" className="shrink-0 select-none rounded-lg border border-slate-700/50 bg-slate-900/40 px-3 py-2 opacity-70">
+      <div className="flex items-center gap-1.5">
+        {dir === 'prev' ? <ArrowUp className="h-3.5 w-3.5 shrink-0 text-slate-500" /> : <ArrowDown className="h-3.5 w-3.5 shrink-0 text-slate-500" />}
+        <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-slate-500">{dir === 'prev' ? 'Previous' : 'Next'}</span>
+        <span className="shrink-0 text-[10px] font-medium text-slate-500">· {ctx.kind === 'header' ? 'Header' : 'Paragraph'}</span>
+        <span className="ml-auto shrink-0 text-[10px] tabular-nums text-slate-600">{ctx.position} of {ctx.total}</span>
+      </div>
+      <p className="mt-1 line-clamp-2 text-xs leading-snug text-slate-400 blur-[0.5px]">{ctx.text || 'No text'}</p>
+      {(ctx.fileCount > 0 || (ctx.kind === 'paragraph' && ctx.text)) && (
+        <div className="mt-1 flex items-center gap-2.5 text-[10px] text-slate-600">
+          {ctx.fileCount > 0 && <span className="inline-flex items-center gap-1"><Paperclip className="h-3 w-3" />{ctx.fileCount}</span>}
+          {ctx.kind === 'paragraph' && ctx.text && <span className="tabular-nums">{ctx.text.length} chars</span>}
+        </div>
+      )}
     </div>
   );
   const navBtn = 'inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border text-[13px] font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40';
@@ -85,21 +106,19 @@ export function ParagraphEditWindow({ paragraph, files, suspended, prevLabel, ne
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>}
-      <div className="flex-1 min-h-0 flex flex-col gap-3 p-4 sm:p-5">
+      <div className="flex-1 min-h-0 flex flex-col gap-2.5 p-4 sm:p-5">
         {isHeader ? <div className="space-y-2">
           <label htmlFor={`heading-${paragraph.id}`} className="text-xs font-medium text-slate-400">Header</label>
           <input id={`heading-${paragraph.id}`} autoFocus value={paragraph.heading ?? ''} placeholder="Header" onChange={e => onHeadingChange(e.target.value)} onBlur={e => onHeadingChange(e.target.value.trim() ? e.target.value : null, true)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onClose(); } }} className="w-full rounded-lg border border-slate-700/60 bg-slate-900/50 px-3 py-2.5 text-base font-semibold text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60" />
         </div> : <>
-        {!attachmentsOpen && (prevLabel ? ctxCard('prev', prevLabel) : <div className="h-[34px] shrink-0" />)}
-        <div className={attachmentsOpen ? 'hidden' : 'flex-1 min-h-0 flex flex-col justify-center'}>
-          <div className="paragraph-edit-body max-h-full overflow-y-auto rounded-xl border border-slate-700/60 bg-slate-900/50 px-4 py-3 focus-within:border-emerald-500/50">
+        {!attachmentsOpen && (prevContext ? ctxCard('prev', prevContext) : <div className="h-[54px] shrink-0" />)}
+        <div className={attachmentsOpen ? 'hidden' : 'paragraph-edit-body flex-1 min-h-0 overflow-y-auto rounded-xl border border-slate-700/60 bg-slate-900/50 px-4 py-3 focus-within:border-emerald-500/50'}>
             <RichTextEditor content={paragraph.content} onChange={onChange} placeholder="" minHeightClassName="min-h-0" onEditorReady={editor => {
               onFocusEditor(editor);
               requestAnimationFrame(() => { const ready = editor as Editor | null; if (ready && !ready.isDestroyed) ready.commands.focus('end'); });
             }} />
-          </div>
         </div>
-        {!attachmentsOpen && (nextLabel ? ctxCard('next', nextLabel) : <div className="h-[34px] shrink-0" />)}
+        {!attachmentsOpen && (nextContext ? ctxCard('next', nextContext) : <div className="h-[54px] shrink-0" />)}
         {attachmentsOpen && <div className="flex-1 min-h-0 overflow-y-auto space-y-3">
           <div className="flex justify-end">
             <Button variant="primary" className="h-8 px-2.5 text-xs" onClick={onAttach}><Paperclip className="h-3.5 w-3.5" />Attach file</Button>
