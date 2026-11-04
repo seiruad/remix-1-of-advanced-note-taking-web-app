@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Paperclip, Unlink, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Paperclip, Plus, Unlink, X } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 import { Button } from '../Button';
 import { RichTextEditor } from '../RichTextEditor';
@@ -100,10 +100,12 @@ export function ParagraphEditWindow({ paragraph, files, suspended, prevContext, 
         </div>
         <button type="button" className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-700/60" aria-label="Close editor" onClick={onClose}><X className="h-4 w-4" /></button>
       </header>
-      {!isHeader && !attachmentsOpen && <div className="shrink-0 px-4 sm:px-5 pt-4">
-        <button type="button" onClick={onAttach} aria-label={`View attachments (${files.length})`} className={`${navBtn} w-full justify-between px-3.5 border-emerald-500/25 bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 hover:border-emerald-500/45`}>
-          <span className="flex items-center gap-2"><Paperclip className="h-4 w-4" />Attachments · {files.length}</span>
-          <ArrowRight className="h-4 w-4" />
+      {!isHeader && !attachmentsOpen && <div className="shrink-0 flex gap-2 px-4 sm:px-5 pt-4">
+        <button type="button" onClick={() => onAttachmentsOpenChange(true)} aria-label={`View attachments (${files.length})`} className={`${navBtn} flex-1 justify-center border-slate-600/60 bg-slate-700/60 text-slate-200 hover:border-slate-500 hover:text-emerald-300`}>
+          <Paperclip className="h-4 w-4" />Attachments · {files.length}
+        </button>
+        <button type="button" onClick={onAttach} className={`${navBtn} flex-1 justify-center border-emerald-500/25 bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 hover:border-emerald-500/45`}>
+          <Plus className="h-4 w-4" />New attachment
         </button>
       </div>}
       <div className="flex-1 min-h-0 flex flex-col gap-2.5 p-4 sm:p-5">
