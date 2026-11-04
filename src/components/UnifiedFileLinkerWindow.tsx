@@ -364,11 +364,7 @@ export function UnifiedFileLinkerWindow({
               onClick={onEditParagraph ?? onClose}
               aria-label="Edit paragraph"
               title="Edit paragraph"
-              className={
-                showAttached
-                  ? `${navBtn} w-9 flex-shrink-0 sm:w-auto sm:px-3.5`
-                  : slateBtn
-              }
+              className={slateBtn}
             >
               <ChevronsLeft className="w-4 h-4 flex-shrink-0 transition-transform group-hover:-translate-x-0.5" />
               <span className="hidden sm:inline truncate">Paragraph</span>
