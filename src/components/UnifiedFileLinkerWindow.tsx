@@ -7,8 +7,7 @@ import {
   X,
   Link2,
   Check,
-  ChevronLeft,
-  ChevronRight,
+  GripVertical,
   ChevronsLeft,
   ArrowLeft,
   Pilcrow,
@@ -91,6 +90,8 @@ export function UnifiedFileLinkerWindow({
   const [chipOrder, setChipOrder] = useState<string[]>([]);
   const [deselected, setDeselected] = useState<string[]>([]);
   const [removedIds, setRemovedIds] = useState<string[]>([]);
+  /** Chip the user picked up with the move control; its copy pins to the bottom centre. */
+  const [movingChipId, setMovingChipId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -116,6 +117,7 @@ export function UnifiedFileLinkerWindow({
     setChipOrder([]);
     setDeselected([]);
     setRemovedIds([]);
+    setMovingChipId(null);
     setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
@@ -213,14 +215,6 @@ export function UnifiedFileLinkerWindow({
     .map((id) => files.find((f) => f.id === id))
     .filter((f): f is FileItem => Boolean(f));
 
-  const moveChip = (id: string, dir: -1 | 1) => {
-    const ids = [...orderedIds];
-    const i = ids.indexOf(id);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= ids.length) return;
-    [ids[i], ids[j]] = [ids[j], ids[i]];
-    setChipOrder(ids);
-  };
   const toggleDeselect = (id: string) =>
     setDeselected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   const removeChip = (id: string) => {
@@ -240,7 +234,7 @@ export function UnifiedFileLinkerWindow({
   const chipBtn =
     'w-6 h-6 rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none';
 
-  const renderChip = (file: FileItem, linked: boolean, index: number, total: number) => {
+  const renderChip = (file: FileItem, linked: boolean) => {
     const off = deselected.includes(file.id);
     return (
       <span
@@ -274,23 +268,17 @@ export function UnifiedFileLinkerWindow({
         </span>
         <button
           type="button"
-          onClick={() => moveChip(file.id, -1)}
-          disabled={index === 0}
-          aria-label={`Move ${file.filename} left`}
-          title="Move left"
-          className={`${chipBtn} text-slate-400 hover:text-slate-100 hover:bg-slate-600/40`}
+          onClick={() => setMovingChipId((cur) => (cur === file.id ? null : file.id))}
+          aria-label={`Move ${file.filename}`}
+          aria-pressed={movingChipId === file.id}
+          title="Move"
+          className={`${chipBtn} ${
+            movingChipId === file.id
+              ? 'bg-emerald-500/25 text-emerald-100'
+              : 'text-slate-400 hover:text-slate-100 hover:bg-slate-600/40'
+          }`}
         >
-          <ChevronLeft className="w-3.5 h-3.5" />
-        </button>
-        <button
-          type="button"
-          onClick={() => moveChip(file.id, 1)}
-          disabled={index === total - 1}
-          aria-label={`Move ${file.filename} right`}
-          title="Move right"
-          className={`${chipBtn} text-slate-400 hover:text-slate-100 hover:bg-slate-600/40`}
-        >
-          <ChevronRight className="w-3.5 h-3.5" />
+          <GripVertical className="w-3.5 h-3.5" />
         </button>
         <button
           type="button"
@@ -305,10 +293,11 @@ export function UnifiedFileLinkerWindow({
     );
   };
   const activeSelected = selectedIds.filter((id) => !deselected.includes(id));
+  const movingFile = displayFiles.find((f) => f.id === movingChipId) ?? null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-slate-800 rounded-t-2xl sm:rounded-2xl border-0 sm:border sm:border-slate-700/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] w-full max-w-lg sm:max-w-2xl lg:max-w-4xl sm:mx-4 overflow-hidden h-[85vh] sm:h-[600px] lg:h-[680px] max-h-[90vh] flex flex-col">
+      <div className="relative bg-slate-800 rounded-t-2xl sm:rounded-2xl border-0 sm:border sm:border-slate-700/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] w-full max-w-lg sm:max-w-2xl lg:max-w-4xl sm:mx-4 overflow-hidden h-[85vh] sm:h-[600px] lg:h-[680px] max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="h-14 flex items-center justify-between gap-2 px-4 sm:px-5 border-b border-slate-700/50 flex-shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -453,7 +442,7 @@ export function UnifiedFileLinkerWindow({
                     No files selected yet — pick files in the list or upload a new one.
                   </span>
                 ) : (
-                  displayFiles.map((f, i) => renderChip(f, linkedIds.includes(f.id), i, displayFiles.length))
+                  displayFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))
                 )}
               </div>
             </div>
