@@ -167,7 +167,7 @@ export function ParagraphList({
                 onEdit={() => openEditor(paragraph.id)}
                 onDelete={() => setDeleteTarget(paragraph.id)}
                 onOpenFile={onOpenFile}
-                onAttach={() => setAttachTarget(paragraph.id)}
+                onAttach={() => { setAttachChipsView(false); setAttachTarget(paragraph.id); }}
               />
             ))}
           </div>
