@@ -60,7 +60,7 @@ export function ParagraphList({
   const [editTarget, setEditTarget] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   /** Which view the paragraph editor shows once the attach window closes. */
-  const [attachmentsView, setAttachmentsView] = useState(false);
+  const [, setAttachmentsView] = useState(false);
   /** Whether the attach dialog should open on the attached-chips view. */
   const [attachChipsView, setAttachChipsView] = useState(false);
   const newAttachParagraphId = useRef<string | null>(null);
