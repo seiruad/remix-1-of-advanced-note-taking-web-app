@@ -60,7 +60,9 @@ export function ParagraphList({
   const [editTarget, setEditTarget] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   /** Which view the paragraph editor shows once the attach window closes. */
-  const [attachmentsView, setAttachmentsView] = useState(false);
+  const [, setAttachmentsView] = useState(false);
+  /** Whether the attach dialog should open on the attached-chips view. */
+  const [attachChipsView, setAttachChipsView] = useState(false);
   const newAttachParagraphId = useRef<string | null>(null);
 
 
@@ -165,7 +167,7 @@ export function ParagraphList({
                 onEdit={() => openEditor(paragraph.id)}
                 onDelete={() => setDeleteTarget(paragraph.id)}
                 onOpenFile={onOpenFile}
-                onAttach={() => setAttachTarget(paragraph.id)}
+                onAttach={() => { setAttachChipsView(false); setAttachTarget(paragraph.id); }}
               />
             ))}
           </div>
@@ -218,13 +220,13 @@ export function ParagraphList({
         prevContext={prevContext}
         nextContext={nextContext}
         onClose={closeEditor}
-        attachmentsOpen={attachmentsView}
-        onAttachmentsOpenChange={setAttachmentsView}
+        attachmentsOpen={false}
+        onAttachmentsOpenChange={open => { setAttachChipsView(open); setAttachTarget(editingParagraph.id); }}
 
         onChange={content => setContent(editingParagraph.id, content)}
         onHeadingChange={(heading, immediate) => setHeading(editingParagraph.id, heading, immediate)}
         onFocusEditor={editor => onActiveEditorChange(editor as Editor | null)}
-        onAttach={() => setAttachTarget(editingParagraph.id)}
+        onAttach={() => { setAttachChipsView(false); setAttachTarget(editingParagraph.id); }}
         onDetach={id => attachFileToParagraph(id, null)}
         onOpenFile={file => { closeEditor(); onOpenFile(file); }}
       />}
@@ -248,6 +250,7 @@ export function ParagraphList({
 
         noteId={noteId}
         noteTitle={noteTitle}
+        initialShowAttached={attachChipsView}
 
 
 

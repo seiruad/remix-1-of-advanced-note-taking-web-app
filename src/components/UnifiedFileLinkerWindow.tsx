@@ -35,6 +35,8 @@ interface UnifiedFileLinkerWindowProps {
   paragraphId?: string | null;
   /** Files already attached to that paragraph (shown as linked). */
   paragraphFileIds?: string[];
+  /** Open directly on the attached-chips view instead of the file list. */
+  initialShowAttached?: boolean;
 }
 
 function formatFileSize(bytes: number) {
@@ -68,6 +70,7 @@ export function UnifiedFileLinkerWindow({
   existingFileIds,
   paragraphId = null,
   paragraphFileIds,
+  initialShowAttached = false,
 }: UnifiedFileLinkerWindowProps) {
   const { user } = useAuth();
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -109,7 +112,7 @@ export function UnifiedFileLinkerWindow({
     setError(null);
     setSearchQuery('');
     setSelectedIds([]);
-    setShowAttached(false);
+    setShowAttached(initialShowAttached);
     setChipOrder([]);
     setDeselected([]);
     setRemovedIds([]);
