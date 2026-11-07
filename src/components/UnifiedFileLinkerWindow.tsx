@@ -543,6 +543,44 @@ export function UnifiedFileLinkerWindow({
           </div>
           )}
         </div>
+
+        {/* Copy of the chip the user picked up with the move control, pinned to the bottom centre. */}
+        {showAttached && movingFile && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2"
+          >
+            <span
+              className={`inline-flex items-center gap-0.5 h-8 pl-1 pr-2 rounded-full border text-[11px] font-medium shadow-[0_10px_28px_rgba(0,0,0,0.55)] ${
+                deselected.includes(movingFile.id)
+                  ? 'bg-slate-800/90 border-dashed border-slate-600/70 text-slate-500'
+                  : linkedIds.includes(movingFile.id)
+                    ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-100'
+                    : 'bg-slate-700/80 border-slate-500/50 text-slate-200'
+              }`}
+            >
+              <span
+                className={`w-3.5 h-3.5 rounded border flex items-center justify-center ${
+                  deselected.includes(movingFile.id)
+                    ? 'border-slate-500'
+                    : 'bg-emerald-500 border-emerald-500'
+                }`}
+              >
+                {!deselected.includes(movingFile.id) && (
+                  <Check className="w-2.5 h-2.5 text-slate-900" />
+                )}
+              </span>
+              <span
+                className={`truncate max-w-[160px] px-1 ${
+                  deselected.includes(movingFile.id) ? 'line-through' : ''
+                }`}
+              >
+                {movingFile.filename}
+              </span>
+              <GripVertical className="w-3.5 h-3.5 opacity-60" />
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
