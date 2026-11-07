@@ -550,8 +550,8 @@ export function UnifiedFileLinkerWindow({
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center border-t border-slate-700/60 bg-slate-800 py-2.5"
           >
-            <span className="inline-flex items-center h-8 px-3 rounded-full border border-slate-500/50 bg-slate-700/80 text-[11px] font-medium text-slate-200">
-              <span className="truncate max-w-[200px]">{movingFile.filename}</span>
+            <span className="inline-flex items-center h-11 px-5 rounded-full border border-emerald-400/50 bg-emerald-500/20 text-sm font-medium text-emerald-100">
+              <span className="truncate max-w-[280px]">{movingFile.filename}</span>
             </span>
           </div>
         )}
