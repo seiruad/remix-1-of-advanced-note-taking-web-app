@@ -7,7 +7,7 @@ import {
   X,
   Link2,
   Check,
-  Move,
+  ArrowUpDown,
   ChevronsLeft,
   ArrowLeft,
   Pilcrow,
@@ -278,7 +278,7 @@ export function UnifiedFileLinkerWindow({
               : 'text-slate-400 hover:text-slate-100 hover:bg-slate-600/40'
           }`}
         >
-          <Move className="w-3.5 h-3.5" />
+          <ArrowUpDown className="w-3.5 h-3.5" />
         </button>
         <button
           type="button"
@@ -577,7 +577,7 @@ export function UnifiedFileLinkerWindow({
               >
                 {movingFile.filename}
               </span>
-              <Move className="w-3.5 h-3.5 opacity-60" />
+              <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
             </span>
           </div>
         )}
