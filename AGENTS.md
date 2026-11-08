@@ -13,4 +13,5 @@
 - New paragraph UI uses the shared Button and semantic HSL tokens so interactive states remain consistent without recoloring existing pages.
 - Note blocks are typed (`note_paragraphs.kind` = header | paragraph); a header holds only `heading`, a paragraph only content/files — keeps reading and editing layouts unambiguous.
 - Keep paragraph attachment navigation inside ParagraphEditWindow and reuse its existing file callbacks — this preserves one content model and the existing preview/link/unlink behavior.
+- Attachment chip move choices reorder the existing window-local chip order through a pure helper; they do not create a separate persisted attachment model.
 - Style the note reading canvas through dedicated semantic note color roles — this keeps its sidebar-matched surface isolated from dialogs and other pages.

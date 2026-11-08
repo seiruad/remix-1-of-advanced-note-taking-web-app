@@ -16,6 +16,8 @@ import {
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
+import { Button } from './Button';
+import { moveAttachmentChip, type ChipMoveAction } from './attachmentChipOrder';
 
 interface UnifiedFileLinkerWindowProps {
   open: boolean;
@@ -92,6 +94,7 @@ export function UnifiedFileLinkerWindow({
   const [removedIds, setRemovedIds] = useState<string[]>([]);
   /** Chip the user picked up with the move control; its copy pins to the bottom centre. */
   const [movingChipId, setMovingChipId] = useState<string | null>(null);
+  const [moveTargetId, setMoveTargetId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -118,6 +121,7 @@ export function UnifiedFileLinkerWindow({
     setDeselected([]);
     setRemovedIds([]);
     setMovingChipId(null);
+    setMoveTargetId(null);
     setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
@@ -200,6 +204,23 @@ export function UnifiedFileLinkerWindow({
     }
   };
 
+  useEffect(() => {
+    if (!movingChipId) return;
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMoveTargetId(null);
+        setMovingChipId(null);
+      }
+    };
+    const closeMenu = () => setMoveTargetId(null);
+    document.addEventListener('keydown', dismiss);
+    document.addEventListener('click', closeMenu);
+    return () => {
+      document.removeEventListener('keydown', dismiss);
+      document.removeEventListener('click', closeMenu);
+    };
+  }, [movingChipId]);
+
   if (!open) return null;
 
   const filteredFiles = files.filter((file) =>
@@ -234,61 +255,92 @@ export function UnifiedFileLinkerWindow({
   const chipBtn =
     'w-6 h-6 rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none';
 
-  const renderChip = (file: FileItem, linked: boolean) => {
+  const applyMove = (target: string, action: ChipMoveAction) => {
+    if (!movingChipId) return;
+    setChipOrder(moveAttachmentChip(orderedIds, movingChipId, target, action));
+    setMoveTargetId(null);
+    setMovingChipId(null);
+  };
+
+  const renderChip = (file: FileItem) => {
     const off = deselected.includes(file.id);
+    const moving = movingChipId === file.id;
     return (
       <span
         key={file.id}
-        className={`inline-flex items-center gap-0.5 h-8 pl-1 pr-1 rounded-full border transition-colors text-[11px] font-medium max-w-full ${
-          off
-            ? 'bg-transparent border-dashed border-slate-600/50 text-slate-500'
-            : linked
-              ? 'bg-slate-700/40 border-slate-600/30 text-slate-300'
-              : 'bg-slate-700/40 border-slate-600/30 text-slate-300'
+        data-chip-id={file.id}
+        data-moving={moving}
+        className={`relative inline-flex items-center gap-0.5 h-8 pl-1 pr-1 rounded-full border transition-colors text-[11px] font-medium max-w-full ${
+          moving ? 'bg-primary/20 border-primary/50 text-primary-foreground'
+            : off ? 'bg-transparent border-dashed border-border/50 text-muted-foreground'
+              : 'bg-muted/40 border-border/30 text-foreground/80'
         }`}
       >
-        <button
+        {!movingChipId && <Button
           type="button"
           onClick={() => toggleDeselect(file.id)}
           aria-label={off ? `Select ${file.filename}` : `Deselect ${file.filename}`}
           aria-pressed={!off}
           title={off ? 'Select' : 'Deselect'}
-          className={`${chipBtn} hover:bg-slate-600/40`}
+          className={`${chipBtn} hover:bg-muted/40`}
         >
           <span
             className={`w-3.5 h-3.5 rounded border flex items-center justify-center ${
-              off ? 'border-slate-500' : 'bg-emerald-500 border-emerald-500'
+              off ? 'border-border' : 'bg-primary border-primary'
             }`}
           >
-            {!off && <Check className="w-2.5 h-2.5 text-slate-900" />}
+            {!off && <Check className="w-2.5 h-2.5 text-background" />}
           </span>
-        </button>
+        </Button>}
         <span className={`truncate max-w-[160px] px-1 ${off ? 'line-through' : ''}`} title={file.filename}>
           {file.filename}
         </span>
-        <button
+        {movingChipId ? (
+          <Button
+            variant="subtle"
+            className="h-6 px-2 rounded-full text-[9px] shrink-0"
+            aria-label={`CLICK HERE for ${file.filename}`}
+            aria-haspopup="menu"
+            aria-expanded={moveTargetId === file.id}
+            onClick={(event) => {
+              event.stopPropagation();
+              setMoveTargetId((current) => current === file.id ? null : file.id);
+            }}
+          >CLICK HERE</Button>
+        ) : <Button
           type="button"
           onClick={() => setMovingChipId((cur) => (cur === file.id ? null : file.id))}
           aria-label={`Move ${file.filename}`}
           aria-pressed={movingChipId === file.id}
           title="Move"
-          className={`${chipBtn} ${
-            movingChipId === file.id
-              ? 'bg-emerald-500/25 text-emerald-100'
-              : 'text-slate-400 hover:text-slate-100 hover:bg-slate-600/40'
-          }`}
+          className={chipBtn}
         >
           <ArrowUpDown className="w-3.5 h-3.5" />
-        </button>
-        <button
+        </Button>}
+        {!movingChipId && <Button
           type="button"
           onClick={() => removeChip(file.id)}
           aria-label={`Remove ${file.filename} chip`}
           title="Remove chip"
-          className={`${chipBtn} text-slate-500 hover:text-red-400 hover:bg-slate-600/40`}
+          className={`${chipBtn} hover:text-destructive`}
         >
           <X className="w-3.5 h-3.5" />
-        </button>
+        </Button>}
+        {movingChipId && moveTargetId === file.id && (
+          <span role="menu" aria-label={`Move relative to ${file.filename}`}
+            className="absolute right-0 top-full mt-1 z-20 w-40 rounded-lg border border-border bg-surface p-1 flex flex-col"
+            onClick={(event) => event.stopPropagation()}>
+            {([
+              ['swap', 'Swap positions'],
+              ['before', 'Place before'],
+              ['after', 'Place after'],
+            ] as const).map(([action, label]) => (
+              <Button key={action} role="menuitem" disabled={moving}
+                className="h-9 w-full justify-start px-3 text-xs"
+                onClick={() => applyMove(file.id, action)}>{label}</Button>
+            ))}
+          </span>
+        )}
       </span>
     );
   };
@@ -436,13 +488,13 @@ export function UnifiedFileLinkerWindow({
                 {' / '}
                 {displayFiles.length}
               </p>
-              <div className="flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0">
+              <div className={`flex flex-wrap gap-1.5 content-start items-start overflow-y-auto flex-1 min-h-0 ${movingFile ? 'pb-20' : ''}`}>
                 {displayFiles.length === 0 ? (
                   <span className="inline-flex items-center h-7 px-0.5 text-[11px] text-slate-500">
                     No files selected yet — pick files in the list or upload a new one.
                   </span>
                 ) : (
-                  displayFiles.map((f) => renderChip(f, linkedIds.includes(f.id)))
+                  displayFiles.map((f) => renderChip(f))
                 )}
               </div>
             </div>
