@@ -12,12 +12,16 @@ import {
   ArrowLeft,
   Pilcrow,
   ChevronDown,
+  ArrowLeftRight,
+  ArrowUpToLine,
+  ArrowDownToLine,
 } from 'lucide-react';
 
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
 import { Button } from './Button';
+import { UnifiedMenu, type UnifiedMenuItem } from './UnifiedMenu';
 import { moveAttachmentChip, type ChipMoveAction } from './attachmentChipOrder';
 
 interface UnifiedFileLinkerWindowProps {
