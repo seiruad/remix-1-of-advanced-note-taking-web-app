@@ -258,7 +258,6 @@ export function UnifiedFileLinkerWindow({
   const applyMove = (target: string, action: ChipMoveAction) => {
     if (!movingChipId) return;
     setChipOrder(moveAttachmentChip(orderedIds, movingChipId, target, action));
-    setMoveTargetId(null);
     setMovingChipId(null);
   };
 
