@@ -243,7 +243,7 @@ export function UnifiedFileLinkerWindow({
           off
             ? 'bg-transparent border-dashed border-slate-600/50 text-slate-500'
             : linked
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+              ? 'bg-slate-700/40 border-slate-600/30 text-slate-300'
               : 'bg-slate-700/40 border-slate-600/30 text-slate-300'
         }`}
       >
