@@ -125,7 +125,6 @@ export function UnifiedFileLinkerWindow({
     setDeselected([]);
     setRemovedIds([]);
     setMovingChipId(null);
-    setMoveTargetId(null);
     setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
