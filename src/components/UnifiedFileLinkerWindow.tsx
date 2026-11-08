@@ -99,7 +99,6 @@ export function UnifiedFileLinkerWindow({
   const [removedIds, setRemovedIds] = useState<string[]>([]);
   /** Chip the user picked up with the move control; its copy pins to the bottom centre. */
   const [movingChipId, setMovingChipId] = useState<string | null>(null);
-  const [moveTargetId, setMoveTargetId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -213,16 +212,12 @@ export function UnifiedFileLinkerWindow({
     if (!movingChipId) return;
     const dismiss = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setMoveTargetId(null);
         setMovingChipId(null);
       }
     };
-    const closeMenu = () => setMoveTargetId(null);
     document.addEventListener('keydown', dismiss);
-    document.addEventListener('click', closeMenu);
     return () => {
       document.removeEventListener('keydown', dismiss);
-      document.removeEventListener('click', closeMenu);
     };
   }, [movingChipId]);
 
@@ -333,21 +328,6 @@ export function UnifiedFileLinkerWindow({
         >
           <X className="w-3.5 h-3.5" />
         </Button>}
-        {movingChipId && moveTargetId === file.id && (
-          <span role="menu" aria-label={`Move relative to ${file.filename}`}
-            className="absolute right-0 top-full mt-1 z-20 w-40 rounded-lg border border-border bg-surface p-1 flex flex-col"
-            onClick={(event) => event.stopPropagation()}>
-            {([
-              ['swap', 'Swap positions'],
-              ['before', 'Place before'],
-              ['after', 'Place after'],
-            ] as const).map(([action, label]) => (
-              <Button key={action} role="menuitem" disabled={moving}
-                className="h-9 w-full justify-start px-3 text-xs"
-                onClick={() => applyMove(file.id, action)}>{label}</Button>
-            ))}
-          </span>
-        )}
       </span>
     );
   };
