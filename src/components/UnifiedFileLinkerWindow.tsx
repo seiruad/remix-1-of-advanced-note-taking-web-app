@@ -270,6 +270,11 @@ export function UnifiedFileLinkerWindow({
   const renderChip = (file: FileItem) => {
     const off = deselected.includes(file.id);
     const moving = movingChipId === file.id;
+    const moveItems: UnifiedMenuItem[] = [
+      { id: 'swap', label: 'Swap positions', icon: ArrowLeftRight, onSelect: () => applyMove(file.id, 'swap') },
+      { id: 'before', label: 'Place before', icon: ArrowUpToLine, onSelect: () => applyMove(file.id, 'before') },
+      { id: 'after', label: 'Place after', icon: ArrowDownToLine, onSelect: () => applyMove(file.id, 'after') },
+    ];
     return (
       <span
         key={file.id}
@@ -301,18 +306,14 @@ export function UnifiedFileLinkerWindow({
           {file.filename}
         </span>
         {movingChipId ? (
-          <Button
-            variant="subtle"
-            className="h-6 w-6 rounded-full shrink-0"
-            aria-label={`Placement options for ${file.filename}`}
-            title="Placement options"
-            aria-haspopup="menu"
-            aria-expanded={moveTargetId === file.id}
-            onClick={(event) => {
-              event.stopPropagation();
-              setMoveTargetId((current) => current === file.id ? null : file.id);
-            }}
-          ><ChevronDown className="w-3.5 h-3.5" /></Button>
+          <UnifiedMenu
+            items={moveItems}
+            ariaLabel={`Placement options for ${file.filename}`}
+            triggerClassName="!rounded-full w-6 h-6 text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary/25"
+            iconClassName="w-3.5 h-3.5"
+            openTriggerClassName="!bg-primary/30 !text-primary-foreground"
+            triggerContent={<ChevronDown className="w-3.5 h-3.5" strokeWidth={2.5} />}
+          />
         ) : <Button
           type="button"
           onClick={() => setMovingChipId((cur) => (cur === file.id ? null : file.id))}
