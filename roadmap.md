@@ -1,5 +1,5 @@
 # Paragraph redesign
-- [ ] Add chip move selection, destination menus, and verify the interaction.
+- [x] Add chip move selection, destination menus, and verify the interaction.
 - [x] Replace inline editing with a read-only paragraph and right-hand action rail.
 - [x] Add popup editing for heading, body, and paragraph attachments.
 - [x] Verify reading, editing, attachment access, and menu behavior.
