@@ -11,6 +11,7 @@ import {
   ChevronsLeft,
   ArrowLeft,
   Pilcrow,
+  ChevronDown,
 } from 'lucide-react';
 
 import { supabase } from '../lib/supabase';
@@ -298,15 +299,16 @@ export function UnifiedFileLinkerWindow({
         {movingChipId ? (
           <Button
             variant="subtle"
-            className="h-6 px-2 rounded-full text-[9px] shrink-0"
-            aria-label={`CLICK HERE for ${file.filename}`}
+            className="h-6 w-6 rounded-full shrink-0"
+            aria-label={`Placement options for ${file.filename}`}
+            title="Placement options"
             aria-haspopup="menu"
             aria-expanded={moveTargetId === file.id}
             onClick={(event) => {
               event.stopPropagation();
               setMoveTargetId((current) => current === file.id ? null : file.id);
             }}
-          >CLICK HERE</Button>
+          ><ChevronDown className="w-3.5 h-3.5" /></Button>
         ) : <Button
           type="button"
           onClick={() => setMovingChipId((cur) => (cur === file.id ? null : file.id))}
