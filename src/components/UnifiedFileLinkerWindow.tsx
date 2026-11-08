@@ -12,12 +12,16 @@ import {
   ArrowLeft,
   Pilcrow,
   ChevronDown,
+  ArrowLeftRight,
+  ArrowUpToLine,
+  ArrowDownToLine,
 } from 'lucide-react';
 
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { FileItem } from '../types/database';
 import { Button } from './Button';
+import { UnifiedMenu, type UnifiedMenuItem } from './UnifiedMenu';
 import { moveAttachmentChip, type ChipMoveAction } from './attachmentChipOrder';
 
 interface UnifiedFileLinkerWindowProps {
@@ -95,7 +99,6 @@ export function UnifiedFileLinkerWindow({
   const [removedIds, setRemovedIds] = useState<string[]>([]);
   /** Chip the user picked up with the move control; its copy pins to the bottom centre. */
   const [movingChipId, setMovingChipId] = useState<string | null>(null);
-  const [moveTargetId, setMoveTargetId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -122,7 +125,6 @@ export function UnifiedFileLinkerWindow({
     setDeselected([]);
     setRemovedIds([]);
     setMovingChipId(null);
-    setMoveTargetId(null);
     setParagraphNumber(Math.floor(Math.random() * 12) + 1);
 
     loadFiles();
@@ -209,16 +211,12 @@ export function UnifiedFileLinkerWindow({
     if (!movingChipId) return;
     const dismiss = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setMoveTargetId(null);
         setMovingChipId(null);
       }
     };
-    const closeMenu = () => setMoveTargetId(null);
     document.addEventListener('keydown', dismiss);
-    document.addEventListener('click', closeMenu);
     return () => {
       document.removeEventListener('keydown', dismiss);
-      document.removeEventListener('click', closeMenu);
     };
   }, [movingChipId]);
 
@@ -259,13 +257,17 @@ export function UnifiedFileLinkerWindow({
   const applyMove = (target: string, action: ChipMoveAction) => {
     if (!movingChipId) return;
     setChipOrder(moveAttachmentChip(orderedIds, movingChipId, target, action));
-    setMoveTargetId(null);
     setMovingChipId(null);
   };
 
   const renderChip = (file: FileItem) => {
     const off = deselected.includes(file.id);
     const moving = movingChipId === file.id;
+    const moveItems: UnifiedMenuItem[] = [
+      { id: 'swap', label: 'Swap positions', icon: ArrowLeftRight, onSelect: () => applyMove(file.id, 'swap') },
+      { id: 'before', label: 'Place before', icon: ArrowUpToLine, onSelect: () => applyMove(file.id, 'before') },
+      { id: 'after', label: 'Place after', icon: ArrowDownToLine, onSelect: () => applyMove(file.id, 'after') },
+    ];
     return (
       <span
         key={file.id}
@@ -297,18 +299,14 @@ export function UnifiedFileLinkerWindow({
           {file.filename}
         </span>
         {movingChipId ? (
-          <Button
-            variant="subtle"
-            className="h-6 w-6 rounded-full shrink-0"
-            aria-label={`Placement options for ${file.filename}`}
-            title="Placement options"
-            aria-haspopup="menu"
-            aria-expanded={moveTargetId === file.id}
-            onClick={(event) => {
-              event.stopPropagation();
-              setMoveTargetId((current) => current === file.id ? null : file.id);
-            }}
-          ><ChevronDown className="w-3.5 h-3.5" /></Button>
+          <UnifiedMenu
+            items={moveItems}
+            ariaLabel={`Placement options for ${file.filename}`}
+            triggerClassName="!rounded-full w-6 h-6 text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary/25"
+            iconClassName="w-3.5 h-3.5"
+            openTriggerClassName="!bg-primary/30 !text-primary-foreground"
+            triggerContent={<ChevronDown className="w-3.5 h-3.5" strokeWidth={2.5} />}
+          />
         ) : <Button
           type="button"
           onClick={() => setMovingChipId((cur) => (cur === file.id ? null : file.id))}
@@ -328,21 +326,6 @@ export function UnifiedFileLinkerWindow({
         >
           <X className="w-3.5 h-3.5" />
         </Button>}
-        {movingChipId && moveTargetId === file.id && (
-          <span role="menu" aria-label={`Move relative to ${file.filename}`}
-            className="absolute right-0 top-full mt-1 z-20 w-40 rounded-lg border border-border bg-surface p-1 flex flex-col"
-            onClick={(event) => event.stopPropagation()}>
-            {([
-              ['swap', 'Swap positions'],
-              ['before', 'Place before'],
-              ['after', 'Place after'],
-            ] as const).map(([action, label]) => (
-              <Button key={action} role="menuitem" disabled={moving}
-                className="h-9 w-full justify-start px-3 text-xs"
-                onClick={() => applyMove(file.id, action)}>{label}</Button>
-            ))}
-          </span>
-        )}
       </span>
     );
   };
